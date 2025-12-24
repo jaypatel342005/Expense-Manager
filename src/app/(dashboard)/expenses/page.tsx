@@ -22,7 +22,7 @@ export default async function ExpensesPage() {
 
     const formattedData = data.map((expense) => ({
         ...expense,
-        Amount: expense.Amount.toNumber(), // Convert Decimal to number
+        Amount: expense.Amount.toNumber(), 
     }));
 
     const totalExpense = formattedData.reduce((sum, item) => sum + item.Amount, 0);
