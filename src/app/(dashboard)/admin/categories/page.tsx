@@ -24,7 +24,6 @@ export default async function CategoriesPage() {
     const newlyAdded = data.filter((c: categories) => new Date(c.Created) >= firstDayOfMonth).length;
     const totalCategories = data.length;
     
-    // Calculate total sub-categories across all categories
     const totalSubCategories = data.reduce((acc, curr) => acc + curr.sub_categories.length, 0);
 
     return (
