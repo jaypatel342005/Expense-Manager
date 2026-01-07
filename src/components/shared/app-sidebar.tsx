@@ -17,6 +17,7 @@ import {
     Users,
     Wallet,
 } from "lucide-react"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import {
@@ -113,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="/">
+                            <Link href="/">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Wallet className="size-4" />
                                 </div>
@@ -121,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     <span className="truncate font-semibold">Expense Manager</span>
                                     <span className="truncate text-xs">v1.0.0</span>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -138,6 +139,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
                                 // Render Collapsible for items with sub-items
                                 if (item.items && item.items.length > 0) {
+                                    if (state === "collapsed") {
+                                        return (
+                                            <SidebarMenuItem key={item.title}>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <SidebarMenuButton
+                                                            tooltip={item.title}
+                                                            isActive={isActive}
+                                                            className="hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary/10 data-[active=true]:text-primary transition-all duration-200 ease-in-out"
+                                                        >
+                                                            {item.icon && <item.icon />}
+                                                            <span>{item.title}</span>
+                                                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                                        </SidebarMenuButton>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent side="right" align="start" sideOffset={4}>
+                                                        <DropdownMenuLabel>{item.title}</DropdownMenuLabel>
+                                                        <DropdownMenuSeparator />
+                                                        {item.items.map((subItem) => (
+                                                            <DropdownMenuItem key={subItem.title} asChild>
+                                                                <Link href={subItem.url} className="w-full cursor-pointer">
+                                                                    <span>{subItem.title}</span>
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </SidebarMenuItem>
+                                        )
+                                    }
+
                                     return (
                                         <Collapsible
                                             key={item.title}
@@ -169,10 +201,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                                         isActive={isSubActive}
                                                                         className="hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary/10 data-[active=true]:text-primary transition-all duration-200 ease-in-out"
                                                                     >
-                                                                        <a href={subItem.url}>
+                                                                        <Link href={subItem.url}>
                                                                             {/* Optional: Add icons to sub-menus if desired */}
                                                                             <span>{subItem.title}</span>
-                                                                        </a>
+                                                                        </Link>
                                                                     </SidebarMenuSubButton>
                                                                 </SidebarMenuSubItem>
                                                             )
@@ -193,10 +225,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             isActive={isActive}
                                             className="hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-primary-foreground transition-all duration-200 ease-in-out"
                                         >
-                                            <a href={item.url}>
+                                            <Link href={item.url}>
                                                 {item.icon && <item.icon />}
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )

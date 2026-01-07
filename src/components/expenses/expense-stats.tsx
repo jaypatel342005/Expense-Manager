@@ -17,7 +17,7 @@ export function ExpenseStats({
 }: ExpenseStatsProps) {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
+            <Card className="bg-gradient-to-br from-red-50 to-white dark:from-red-950 dark:to-background border-red-200 dark:border-red-900">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
                     <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center dark:bg-red-900">
@@ -33,7 +33,7 @@ export function ExpenseStats({
                     </p>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-950 dark:to-background border-blue-200 dark:border-blue-900">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Transactions</CardTitle>
                     <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center dark:bg-blue-900">
@@ -47,7 +47,7 @@ export function ExpenseStats({
                     </p>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-background border-purple-200 dark:border-purple-900">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Average Expense</CardTitle>
                     <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center dark:bg-purple-900">
@@ -61,7 +61,7 @@ export function ExpenseStats({
                     </p>
                 </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-gradient-to-br from-amber-50 to-white dark:from-amber-950 dark:to-background border-amber-200 dark:border-amber-900">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Highest Entry</CardTitle>
                     <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center dark:bg-amber-900">
