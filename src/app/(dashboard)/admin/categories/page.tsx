@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { categories } from "@prisma/client"
-import { DataTable } from "@/components/ui/data-table"
-import { columns } from "./columns"
+import { CategoryGrid } from "@/components/categories/category-grid"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { PlusCircle } from "lucide-react"
@@ -60,16 +59,11 @@ export default async function CategoriesPage() {
                         <CardTitle>All Categories</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <DataTable 
-                            columns={columns} 
-                            data={data} 
-                            filterKeys={[
-                                { id: "CategoryName", title: "Name" }
-                            ]} 
-                        />
+                        <CategoryGrid data={JSON.parse(JSON.stringify(data))} />
                     </CardContent>
                 </Card>
             </div>
         </div>
     )
 }
+

@@ -26,20 +26,34 @@ export default function Loading() {
                 ))}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
-                <Card className="col-span-1">
-                    <CardHeader>
+            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-4">
+                <Card className="col-span-1 md:col-span-2 lg:col-span-4 border-0 shadow-none">
+                    <CardHeader className="px-0">
                         <Skeleton className="h-6 w-[150px]" />
                     </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <Skeleton className="h-8 w-[200px]" />
-                                <Skeleton className="h-8 w-[100px]" />
+                    <CardContent className="px-0">
+                        <div className="space-y-6">
+                            <div className="flex items-center space-x-2">
+                                <Skeleton className="h-10 w-[300px]" />
                             </div>
-                            <div className="space-y-2">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                    <Skeleton key={i} className="h-12 w-full" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <div key={i} className="flex flex-col space-y-3 rounded-xl border p-4 shadow-sm">
+                                        <div className="flex flex-row items-center justify-between">
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-5 w-[120px]" />
+                                                <Skeleton className="h-3 w-[80px]" />
+                                            </div>
+                                            <Skeleton className="h-10 w-10 rounded-full" />
+                                        </div>
+                                        <div className="space-y-2 pt-4">
+                                            <Skeleton className="h-3 w-[60px]" />
+                                            <div className="flex gap-2">
+                                                <Skeleton className="h-5 w-12 rounded-full" />
+                                                <Skeleton className="h-5 w-12 rounded-full" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
