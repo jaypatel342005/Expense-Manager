@@ -204,7 +204,7 @@ export const columns: ColumnDef<Income>[] = [
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href={`/incomes/details/${income.IncomeID}`}>
+                            <Link href={`/incomes/${income.IncomeID}`}>
                                 View Details
                             </Link>
                         </DropdownMenuItem>
