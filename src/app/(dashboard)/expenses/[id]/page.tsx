@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
@@ -23,6 +24,9 @@ function DetailItem({ title, children }: { title: string, children: React.ReactN
         </div>
     );
 }
+
+import { Logo } from "@/components/shared/logo";
+
 
 function EmptyState({ label }: { label: string }) {
     return (
@@ -146,20 +150,28 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                                 {expense.projects ? (
                                     <div className="space-y-4">
                                         <div className="flex items-start justify-between p-3 bg-muted/30 rounded-lg border border-dashed border-border/60">
-                                            <div>
-                                                <h3 className="text-base font-bold flex items-center gap-2">
-                                                    {expense.projects.ProjectName}
-                                                    {expense.projects.IsActive && (
-                                                        <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse ring-2 ring-green-500/20" />
-                                                    )}
-                                                </h3>
-                                                <p className="text-xs text-muted-foreground mt-0.5">{expense.projects.Description}</p>
+                                            <div className="flex gap-3">
+                                                 <Logo 
+                                                    path={expense.projects.ProjectLogo} 
+                                                    alt={expense.projects.ProjectName} 
+                                                    fallbackClassName="h-10 w-10 rounded-md flex items-center justify-center bg-primary/10 text-primary"
+                                                    fallbackIcon={<Briefcase className="h-5 w-5" />}
+                                                />
+                                                <div>
+                                                    <h3 className="text-base font-bold flex items-center gap-2">
+                                                        {expense.projects.ProjectName}
+                                                        {expense.projects.IsActive && (
+                                                            <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse ring-2 ring-green-500/20" />
+                                                        )}
+                                                        {expense.projects.IsActive ? (
+                                                            <Badge className="bg-green-500/15 text-green-700 dark:text-green-400 hover:bg-green-500/25 border-green-200/50 text-[10px] px-2 py-0.5">Active</Badge>
+                                                        ) : (
+                                                            <Badge variant="secondary" className="text-[10px] px-2 py-0.5">Inactive</Badge>
+                                                        )}
+                                                    </h3>
+                                                    <p className="text-xs text-muted-foreground mt-0.5">{expense.projects.Description}</p>
+                                                </div>
                                             </div>
-                                            {expense.projects.IsActive ? (
-                                                <Badge className="bg-green-500/15 text-green-700 dark:text-green-400 hover:bg-green-500/25 border-green-200/50 text-[10px] px-2 py-0.5">Active</Badge>
-                                            ) : (
-                                                <Badge variant="secondary" className="text-[10px] px-2 py-0.5">Inactive</Badge>
-                                            )}
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 text-sm mt-3">
                                             <div className="flex flex-col gap-1 p-2 rounded focus-within:bg-muted/30 hover:bg-muted/30 transition-colors">
@@ -260,9 +272,12 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                                 <div className="p-3 rounded-lg hover:bg-muted/40 transition-colors bg-gradient-to-r from-transparent to-muted/20 border border-transparent hover:border-border/50">
                                     <p className="text-[10px] text-muted-foreground mb-1.5 uppercase tracking-wider font-bold">Category</p>
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-md bg-gradient-to-br from-rose-500 to-red-600 shadow-sm flex items-center justify-center text-white text-xs font-black">
-                                            {expense.categories?.CategoryName?.charAt(0) || "U"}
-                                        </div>
+                                        <Logo 
+                                            path={expense.categories?.LogoPath} 
+                                            alt={expense.categories?.CategoryName || "Category"} 
+                                            fallbackClassName="h-10 w-10 rounded-md bg-gradient-to-br from-rose-500 to-red-600 shadow-sm flex items-center justify-center text-white text-xs font-black"
+                                            fallbackIcon={<span>{expense.categories?.CategoryName?.charAt(0) || "U"}</span>}
+                                        />
                                         <div>
                                             <span className="font-bold text-lg block leading-none mb-1">{expense.categories?.CategoryName || "Uncategorized"}</span>
                                             {expense.categories?.Description && (
@@ -275,7 +290,21 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                                 <div className="p-3 rounded-lg hover:bg-muted/40 transition-colors border border-transparent hover:border-border/50">
                                     <p className="text-[10px] text-muted-foreground mb-1.5 uppercase tracking-wider font-bold">Sub-Category</p>
                                     <div className="flex items-center gap-2">
-                                        <Layers className="h-4 w-4 text-muted-foreground" />
+                                        <Logo 
+                                            path={expense.sub_categories?.LogoPath} 
+                                            alt={expense.sub_categories?.SubCategoryName || "Sub Category"} 
+                                            fallbackClassName="hidden"
+                                            fallbackIcon={<Layers className="h-4 w-4 text-muted-foreground" />}
+                                        />
+                                        {/* If logo exists, overwrite the hidden fallback by not using it inside the component? 
+                                            Actually my Logo component always renders the div. 
+                                            Let's just use it simply: */}
+                                        <Logo
+                                            path={expense.sub_categories?.LogoPath}
+                                            alt={expense.sub_categories?.SubCategoryName || "Sub Category"}
+                                            fallbackClassName="h-6 w-6 rounded overflow-hidden flex items-center justify-center bg-muted/20"
+                                            fallbackIcon={<Layers className="h-4 w-4 text-muted-foreground" />}
+                                        />
                                         <span className="text-base font-medium">{expense.sub_categories?.SubCategoryName || "None"}</span>
                                     </div>
                                 </div>
@@ -327,6 +356,12 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                                                 </div>
                                             )}
                                         </div>
+
+                                        {expense.peoples.Description && (
+                                            <div className="pt-2 border-t border-border/50">
+                                                 <p className="text-xs text-muted-foreground italic">"{expense.peoples.Description}"</p>
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     <div className="text-center py-6 text-muted-foreground bg-muted/20 rounded-lg border border-dashed">

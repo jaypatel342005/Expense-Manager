@@ -26,6 +26,8 @@ export type Income = {
     sub_categories: { SubCategoryName: string } | null;
     projects: { ProjectName: string } | null;
     peoples: { PeopleName: string } | null;
+    Created: Date;
+    Modified: Date;
 };
 
 export const columns: ColumnDef<Income>[] = [
@@ -74,6 +76,7 @@ export const columns: ColumnDef<Income>[] = [
             return <div>{date.toDateString()}</div>;
         },
     },
+
     {
         accessorKey: "Amount",
         header: ({ column }) => {

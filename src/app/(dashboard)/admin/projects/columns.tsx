@@ -1,6 +1,6 @@
 "use client";
 
-import { IKImage } from "imagekitio-next";
+import { Logo } from "@/components/shared/logo";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -58,20 +58,13 @@ export const columns: ColumnDef<Project>[] = [
         header: "Logo",
         cell: ({ row }) => {
             const logo = row.original.ProjectLogo;
-            if (!logo) return <div className="h-10 w-10 bg-slate-100 rounded-md dark:bg-slate-800" />;
-            
-            
             return (
-                <div className="h-10 w-10 relative overflow-hidden rounded-md">
-                    <IKImage
-                        urlEndpoint={process.env.NEXT_PUBLIC_URL_ENDPOINT}
-                        {...(logo.startsWith("http") ? { src: logo } : { path: logo })}
-                        transformation={[{ height: 100, width: 100 }]}
-                        loading="lazy"
-                        className="object-cover h-full w-full"
-                        alt={row.original.ProjectName || "Project Logo"}
-                    />
-                </div>
+                <Logo
+                    path={logo}
+                    alt={row.original.ProjectName || "Project Logo"}
+                    fallbackClassName="h-10 w-10 rounded-md bg-slate-100 dark:bg-slate-800"
+                    fallbackIcon={null}
+                />
             );
         },
     },
