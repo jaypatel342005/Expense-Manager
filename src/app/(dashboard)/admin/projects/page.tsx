@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
-import { DataTable } from "@/components/ui/data-table";
-import { columns } from "./columns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProjectGrid } from "@/components/projects/project-grid";
 import { ProjectStats } from "@/components/projects/project-stats";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 
 export default async function ProjectsPage() {
     const data = await prisma.projects.findMany({
@@ -25,6 +27,14 @@ export default async function ProjectsPage() {
                         Manage and track your projects.
                     </p>
                 </div>
+                <div className="flex items-center space-x-2">
+                    <Button asChild disabled variant="default" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 dark:shadow-none">
+                        <Link href="#">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            New Project
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             <ProjectStats
@@ -34,20 +44,13 @@ export default async function ProjectsPage() {
                 completionRate={completionRate}
             />
 
-            <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
-                <Card className="col-span-1">
-                    <CardHeader>
+            <div className="mt-6">
+                <Card className="border-0 shadow-none bg-transparent md:border md:shadow-sm md:bg-card">
+                    <CardHeader className="px-0 md:px-6">
                         <CardTitle>All Projects</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                        <DataTable 
-                            columns={columns} 
-                            data={data} 
-                            filterKeys={[
-                                { id: "ProjectName", title: "Project Name" },
-                                { id: "Description", title: "Description" },
-                            ]} 
-                        />
+                    <CardContent className="px-0 md:px-6">
+                        <ProjectGrid data={data} />
                     </CardContent>
                 </Card>
             </div>

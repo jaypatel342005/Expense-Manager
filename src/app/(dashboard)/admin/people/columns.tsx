@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ArrowUpDown, Copy, Edit, Trash } from "lucide-react"
+import { MoreHorizontal, ArrowUpDown, Copy, Edit, Trash, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -13,10 +13,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { peoples } from "@prisma/client"
+import { peoples, users } from "@prisma/client"
 import Link from "next/link"
+import { Logo } from "@/components/shared/logo"
+import { User } from "lucide-react"
 
-export const columns: ColumnDef<peoples>[] = [
+export type PeopleWithUser = peoples & {
+    users: users
+}
+
+export const columns: ColumnDef<PeopleWithUser>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -52,6 +58,23 @@ export const columns: ColumnDef<peoples>[] = [
                     Name
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const user = row.original.users;
+            const name = row.getValue("PeopleName") as string;
+            return (
+                <div className="flex items-center gap-3">
+                     <div className="h-9 w-9 min-w-[2.25rem]">
+                        <Logo 
+                            path={user?.ProfileImage} 
+                            alt={name} 
+                            fallbackClassName="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border"
+                            fallbackIcon={<User className="h-4 w-4" />}
+                        />
+                    </div>
+                    <span className="font-medium">{name}</span>
+                </div>
             )
         },
     },
@@ -105,11 +128,11 @@ export const columns: ColumnDef<peoples>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(person.PeopleID.toString())}
-                        >
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copy ID
+                        <DropdownMenuItem asChild>
+                            <Link href={`/admin/people/${person.PeopleID}`}>
+                                <FileText className="mr-2 h-4 w-4" />
+                                Detail
+                            </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>

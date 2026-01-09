@@ -12,6 +12,9 @@ export default async function PeoplePage() {
     const data = await prisma.peoples.findMany({
         orderBy: {
             PeopleName: 'asc'
+        },
+        include: {
+            users: true
         }
     });
 
