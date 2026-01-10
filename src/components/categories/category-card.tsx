@@ -1,4 +1,3 @@
-"use client"
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -102,10 +101,11 @@ export function CategoryCard({ category }: CategoryCardProps) {
             </div>
 
             <CardContent className="pt-2 pb-5 px-5 space-y-5 relative z-10">
+                <Link href={`/admin/categories/${category.CategoryID}`} className="block h-full group/link">
                 {/* Hero Section: Logo & Name */}
                 <div className="flex items-center gap-3 sm:gap-4">
                     <div className={cn(
-                        "p-1 rounded-2xl shadow-sm border",
+                        "p-1 rounded-2xl shadow-sm border transition-colors group-hover/link:border-primary/30",
                          isExpense ? "bg-gradient-to-br from-red-50 to-white border-red-100 dark:from-red-950/20 dark:to-slate-950 dark:border-red-900/30" : 
                          isIncome ? "bg-gradient-to-br from-emerald-50 to-white border-emerald-100 dark:from-emerald-950/20 dark:to-slate-950 dark:border-emerald-900/30" : 
                          "bg-gradient-to-br from-slate-50 to-white border-slate-100 dark:from-slate-900/20 dark:to-slate-950 dark:border-slate-800"
@@ -128,7 +128,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                     </div>
                     
                     <div className="space-y-1 min-w-0 flex-1">
-                        <CardTitle className="text-base sm:text-lg font-bold tracking-tight text-foreground line-clamp-1 transition-all duration-300">
+                        <CardTitle className="text-base sm:text-lg font-bold tracking-tight text-foreground line-clamp-1 transition-all duration-300 group-hover/link:text-primary">
                             {category.CategoryName}
                         </CardTitle>
                         <div className="flex items-center gap-2 text-xs">
@@ -149,7 +149,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="grid grid-cols-2 gap-2 text-xs mt-5">
                     <div className={cn(
                         "p-1 rounded-lg border shadow-sm transition-colors",
                         isExpense ? "bg-gradient-to-br from-red-50/50 to-transparent border-red-100/50 dark:from-red-950/10 dark:border-red-900/20" : 
@@ -182,7 +182,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                 
                 {/* Sub-Categories List */}
                 {category.sub_categories && category.sub_categories.length > 0 && (
-                     <div className="pt-1">
+                     <div className="pt-1 mt-5">
                         <div className="flex flex-wrap gap-1.5">
                             {category.sub_categories.slice(0, 3).map((sub) => (
                                 <span 
@@ -200,6 +200,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                         </div>
                     </div>
                 )}
+                </Link>
             </CardContent>
         </Card>
     )
