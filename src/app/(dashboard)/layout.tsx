@@ -21,8 +21,10 @@ import {
 
 export default function DashboardLayout({
     children,
+    modal,
 }: {
     children: React.ReactNode;
+    modal: React.ReactNode;
 }) {
     const pathname = usePathname();
     const breadcrumbSegments = pathname === "/" ? [] : pathname.split("/").filter((segment) => segment);
@@ -69,6 +71,7 @@ export default function DashboardLayout({
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                     {children}
+                    {modal}
                 </div>
             </SidebarInset>
         </SidebarProvider>

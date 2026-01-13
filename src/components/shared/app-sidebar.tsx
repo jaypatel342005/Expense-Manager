@@ -106,7 +106,7 @@ const navItems: { group: string; items: NavItem[] }[] = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const pathname = usePathname()
-    const { state } = useSidebar()
+    const { state, isMobile, setOpenMobile } = useSidebar()
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -114,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/">
+                            <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                     <Wallet className="size-4" />
                                 </div>
@@ -159,7 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                         <DropdownMenuSeparator />
                                                         {item.items.map((subItem) => (
                                                             <DropdownMenuItem key={subItem.title} asChild>
-                                                                <Link href={subItem.url} className="w-full cursor-pointer">
+                                                                <Link href={subItem.url} className="w-full cursor-pointer" onClick={() => isMobile && setOpenMobile(false)}>
                                                                     <span>{subItem.title}</span>
                                                                 </Link>
                                                             </DropdownMenuItem>
@@ -201,7 +201,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                                                         isActive={isSubActive}
                                                                         className="hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary/10 data-[active=true]:text-primary transition-all duration-200 ease-in-out"
                                                                     >
-                                                                        <Link href={subItem.url}>
+                                                                        <Link href={subItem.url} onClick={() => isMobile && setOpenMobile(false)}>
                                                                             {/* Optional: Add icons to sub-menus if desired */}
                                                                             <span>{subItem.title}</span>
                                                                         </Link>
@@ -225,7 +225,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             isActive={isActive}
                                             className="hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-primary-foreground transition-all duration-200 ease-in-out"
                                         >
-                                            <Link href={item.url}>
+                                            <Link href={item.url} onClick={() => isMobile && setOpenMobile(false)}>
                                                 {item.icon && <item.icon />}
                                                 <span>{item.title}</span>
                                             </Link>

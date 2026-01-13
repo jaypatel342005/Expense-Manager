@@ -234,16 +234,21 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                                                     </div>
                                                     <div className="space-y-0.5">
                                                         <p className="text-sm font-semibold truncate max-w-[180px] sm:max-w-xs group-hover/file:text-blue-600 transition-colors">
-                                                            {expense.AttachmentPath}
+                                                            {expense.AttachmentPath.split(/[/\\]/).pop()}
                                                         </p>
                                                         <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                             Attached Document 
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5 text-muted-foreground group-hover/file:text-foreground">
-                                                    <ExternalLink className="h-3.5 w-3.5" />
-                                                    Open
+                                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5 text-muted-foreground group-hover/file:text-foreground" asChild>
+                                                    <Link 
+                                                        href={`/view-attachment/expense/${expense.ExpenseID}`} 
+                                                        scroll={false}
+                                                    >
+                                                        <ExternalLink className="h-3.5 w-3.5" />
+                                                        Open
+                                                    </Link>
                                                 </Button>
                                             </div>
                                         </div>

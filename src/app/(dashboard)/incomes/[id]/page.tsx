@@ -234,16 +234,18 @@ export default async function IncomeDetailPage({ params }: { params: Promise<{ i
                                                     </div>
                                                     <div className="space-y-0.5">
                                                         <p className="text-sm font-semibold truncate max-w-[180px] sm:max-w-xs group-hover/file:text-blue-600 transition-colors">
-                                                            {income.AttachmentPath}
+                                                            {income.AttachmentPath.split(/[/\\]/).pop()}
                                                         </p>
                                                         <p className="text-[10px] text-muted-foreground flex items-center gap-1">
                                                             Attached Document 
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5 text-muted-foreground group-hover/file:text-foreground">
-                                                    <ExternalLink className="h-3.5 w-3.5" />
-                                                    Open
+                                                <Button variant="ghost" size="sm" className="h-7 text-xs gap-1.5 text-muted-foreground group-hover/file:text-foreground" asChild>
+                                                    <Link href={`/view-attachment/income/${income.IncomeID}`} scroll={false}>
+                                                        <ExternalLink className="h-3.5 w-3.5" />
+                                                        Open
+                                                    </Link>
                                                 </Button>
                                             </div>
                                         </div>

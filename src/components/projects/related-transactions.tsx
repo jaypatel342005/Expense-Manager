@@ -3,10 +3,11 @@
 
 import { format } from "date-fns";
 import { ArrowUpRight, ArrowDownLeft, Calendar, ArrowRightLeft } from "lucide-react";
+import Link from "next/link";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 
@@ -43,15 +44,15 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                             </div>
                         ) : (
                             <ScrollArea className="h-[400px] md:h-[500px] lg:h-[600px] rounded-md border bg-background w-full">
-                                <div className="p-3 grid gap-2">
+                                <div className="p-3 grid gap-2 w-max min-w-full">
                                     {expenses.map((expense) => (
-                                        <div key={expense.ExpenseID} className="flex items-center justify-between p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer gap-2 w-full">
-                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                        <Link href={`/expenses/${expense.ExpenseID}`} key={expense.ExpenseID} className="flex items-center gap-32 p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer w-full">
+                                            <div className="flex items-center gap-2.5 min-w-0">
                                                 <div className="h-8 w-8 rounded-md bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                                                     <ArrowUpRight className="h-4 w-4" />
                                                 </div>
-                                                <div className="min-w-0 flex-1 pr-2">
-                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
+                                                <div className="min-w-0 w-[140px] sm:w-[200px] shrink-0 pr-2">
+                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate">
                                                         {expense.ExpenseDetail || expense.categories?.CategoryName || "Expense"}
                                                     </p>
                                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 min-w-0">
@@ -71,14 +72,15 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                                                 </div>
                                             </div>
 
-                                            <div className="text-right shrink-0 pl-1">
+                                            <div className="text-right shrink-0 pl-1 w-[80px] sm:w-[100px]">
                                                 <p className="font-bold text-sm sm:text-base text-rose-600 dark:text-rose-400 whitespace-nowrap">
                                                     -{formatCurrency(Number(expense.Amount))}
                                                 </p>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
+                                <ScrollBar orientation="horizontal" />
                             </ScrollArea>
                         )}
                     </TabsContent>
@@ -90,15 +92,15 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                             </div>
                         ) : (
                              <ScrollArea className="h-[400px] md:h-[500px] lg:h-[600px] rounded-md border bg-background w-full">
-                                <div className="p-3 grid gap-2">
+                                <div className="p-3 grid gap-2 w-max min-w-full">
                                     {incomes.map((income) => (
-                                        <div key={income.IncomeID} className="flex items-center justify-between p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer gap-2 w-full">
-                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                        <Link href={`/incomes/${income.IncomeID}`} key={income.IncomeID} className="flex items-center gap-32 p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer w-full">
+                                            <div className="flex items-center gap-2.5 min-w-0">
                                                 <div className="h-8 w-8 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
                                                     <ArrowDownLeft className="h-4 w-4" />
                                                 </div>
-                                                <div className="min-w-0 flex-1 pr-2">
-                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
+                                                <div className="min-w-0 w-[140px] sm:w-[200px] shrink-0 pr-2">
+                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate">
                                                         {income.IncomeDetail || income.categories?.CategoryName || "Income"}
                                                     </p>
                                                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 min-w-0">
@@ -118,14 +120,15 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                                                 </div>
                                             </div>
 
-                                            <div className="text-right shrink-0 pl-1">
+                                            <div className="text-right shrink-0 pl-1 w-[80px] sm:w-[100px]">
                                                 <p className="font-bold text-sm sm:text-base text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                                                     +{formatCurrency(Number(income.Amount))}
                                                 </p>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
+                                <ScrollBar orientation="horizontal" />
                              </ScrollArea>
                         )}
                     </TabsContent>

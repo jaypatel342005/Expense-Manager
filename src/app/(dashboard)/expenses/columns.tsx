@@ -162,19 +162,7 @@ export const columns: ColumnDef<Expense>[] = [
             </div>
         ),
     },
-    {
-        accessorKey: "AttachmentPath",
-        header: "Attachment",
-        cell: ({ row }) => {
-            const path = row.getValue("AttachmentPath") as string;
-            if (!path) return <div className="text-muted-foreground">-</div>;
-            return (
-                <div className="truncate max-w-[150px]" title={path}>
-                    {path}
-                </div>
-            );
-        },
-    },
+
     {
         id: "actions",
         cell: ({ row }) => {
