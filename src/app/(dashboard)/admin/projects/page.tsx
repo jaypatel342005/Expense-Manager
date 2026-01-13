@@ -1,20 +1,23 @@
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+
 import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/serialization";
+
 import { ProjectGrid } from "@/components/projects/project-grid";
 import { ProjectStats } from "@/components/projects/project-stats";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
-import { PlusCircle } from "lucide-react";
 
 export default async function ProjectsPage() {
-    const data = await prisma.projects.findMany({
+    const projectsList = await prisma.projects.findMany({
         orderBy: {
             Created: 'desc'
         }
     });
 
-    const totalProjects = data.length;
-    const activeProjects = data.filter(p => p.IsActive).length;
+    const totalProjects = projectsList.length;
+    const activeProjects = projectsList.filter(p => p.IsActive).length;
     const completedProjects = totalProjects - activeProjects;
     const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
 
@@ -50,7 +53,7 @@ export default async function ProjectsPage() {
                         <CardTitle>All Projects</CardTitle>
                     </CardHeader>
                     <CardContent className="px-0 md:px-6">
-                        <ProjectGrid data={data} />
+                        <ProjectGrid data={serializeData(projectsList)} />
                     </CardContent>
                 </Card>
             </div>

@@ -1,15 +1,19 @@
-import { prisma } from "@/lib/prisma"
-import { peoples } from "@prisma/client"
-import { DataTable } from "@/components/ui/data-table"
-import { columns } from "./columns"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { PlusCircle } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PeopleStats } from "@/components/people/people-stats"
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+import { peoples } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/serialization";
+
+import { DataTable } from "@/components/ui/data-table";
+import { columns } from "./columns";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PeopleStats } from "@/components/people/people-stats";
 
 export default async function PeoplePage() {
-    const data = await prisma.peoples.findMany({
+    // Fetch all people sorted by name, including associated users for details
+    const peopleList = await prisma.peoples.findMany({
         orderBy: {
             PeopleName: 'asc'
         },
@@ -21,10 +25,10 @@ export default async function PeoplePage() {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const activePeople = data.filter((p: peoples) => p.IsActive).length;
-    const inactivePeople = data.filter((p: peoples) => !p.IsActive).length;
-    const newlyAdded = data.filter((p: peoples) => new Date(p.Created) >= firstDayOfMonth).length;
-    const totalPeople = data.length;
+    const activePeople = peopleList.filter((p: peoples) => p.IsActive).length;
+    const inactivePeople = peopleList.filter((p: peoples) => !p.IsActive).length;
+    const newlyAdded = peopleList.filter((p: peoples) => new Date(p.Created) >= firstDayOfMonth).length;
+    const totalPeople = peopleList.length;
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -61,7 +65,7 @@ export default async function PeoplePage() {
                     <CardContent>
                         <DataTable 
                             columns={columns} 
-                            data={data} 
+                            data={serializeData(peopleList)} 
                             filterKeys={[
                                 { id: "PeopleName", title: "Name" },
                                 { id: "MobileNo", title: "Mobile" }

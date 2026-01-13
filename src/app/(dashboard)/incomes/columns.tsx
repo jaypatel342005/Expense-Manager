@@ -4,20 +4,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ActionMenu } from "@/components/shared/action-menu";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
 export type Income = {
     IncomeID: number;
-    IncomeDate: Date;
+    IncomeDate: string;
     Amount: number;
     IncomeDetail: string | null;
     Description: string | null;
@@ -26,8 +19,8 @@ export type Income = {
     sub_categories: { SubCategoryName: string } | null;
     projects: { ProjectName: string } | null;
     peoples: { PeopleName: string } | null;
-    Created: Date;
-    Modified: Date;
+    Created: string;
+    Modified: string;
 };
 
 export const columns: ColumnDef<Income>[] = [
@@ -189,30 +182,11 @@ export const columns: ColumnDef<Income>[] = [
             const income = row.original;
 
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() =>
-                                navigator.clipboard.writeText(income.IncomeID.toString())
-                            }
-                        >
-                            Copy Income ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/incomes/${income.IncomeID}`}>
-                                View Details
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <ActionMenu
+                    align="end"
+                    viewHref={`/incomes/${income.IncomeID}`}
+                    className="h-8 w-8 p-0"
+                />
             );
         },
     },

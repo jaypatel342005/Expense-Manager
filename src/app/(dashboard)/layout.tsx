@@ -25,7 +25,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const paths = pathname === "/" ? [] : pathname.split("/").filter((path) => path);
+    const breadcrumbSegments = pathname === "/" ? [] : pathname.split("/").filter((segment) => segment);
 
     return (
         <SidebarProvider>
@@ -41,13 +41,13 @@ export default function DashboardLayout({
                                     Dashboard
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
-                            {paths.map((path, index) => {
-                                const href = `/${paths.slice(0, index + 1).join("/")}`;
-                                const isLast = index === paths.length - 1;
-                                const title = path.charAt(0).toUpperCase() + path.slice(1);
+                            {breadcrumbSegments.map((segment, index) => {
+                                const href = `/${breadcrumbSegments.slice(0, index + 1).join("/")}`;
+                                const isLast = index === breadcrumbSegments.length - 1;
+                                const title = segment.charAt(0).toUpperCase() + segment.slice(1);
 
                                 return (
-                                    <React.Fragment key={path}>
+                                    <React.Fragment key={segment}>
                                         <BreadcrumbSeparator className="hidden md:block" />
                                         <BreadcrumbItem>
                                             {isLast ? (

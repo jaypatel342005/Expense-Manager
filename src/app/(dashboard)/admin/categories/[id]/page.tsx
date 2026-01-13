@@ -17,6 +17,10 @@ interface PageProps {
 export default async function CategoryDetailPage({ params }: PageProps) {
     const { id: idParam } = await params
     const id = parseInt(idParam)
+    
+    // Preliminary verification delay
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
     if (isNaN(id)) notFound()
 
     const category = await prisma.categories.findUnique({

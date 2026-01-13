@@ -1,7 +1,8 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { TrendingDown, TrendingUp, Wallet } from "lucide-react";
+
+import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency, cn } from "@/lib/utils";
 
 interface CategoryFinancialsProps {

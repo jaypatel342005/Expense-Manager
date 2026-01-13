@@ -1,14 +1,19 @@
-import { prisma } from "@/lib/prisma";
-import { DataTable } from "@/components/ui/data-table";
-import { columns } from "./columns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+
+import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/serialization";
+import { Expense } from "./columns";
+
+import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseStats } from "@/components/expenses/expense-stats";
+import { columns } from "./columns";
 
 export default async function ExpensesPage() {
-    const data = await prisma.expenses.findMany({
+    // Fetch expenses with all related data for display
+    const rawExpenses = await prisma.expenses.findMany({
         orderBy: {
             ExpenseDate: 'desc'
         },
@@ -20,15 +25,12 @@ export default async function ExpensesPage() {
         }
     });
 
-    const formattedData = data.map((expense) => ({
-        ...expense,
-        Amount: expense.Amount.toNumber(), 
-    }));
+    const expensesList = serializeData(rawExpenses) as unknown as Expense[];
 
-    const totalExpense = formattedData.reduce((sum, item) => sum + item.Amount, 0);
-    const expenseCount = formattedData.length;
+    const totalExpense = expensesList.reduce((sum, item) => sum + item.Amount, 0);
+    const expenseCount = expensesList.length;
     const averageExpense = expenseCount > 0 ? totalExpense / expenseCount : 0;
-    const highestExpense = formattedData.reduce((max, item) => Math.max(max, item.Amount), 0);
+    const highestExpense = expensesList.reduce((max, item) => Math.max(max, item.Amount), 0);
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -64,7 +66,7 @@ export default async function ExpensesPage() {
                     <CardContent>
                         <DataTable 
                             columns={columns} 
-                            data={formattedData} 
+                            data={expensesList} 
                             filterKeys={[
                                 { id: "Category", title: "Category" },
                                 { id: "Description", title: "Description" },

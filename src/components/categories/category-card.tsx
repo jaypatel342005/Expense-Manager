@@ -1,7 +1,6 @@
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { categories, sub_categories } from "@prisma/client"
 import { 
     MoreHorizontal, 
     Edit, 
@@ -15,18 +14,19 @@ import {
     Tag,
     Layers
 } from "lucide-react"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import Link from "next/link"
-import { categories, sub_categories } from "@prisma/client"
+
 import { cn } from "@/lib/utils"
 import { Logo } from "@/components/shared/logo"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { 
+    Card, 
+    CardContent, 
+    CardFooter, 
+    CardHeader, 
+    CardTitle 
+} from "@/components/ui/card"
+import { ActionMenu } from "@/components/shared/action-menu"
 
 export type CategoryWithSubCategories = categories & {
     sub_categories: sub_categories[]
@@ -70,34 +70,14 @@ export function CategoryCard({ category }: CategoryCardProps) {
                     {isExpense ? "Expense" : isIncome ? "Income" : "Other"}
                 </Badge>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full bg-white/50 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-900 shadow-sm backdrop-blur-sm -mr-1">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(category.CategoryID.toString())}
-                        >
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copy ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/admin/categories/${category.CategoryID}`}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <ActionMenu
+                    align="end"
+                    editHref={`/admin/categories/${category.CategoryID}`}
+                    editLabel="Edit Category"
+                    onDelete={() => {}} // TODO: Add delete functionality or pass handler
+                    deleteLabel="Delete Category"
+                    className="h-7 w-7 bg-white/50 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-900 shadow-sm backdrop-blur-sm -mr-1"
+                />
             </div>
 
             <CardContent className="pt-2 pb-5 px-5 space-y-5 relative z-10">

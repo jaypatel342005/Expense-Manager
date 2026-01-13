@@ -1,10 +1,11 @@
 
 "use client";
 
+import { Tags } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/utils";
-import { Tags } from "lucide-react";
 
 interface ProjectExpenseBreakdownProps {
     expenses: any[];

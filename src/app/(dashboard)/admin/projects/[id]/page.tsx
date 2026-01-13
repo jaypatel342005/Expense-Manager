@@ -65,9 +65,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 </section>
 
                 {/* Main Content Grid 2 columns */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 pb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
                     {/* Left Column: Project Info & Analytics (3 cols - 60%) */}
-                    <div className="lg:col-span-3 flex flex-col gap-6">
+                    <div className="lg:col-span-1 flex flex-col gap-6">
                          {/* About Project */}
                          <Card className="shadow-md bg-gradient-to-br from-white/90 to-muted/50 dark:from-card/90 dark:to-muted/20 backdrop-blur-xl relative overflow-hidden transition-all hover:shadow-lg group border border-transparent hover:border-primary/30">
                             <div className="absolute top-0 right-0 p-4 opacity-50">
@@ -145,7 +145,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                     </div>
 
                     {/* Right Column: Transactions (2 col - 40%) */}
-                    <div className="lg:col-span-2 h-full min-h-0">
+                    <div className="lg:col-span-1 h-full min-h-0">
                         <RelatedTransactions expenses={serializedProject.expenses} incomes={serializedProject.incomes} />
                     </div>
                 </div>

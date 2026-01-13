@@ -1,20 +1,24 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Folder, Tag, Plus, Calendar, ArrowUpRight, ArrowDownLeft, Calculator, TrendingUp, Clock, Percent, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { format } from "date-fns";
+import { 
+    Folder, Tag, Plus, Calendar, ArrowUpRight, ArrowDownLeft, 
+    Calculator, TrendingUp, Clock, Percent, MoreHorizontal, 
+    Pencil, Trash2 
+} from "lucide-react";
+
+import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
-import { format } from "date-fns";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+    Card, 
+    CardContent, 
+    CardHeader, 
+    CardTitle, 
+    CardDescription 
+} from "@/components/ui/card";
+import { ActionMenu } from "@/components/shared/action-menu";
 
 interface SubCategoryListProps {
     subCategories: any[];
@@ -85,8 +89,16 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: 
                                         {/* Top Row: Identity & Actions */}
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                <div className="h-10 w-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/50 group-hover/item:scale-110 transition-transform shrink-0">
-                                                    <Tag className="h-5 w-5" />
+                                                <div className="h-10 w-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 dark:bg-indigo-950/30 dark:border-indigo-900/50 group-hover/item:scale-110 transition-transform shrink-0 overflow-hidden">
+                                                    {sub.LogoPath ? (
+                                                        <img 
+                                                            src={sub.LogoPath} 
+                                                            alt={sub.SubCategoryName} 
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <Tag className="h-5 w-5" />
+                                                    )}
                                                 </div>
                                                 <div className="space-y-0.5 min-w-0">
                                                     <div className="flex items-center gap-2">
@@ -118,23 +130,14 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: 
                                                     )}
                                                 </div>
 
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2 rounded-full hover:bg-muted">
-                                                            <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem>
-                                                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-destructive focus:text-destructive">
-                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <ActionMenu
+                                                    align="end"
+                                                    editHref="#" // TODO: Add subcategory edit
+                                                    editLabel="Edit Sub-Category"
+                                                    onDelete={() => {}} // TODO: Add delete
+                                                    deleteLabel="Delete Sub-Category"
+                                                    className="h-8 w-8 -mr-2 rounded-full hover:bg-muted"
+                                                />
                                             </div>
                                         </div>
 

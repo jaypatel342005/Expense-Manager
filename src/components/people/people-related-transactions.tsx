@@ -1,14 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatCurrency } from "@/lib/utils";
-import { format } from "date-fns";
-import { ArrowUpRight, ArrowDownLeft, FileText, Calendar, Tag, Folder, ArrowRightLeft } from "lucide-react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { 
+    ArrowUpRight, ArrowDownLeft, FileText, 
+    Calendar, Tag, Folder, ArrowRightLeft 
+} from "lucide-react";
+
+import { cn, formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PeopleRelatedTransactionsProps {
     expenses: any[];

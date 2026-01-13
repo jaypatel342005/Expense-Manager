@@ -1,17 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowLeft, MoreVertical, Pencil, Trash2, User } from "lucide-react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ActionMenu } from "@/components/shared/action-menu";
 import { Logo } from "@/components/shared/logo";
-import { ArrowLeft, MoreVertical, Pencil, Trash2, User } from "lucide-react";
-import Link from "next/link";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface PeopleDetailHeaderProps {
     person: {
@@ -80,24 +75,14 @@ export function PeopleDetailHeader({ person }: PeopleDetailHeaderProps) {
                         <Pencil className="h-3.5 w-3.5 mr-1.5" />
                         Edit Details
                     </Button>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem>
-                                <Pencil className="mr-2 h-4 w-4" />
-                                Edit Person
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Person
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                <ActionMenu
+                     align="end"
+                     editHref="#" // TODO: Add real edit link
+                     editLabel="Edit Person"
+                     onDelete={() => {}}
+                     deleteLabel="Delete Person"
+                     className="h-8 w-8"
+                />
                 </div>
             </div>
         </div>

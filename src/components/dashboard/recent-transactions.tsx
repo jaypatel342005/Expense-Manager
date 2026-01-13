@@ -1,3 +1,6 @@
+import { format } from "date-fns"
+import { ArrowDownRight, ArrowUpRight } from "lucide-react"
+
 import {
     Avatar,
     AvatarFallback,
@@ -12,8 +15,6 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Transaction } from "@/types/dashboard"
-import { format } from "date-fns"
-import { ArrowDownRight, ArrowUpRight } from "lucide-react"
 
 // Mock Data matching Schema
 const recentTransactions: Transaction[] = [

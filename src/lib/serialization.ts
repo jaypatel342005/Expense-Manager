@@ -1,8 +1,4 @@
-/**
- * Serializes data to be passed from Server Components to Client Components.
- * Converts Decimal to number and Date to ISO string.
- * This is necessary because Next.js cannot serialize complex objects like Decimal directly.
- */
+
 export function serializeData<T>(data: T): T {
     if (data === null || data === undefined) {
         return data;
@@ -12,9 +8,7 @@ export function serializeData<T>(data: T): T {
         if (data instanceof Date) {
             return data.toISOString() as any;
         }
-
-        // Check for Decimal (Prisma/Decimal.js) using duck typing
-        // We check for .toNumber() and .toFixed() which are characteristic of Decimal types
+        
         const asAny = data as any;
         if (
             asAny &&

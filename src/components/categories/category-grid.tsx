@@ -1,15 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { CategoryCard, CategoryWithSubCategories } from "./category-card"
-import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
+
+import { Input } from "@/components/ui/input"
+import { CategoryCard, CategoryWithSubCategories } from "./category-card"
 
 interface CategoryGridProps {
     data: CategoryWithSubCategories[]
 }
 
 export function CategoryGrid({ data }: CategoryGridProps) {
+    // State to act as a search filter for categories and sub-categories
     const [searchQuery, setSearchQuery] = useState("")
 
     const filteredData = data.filter((category) => {

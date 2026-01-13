@@ -1,10 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Calendar, Clock, CheckCircle2, FileText, Layers, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import { 
+    Info, Calendar, Clock, CheckCircle2, FileText, 
+    Layers, TrendingDown, TrendingUp, Wallet 
+} from "lucide-react";
+
 import { formatCurrency } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface CategoryInfoProps {
     category: any;

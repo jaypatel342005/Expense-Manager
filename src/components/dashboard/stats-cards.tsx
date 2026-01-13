@@ -1,10 +1,11 @@
+import { DollarSign, Wallet, ArrowUpRight, ArrowDownRight, CreditCard, Activity } from "lucide-react"
+
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { DollarSign, Wallet, ArrowUpRight, ArrowDownRight, CreditCard, Activity } from "lucide-react"
 
 export function StatsCards() {
     return (

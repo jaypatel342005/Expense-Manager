@@ -1,14 +1,19 @@
-import { prisma } from "@/lib/prisma";
-import { DataTable } from "@/components/ui/data-table";
-import { columns } from "./columns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+
+import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/serialization";
+import { Income } from "./columns";
+
+import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IncomeStats } from "@/components/incomes/income-stats";
+import { columns } from "./columns";
 
 export default async function IncomesPage() {
-    const data = await prisma.incomes.findMany({
+    // Fetch incomes with all related data for display
+    const rawIncomes = await prisma.incomes.findMany({
         orderBy: {
             IncomeDate: 'desc'
         },
@@ -20,15 +25,12 @@ export default async function IncomesPage() {
         }
     });
 
-    const formattedData = data.map((income) => ({
-        ...income,
-        Amount: income.Amount.toNumber(), // Convert Decimal to number
-    }));
+    const incomesList = serializeData(rawIncomes) as unknown as Income[];
 
-    const totalIncome = formattedData.reduce((sum, item) => sum + item.Amount, 0);
-    const incomeCount = formattedData.length;
+    const totalIncome = incomesList.reduce((sum, item) => sum + item.Amount, 0);
+    const incomeCount = incomesList.length;
     const averageIncome = incomeCount > 0 ? totalIncome / incomeCount : 0;
-    const highestIncome = formattedData.reduce((max, item) => Math.max(max, item.Amount), 0);
+    const highestIncome = incomesList.reduce((max, item) => Math.max(max, item.Amount), 0);
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -64,7 +66,7 @@ export default async function IncomesPage() {
                     <CardContent>
                         <DataTable 
                             columns={columns} 
-                            data={formattedData} 
+                            data={incomesList} 
                             filterKeys={[
                                 { id: "Category", title: "Category" },
                                 { id: "Description", title: "Description" },

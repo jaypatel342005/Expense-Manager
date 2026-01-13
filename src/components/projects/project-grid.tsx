@@ -2,9 +2,9 @@
 "use client"
 
 import { useState } from "react"
-import { ProjectCard, ProjectCardProps } from "./project-card"
-import { Input } from "@/components/ui/input"
 import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react"
+
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -16,6 +16,8 @@ import {
     DropdownMenuRadioGroup,
     DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
+
+import { ProjectCard, ProjectCardProps } from "./project-card"
 
 interface ProjectGridProps {
     data: ProjectCardProps['project'][]

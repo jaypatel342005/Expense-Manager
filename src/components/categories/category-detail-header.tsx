@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash, Folder } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, Edit, Trash, Folder } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { CardDescription, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,8 +23,16 @@ export function CategoryDetailHeader({ category }: CategoryDetailHeaderProps) {
                         <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                     </Button>
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 shadow-sm">
+                        <div className="h-10 w-10 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 shadow-sm overflow-hidden">
+                            {category.LogoPath ? (
+                            <img 
+                                src={category.LogoPath} 
+                                alt={category.CategoryName} 
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
                             <Folder className="h-5 w-5" />
+                        )}
                         </div>
                         <div>
                             <div className="flex items-center gap-2">

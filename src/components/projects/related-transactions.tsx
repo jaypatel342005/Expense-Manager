@@ -1,14 +1,14 @@
 
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import { ArrowUpRight, ArrowDownLeft, Calendar, ArrowRightLeft } from "lucide-react";
-import Link from "next/link";
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/utils";
 
 interface RelatedTransactionsProps {
     expenses: any[];
@@ -43,40 +43,40 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                             </div>
                         ) : (
                             <ScrollArea className="h-[400px] md:h-[500px] lg:h-[600px] rounded-md border bg-background w-full">
-                                <div className="p-4 grid gap-3">
+                                <div className="p-3 grid gap-2">
                                     {expenses.map((expense) => (
-                                        <Link key={expense.ExpenseID} href={`/expenses/${expense.ExpenseID}`} className="block group">
-                                            <div className="flex items-center justify-between gap-2 p-3 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md">
-                                                <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                    <div className="h-9 w-9 rounded bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                                                        <ArrowUpRight className="h-5 w-5" />
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="font-medium text-sm group-hover:text-primary transition-colors truncate">
-                                                            {expense.ExpenseDetail || expense.categories?.CategoryName || "Expense"}
-                                                        </p>
-                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                            <span className="flex items-center gap-1">
-                                                                <Calendar className="h-3 w-3" />
-                                                                {format(new Date(expense.ExpenseDate), "MMM d")}
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                        <div key={expense.ExpenseID} className="flex items-center justify-between p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer gap-2 w-full">
+                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                <div className="h-8 w-8 rounded-md bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                                    <ArrowUpRight className="h-4 w-4" />
                                                 </div>
-                                                
-                                                {expense.categories && (
-                                                    <Badge variant="secondary" className="text-[10px] px-2 py-0.5 h-auto hidden sm:flex shrink-0 mx-2">
-                                                        {expense.categories.CategoryName}
-                                                    </Badge>
-                                                )}
-
-                                                <div className="text-right shrink-0">
-                                                    <p className="font-bold text-rose-600 dark:text-rose-400">
-                                                        -{formatCurrency(Number(expense.Amount))}
+                                                <div className="min-w-0 flex-1 pr-2">
+                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
+                                                        {expense.ExpenseDetail || expense.categories?.CategoryName || "Expense"}
                                                     </p>
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 min-w-0">
+                                                        <span className="flex items-center gap-1 shrink-0">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {format(new Date(expense.ExpenseDate), "MMM d")}
+                                                        </span>
+                                                        {expense.categories && (
+                                                            <>
+                                                                <span className="text-muted-foreground/30 shrink-0">•</span>
+                                                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 min-w-0 shrink truncate font-normal bg-muted max-w-[80px] sm:max-w-[100px]">
+                                                                    {expense.categories.CategoryName}
+                                                                </Badge>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </Link>
+
+                                            <div className="text-right shrink-0 pl-1">
+                                                <p className="font-bold text-sm sm:text-base text-rose-600 dark:text-rose-400 whitespace-nowrap">
+                                                    -{formatCurrency(Number(expense.Amount))}
+                                                </p>
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </ScrollArea>
@@ -90,34 +90,36 @@ export function RelatedTransactions({ expenses, incomes }: RelatedTransactionsPr
                             </div>
                         ) : (
                              <ScrollArea className="h-[400px] md:h-[500px] lg:h-[600px] rounded-md border bg-background w-full">
-                                <div className="p-4 grid gap-3">
+                                <div className="p-3 grid gap-2">
                                     {incomes.map((income) => (
-                                        <div key={income.IncomeID} className="flex items-center justify-between gap-2 p-3 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer">
-                                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                                                <div className="h-9 w-9 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
-                                                    <ArrowDownLeft className="h-5 w-5" />
+                                        <div key={income.IncomeID} className="flex items-center justify-between p-2.5 rounded-lg border bg-card hover:bg-muted/40 transition-all hover:border-primary/40 hover:shadow-md group cursor-pointer gap-2 w-full">
+                                            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                                                <div className="h-8 w-8 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300">
+                                                    <ArrowDownLeft className="h-4 w-4" />
                                                 </div>
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate">
+                                                <div className="min-w-0 flex-1 pr-2">
+                                                    <p className="font-medium text-sm group-hover:text-primary transition-colors truncate max-w-[140px] sm:max-w-[200px] md:max-w-none">
                                                         {income.IncomeDetail || income.categories?.CategoryName || "Income"}
                                                     </p>
-                                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                        <span className="flex items-center gap-1">
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 min-w-0">
+                                                        <span className="flex items-center gap-1 shrink-0">
                                                             <Calendar className="h-3 w-3" />
                                                             {format(new Date(income.IncomeDate), "MMM d")}
                                                         </span>
+                                                        {income.categories && (
+                                                            <>
+                                                                <span className="text-muted-foreground/30 shrink-0">•</span>
+                                                                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 min-w-0 shrink truncate font-normal bg-muted max-w-[80px] sm:max-w-[100px]">
+                                                                    {income.categories.CategoryName}
+                                                                </Badge>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                             {income.categories && (
-                                                <Badge variant="secondary" className="text-[10px] px-2 py-0.5 h-auto hidden sm:flex shrink-0 mx-2">
-                                                    {income.categories.CategoryName}
-                                                </Badge>
-                                            )}
-
-                                            <div className="text-right shrink-0">
-                                                <p className="font-bold text-emerald-600 dark:text-emerald-400">
+                                            <div className="text-right shrink-0 pl-1">
+                                                <p className="font-bold text-sm sm:text-base text-emerald-600 dark:text-emerald-400 whitespace-nowrap">
                                                     +{formatCurrency(Number(income.Amount))}
                                                 </p>
                                             </div>

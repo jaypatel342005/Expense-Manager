@@ -1,14 +1,18 @@
-import { prisma } from "@/lib/prisma"
-import { categories } from "@prisma/client"
-import { CategoryGrid } from "@/components/categories/category-grid"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { PlusCircle } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CategoriesStats } from "@/components/categories/categories-stats"
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+import { categories } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
+import { serializeData } from "@/lib/serialization";
+
+import { CategoryGrid } from "@/components/categories/category-grid";
+import { CategoriesStats } from "@/components/categories/categories-stats";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function CategoriesPage() {
-    const data = await prisma.categories.findMany({
+    // Fetch categories including sub-categories for the grid view
+    const categoriesList = await prisma.categories.findMany({
         include: {
             sub_categories: true
         },
@@ -20,11 +24,11 @@ export default async function CategoriesPage() {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const activeCategories = data.filter((c: categories) => c.IsActive).length;
-    const newlyAdded = data.filter((c: categories) => new Date(c.Created) >= firstDayOfMonth).length;
-    const totalCategories = data.length;
+    const activeCategories = categoriesList.filter((c: categories) => c.IsActive).length;
+    const newlyAdded = categoriesList.filter((c: categories) => new Date(c.Created) >= firstDayOfMonth).length;
+    const totalCategories = categoriesList.length;
     
-    const totalSubCategories = data.reduce((acc, curr) => acc + curr.sub_categories.length, 0);
+    const totalSubCategories = categoriesList.reduce((acc, curr) => acc + curr.sub_categories.length, 0);
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -58,10 +62,11 @@ export default async function CategoriesPage() {
                         <CardTitle>All Categories</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <CategoryGrid data={JSON.parse(JSON.stringify(data))} />
+                        <CategoryGrid data={serializeData(categoriesList)} />
                     </CardContent>
                 </Card>
             </div>
+
         </div>
     )
 }
