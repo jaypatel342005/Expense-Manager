@@ -15,6 +15,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import { toast } from "sonner"
+import AlertSoftSuccessDemo from '@/components/ui/alert-23'
 
 interface DeleteButtonProps {
     model: string;
@@ -45,11 +47,24 @@ export default function DeleteButton({
         try {
             await deleteRow(model, id, path);
             setOpen(false);
+            toast.custom(() => (
+                <AlertSoftSuccessDemo 
+                    title={`${model} deleted`}
+                    description={`${model} has been deleted successfully.`}
+                />
+            ));
             if (redirectTo) {
                 router.push(redirectTo);
             }
         } catch (error) {
             console.error(error);
+            toast.custom(() => (
+                <AlertSoftSuccessDemo 
+                    title="Something went wrong"
+                    description="Failed to delete the item. Please try again."
+                    variant="error"
+                />
+            ));
         } finally {
             setIsDeleting(false);
         }
