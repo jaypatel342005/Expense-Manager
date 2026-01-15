@@ -8,10 +8,18 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { 
     ArrowLeft, Calendar, User, Briefcase, FileText, Tag, Layers, 
-    Paperclip, Phone, Mail, Hash, Clock, Edit, Trash2, ExternalLink
+    Paperclip, Phone, Mail, Hash, Clock, Edit, Trash2, ExternalLink, MoreHorizontal
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import DeleteButton from "@/components/shared/delete-button";
 
 // Helper component to reduce nesting and ensure consistent styling
 function DetailItem({ title, children }: { title: string, children: React.ReactNode }) {
@@ -87,14 +95,41 @@ export default async function ExpenseDetailPage({ params }: { params: Promise<{ 
                         </div>
                     </div>
                     <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                        <Button variant="outline" size="sm" className="h-8 text-xs hover:border-primary/50 hover:bg-primary/5 transition-all px-3">
+                        <Button variant="outline" size="sm" className="h-8 text-xs hover:border-primary/50 hover:bg-primary/5 transition-all px-3 hidden sm:flex">
                             <Edit className="h-3.5 w-3.5 mr-1.5" />
-                            Edit
+                            Edit Expense
                         </Button>
-                        <Button variant="destructive" size="sm" className="h-8 text-xs shadow-sm hover:shadow-md transition-all px-3">
-                            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                            Delete
-                        </Button>
+                        <DropdownMenu>
+                             <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 sm:hidden">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                    <Edit className="mr-2 h-4 w-4" /> Edit Expense
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="p-0 text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
+                                    <DeleteButton
+                                        model="expenses"
+                                        id={expense.ExpenseID.toString()}
+                                        redirectTo="/expenses"
+                                        deleteLabel="Delete Expense"
+                                        variant="ghost"
+                                        className="w-full justify-start h-auto p-2 text-destructive hover:text-destructive hover:bg-transparent"
+                                    />
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DeleteButton 
+                            model="expenses" 
+                            id={expense.ExpenseID.toString()} 
+                            redirectTo="/expenses"
+                            className="h-8 text-xs shadow-sm hover:shadow-md transition-all px-3 hidden sm:flex"
+                            variant="destructive"
+                        />
                     </div>
                 </div>
             </div>

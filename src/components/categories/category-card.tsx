@@ -12,7 +12,8 @@ import {
     CheckCircle2,
     XCircle,
     Tag,
-    Layers
+    Layers,
+    Eye
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -45,19 +46,16 @@ export function CategoryCard({ category }: CategoryCardProps) {
         <Card className={cn(
             "group relative overflow-hidden transition-all duration-300 py-0 gap-0", // Removed default padding and gap
             "hover:shadow-xl hover:-translate-y-1 border",
-            // Gradient Background
             isExpense ? "bg-gradient-to-br from-red-100/50 via-white to-white dark:from-red-900/30 dark:via-slate-950 dark:to-slate-950" : 
             isIncome ? "bg-gradient-to-br from-emerald-100/50 via-white to-white dark:from-emerald-900/30 dark:via-slate-950 dark:to-slate-950" : 
             "bg-gradient-to-br from-slate-100/50 via-white to-white dark:from-slate-800/30 dark:via-slate-950 dark:to-slate-950"
         )}>
-            {/* Background Decorator - Subtle */}
             <div className="absolute -right-2 -bottom-6 opacity-5 dark:opacity-20 pointer-events-none transition-transform group-hover:scale-110 duration-500">
                 {isExpense ? <TrendingDown className="h-40 w-40 text-red-500 dark:text-red-900" /> : 
                  isIncome ? <TrendingUp className="h-40 w-40 text-emerald-500 dark:text-emerald-900" /> : 
                  <Tag className="h-40 w-40 text-slate-500 dark:text-slate-800" />}
             </div>
 
-            {/* Top Bar: Badge & Actions - Completely separate from content */}
             <div className="flex items-center justify-between px-3 pt-2 pb-0 relative z-20">
                 <Badge 
                     variant="secondary" 
@@ -72,9 +70,12 @@ export function CategoryCard({ category }: CategoryCardProps) {
 
                 <ActionMenu
                     align="end"
+                    viewHref={`/admin/categories/${category.CategoryID}`}
                     editHref={`/admin/categories/${category.CategoryID}`}
                     editLabel="Edit Category"
-                    onDelete={() => {}} // TODO: Add delete functionality or pass handler
+                    model="categories"
+                    id={category.CategoryID.toString()}
+                    deletePath="/admin/categories"
                     deleteLabel="Delete Category"
                     className="h-7 w-7 bg-white/50 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-900 shadow-sm backdrop-blur-sm -mr-1"
                 />
@@ -82,7 +83,6 @@ export function CategoryCard({ category }: CategoryCardProps) {
 
             <CardContent className="pt-2 pb-5 px-5 space-y-5 relative z-10">
                 <Link href={`/admin/categories/${category.CategoryID}`} className="block h-full group/link">
-                {/* Hero Section: Logo & Name */}
                 <div className="flex items-center gap-3 sm:gap-4">
                     <div className={cn(
                         "p-1 rounded-2xl shadow-sm border transition-colors group-hover/link:border-primary/30",
@@ -160,7 +160,6 @@ export function CategoryCard({ category }: CategoryCardProps) {
                     </div>
                 </div>
                 
-                {/* Sub-Categories List */}
                 {category.sub_categories && category.sub_categories.length > 0 && (
                      <div className="pt-1 mt-5">
                         <div className="flex flex-wrap gap-1.5">

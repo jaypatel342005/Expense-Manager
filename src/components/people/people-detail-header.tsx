@@ -1,12 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, MoreVertical, Pencil, Trash2, User } from "lucide-react";
+import { ArrowLeft, Edit, MoreHorizontal, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ActionMenu } from "@/components/shared/action-menu";
 import { Logo } from "@/components/shared/logo";
+import DeleteButton from "@/components/shared/delete-button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface PeopleDetailHeaderProps {
     person: {
@@ -72,17 +79,41 @@ export function PeopleDetailHeader({ person }: PeopleDetailHeaderProps) {
 
                 <div className="flex items-center gap-2 ml-12 md:ml-0">
                     <Button variant="outline" size="sm" className="h-8 text-xs hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all px-3 hidden sm:flex">
-                        <Pencil className="h-3.5 w-3.5 mr-1.5" />
-                        Edit Details
+                        <Edit className="h-3.5 w-3.5 mr-1.5" />
+                        Edit Person
                     </Button>
-                <ActionMenu
-                     align="end"
-                     editHref="#" // TODO: Add real edit link
-                     editLabel="Edit Person"
-                     onDelete={() => {}}
-                     deleteLabel="Delete Person"
-                     className="h-8 w-8"
-                />
+                    <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 sm:hidden">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                                <Edit className="mr-2 h-4 w-4" /> Edit Person
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="p-0 text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
+                                <DeleteButton
+                                    model="peoples"
+                                    id={person.PeopleID.toString()}
+                                    redirectTo="/admin/people"
+                                    deleteLabel="Delete Person"
+                                    variant="ghost"
+                                    className="w-full justify-start h-auto p-2 text-destructive hover:text-destructive hover:bg-transparent"
+                                />
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DeleteButton 
+                        model="peoples" 
+                        id={person.PeopleID.toString()} 
+                        redirectTo="/admin/people"
+                        className="h-8 text-xs shadow-sm hover:shadow-md transition-all px-3 hidden sm:flex"
+                        variant="destructive"
+                        deleteLabel="Delete"
+                    />
                 </div>
             </div>
         </div>

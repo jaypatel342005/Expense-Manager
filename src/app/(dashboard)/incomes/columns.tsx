@@ -173,6 +173,9 @@ export const columns: ColumnDef<Income>[] = [
                 <ActionMenu
                     align="end"
                     viewHref={`/incomes/${income.IncomeID}`}
+                    model="incomes"
+                    id={income.IncomeID.toString()}
+                    deletePath="/incomes"
                     className="h-8 w-8 p-0"
                 />
             );

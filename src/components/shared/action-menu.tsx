@@ -13,25 +13,33 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import DeleteButton from "./delete-button";
 
 interface ActionMenuProps {
     editHref?: string;
     editLabel?: string;
     viewHref?: string;
-    onDelete?: () => void;
     deleteLabel?: string;
     className?: string;
     align?: "end" | "start" | "center";
+    model?: string;
+    id?: string;
+    deletePath?: string;
+    redirectTo?: string;
 }
 
 export function ActionMenu({
     editHref,
     editLabel = "Edit",
     viewHref,
-    onDelete,
+    
     deleteLabel = "Delete",
     className,
     align = "end",
+    model,
+    id,
+    deletePath,
+    redirectTo,
 }: ActionMenuProps) {
     return (
         <DropdownMenu>
@@ -70,15 +78,21 @@ export function ActionMenu({
                     </DropdownMenuItem>
                 )}
 
-                {(viewHref || editHref) && onDelete && <DropdownMenuSeparator />}
-
-                {onDelete && (
+                {(viewHref || editHref) && (model && id) && <DropdownMenuSeparator />}
+                {(model && id) && (
                     <DropdownMenuItem 
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20"
-                        onClick={onDelete}
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20 p-0"
+                        onSelect={(e) => e.preventDefault()}
                     >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {deleteLabel}
+                        <DeleteButton
+                            model={model}
+                            id={id}
+                            path={deletePath}
+                            redirectTo={redirectTo}
+                            deleteLabel={deleteLabel}
+                            className="w-full justify-start h-auto p-2 hover:bg-transparent hover:text-red-600"
+                            variant="ghost"
+                        />
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>

@@ -1,7 +1,4 @@
 
-"use client";
-
-import Link from "next/link";
 import { format } from "date-fns";
 import { 
     Copy, 
@@ -20,7 +17,6 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/shared/logo";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { ActionMenu } from "@/components/shared/action-menu";
 
 export interface ProjectCardProps {
@@ -49,12 +45,10 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 ? "bg-gradient-to-br from-indigo-50/50 via-white to-white dark:from-indigo-900/20 dark:via-slate-950 dark:to-slate-950" 
                 : "bg-gradient-to-br from-slate-100/50 via-white to-white dark:from-slate-800/20 dark:via-slate-950 dark:to-slate-950"
         )}>
-            {/* Background Decorator */}
             <div className="absolute -right-2 -bottom-6 opacity-5 dark:opacity-10 pointer-events-none transition-transform group-hover:scale-110 duration-500">
                 <Briefcase className="h-40 w-40 text-indigo-500 dark:text-indigo-400" />
             </div>
 
-            {/* Top Bar: Badge & Actions */}
             <div className="flex items-center justify-between px-3 pt-2 pb-0 relative z-20">
                  <Badge 
                     variant="secondary" 
@@ -73,14 +67,15 @@ export function ProjectCard({ project }: ProjectCardProps) {
                     viewHref={`/admin/projects/${project.ProjectID}`}
                     editHref={`/admin/projects/${project.ProjectID}`} 
                     editLabel="Edit Project"
-                    onDelete={() => {}}
+                    model="projects"
+                    id={project.ProjectID.toString()}
+                    deletePath="/admin/projects"
                     deleteLabel="Delete Project"
                     className="h-7 w-7 bg-white/50 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-900 shadow-sm backdrop-blur-sm -mr-1"
                 />
             </div>
 
             <CardContent className="pt-2 pb-5 px-5 space-y-5 relative z-10">
-                 {/* Hero Section: Logo & Name */}
                  <div className="flex items-center gap-3 sm:gap-4">
                      <div className={cn(
                         "p-1 rounded-2xl shadow-sm border",
@@ -121,14 +116,12 @@ export function ProjectCard({ project }: ProjectCardProps) {
                     </div>
                  </div>
 
-                 {/* Description */}
                  <div className="bg-white/50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800 min-h-[4.5rem]">
                     <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
                         {project.Description || "No description provided for this project."}
                     </p>
                  </div>
 
-                 {/* Dates Grid */}
                  <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2 rounded-lg border bg-background/50 backdrop-blur-sm shadow-sm">
                         <p className="text-muted-foreground mb-1 font-medium text-[9px] uppercase tracking-wider flex items-center gap-1">

@@ -117,7 +117,9 @@ export const columns: ColumnDef<PeopleWithUser>[] = [
                     viewHref={`/admin/people/${person.PeopleID}`}
                     editHref={`/admin/people/${person.PeopleID}`} // Assuming edit page is same for now
                     editLabel="Edit Person"
-                    onDelete={() => {}} // TODO: Add delete functionality
+                    model="peoples"
+                    id={person.PeopleID.toString()}
+                    deletePath="/admin/people"
                     deleteLabel="Delete Person"
                     className="h-8 w-8 p-0"
                 />

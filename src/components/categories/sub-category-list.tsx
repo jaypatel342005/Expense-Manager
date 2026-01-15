@@ -134,7 +134,9 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: 
                                                     align="end"
                                                     editHref="#" // TODO: Add subcategory edit
                                                     editLabel="Edit Sub-Category"
-                                                    onDelete={() => {}} // TODO: Add delete
+                                                    model="sub_categories"
+                                                    id={sub.SubCategoryID.toString()}
+                                                    deletePath="/admin/categories"
                                                     deleteLabel="Delete Sub-Category"
                                                     className="h-8 w-8 -mr-2 rounded-full hover:bg-muted"
                                                 />

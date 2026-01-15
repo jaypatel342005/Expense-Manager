@@ -8,6 +8,7 @@ import { ArrowLeft, Clock, Edit, Trash2, MoreHorizontal } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import DeleteButton from "@/components/shared/delete-button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -84,16 +85,26 @@ export function ProjectDetailHeader({ project }: ProjectDetailHeaderProps) {
                                 <Edit className="mr-2 h-4 w-4" /> Edit Project
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Project
+                            <DropdownMenuItem className="p-0 text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
+                                <DeleteButton
+                                    model="projects"
+                                    id={project.ProjectID.toString()}
+                                    redirectTo="/admin/projects"
+                                    deleteLabel="Delete Project"
+                                    variant="ghost"
+                                    className="w-full justify-start h-auto p-2 text-destructive hover:text-destructive hover:bg-transparent"
+                                />
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
 
-                    <Button variant="destructive" size="sm" className="h-8 text-xs shadow-sm hover:shadow-md transition-all px-3 hidden sm:flex bg-red-600 hover:bg-red-700">
-                        <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                        Delete
-                    </Button>
+                    <DeleteButton 
+                        model="projects" 
+                        id={project.ProjectID.toString()} 
+                        redirectTo="/admin/projects"
+                        className="h-8 text-xs shadow-sm hover:shadow-md transition-all px-3 hidden sm:flex"
+                        variant="destructive"
+                    />
                 </div>
             </div>
         </div>
