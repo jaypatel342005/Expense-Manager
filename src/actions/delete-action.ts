@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-
+import { deleteImage } from "@/lib/imagekit";
 
 export async function deleteRow(
   model: string,
@@ -29,6 +29,23 @@ export async function deleteRow(
 
     if (!prismaModel) {
         throw new Error(`Invalid model name: ${model}`);
+    }
+
+    // Special logic for Income to delete image
+    if (model === "incomes") {
+        try {
+            // Fetch the record first
+            const record = await prismaModel.findUnique({
+                where: { [pkField]: idValue }
+            });
+
+            if (record && record.AttachmentPath && record.AttachmentPath.includes("imagekit.io")) {
+                await deleteImage(record.AttachmentPath);
+            }
+        } catch (error) {
+            console.error("Error cleaning up image:", error);
+            // Proceed with deletion even if image cleanup fails
+        }
     }
 
     await prismaModel.delete({

@@ -12,7 +12,7 @@ interface AttachmentViewerProps {
 
 export function AttachmentViewer({ path, alt, className }: AttachmentViewerProps) {
     const [error, setError] = useState(false);
-    const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
+    const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
 
     if (error) {
         return (

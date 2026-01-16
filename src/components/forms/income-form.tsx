@@ -7,8 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileUpload } from "@/components/ui/file-upload";
 
-// Type definitions
 type Category = { CategoryID: number; CategoryName: string };
 type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName: string };
 type People = { PeopleID: number; PeopleName: string };
@@ -42,16 +42,13 @@ export default function IncomeForm({ income, categories, subCategories, people, 
     const [selectedPeople, setSelectedPeople] = useState<string>(income?.PeopleID?.toString() || "");
     const [selectedProject, setSelectedProject] = useState<string>(income?.ProjectID?.toString() || "");
 
-    // Filter subcategories based on selected category
     const filteredSubCategories = subCategories.filter(
         sc => sc.CategoryID.toString() === selectedCategory
     );
 
-    // Reset subcategory when category changes
     useEffect(() => {
         if (selectedCategory !== income?.CategoryID?.toString()) {
-             // If manual change, might want to reset, but if it's initial load we keep it.
-             // Simple logic: if current subcat doesn't belong to new cat, clear it.
+             
              const isValid = subCategories.find(sc => sc.SubCategoryID.toString() === selectedSubCategory && sc.CategoryID.toString() === selectedCategory);
              if (!isValid) setSelectedSubCategory("");
         }
@@ -117,7 +114,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                         </div>
                     </div>
 
-                    {/* Row 2: Category, Sub Category, Project (3 columns to match or 2 columns if preferred, but let's stick to a grid) */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label>Category</Label>
@@ -168,38 +164,68 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="IncomeDetail">Income Detail (Short)</Label>
-                        <Input 
-                            type="text" 
-                            id="IncomeDetail"
-                            name="IncomeDetail" 
-                            defaultValue={income?.IncomeDetail || ""} 
-                            placeholder="Brief detail..."
-                        />
-                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <Card className="h-full ring-0 border-0 shadow-none bg-transparent md:ring-1 md:border md:border-muted md:bg-muted/10 md:shadow-sm">
+                            <CardContent className="p-0 pt-0 md:p-6 md:pt-1 space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="IncomeDetail" className="font-medium text-foreground">Additional Details</Label>
+                                    <Input 
+                                        type="text" 
+                                        id="IncomeDetail"
+                                        name="IncomeDetail" 
+                                        defaultValue={income?.IncomeDetail || ""} 
+                                        placeholder="Brief detail..."
+                                        className="bg-background"
+                                    />
+                                </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="Description">Description (Long)</Label>
-                        <Textarea 
-                            id="Description"
-                            name="Description" 
-                            defaultValue={income?.Description || ""} 
-                            placeholder="Detailed description..."
-                            className="h-24"
-                        />
-                    </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="Description">Description (Long)</Label>
+                                    <Textarea 
+                                        id="Description"
+                                        name="Description" 
+                                        defaultValue={income?.Description || ""} 
+                                        placeholder="Detailed description..."
+                                        className="h-32 bg-background"
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                    {/* Placeholder for Attachment - ideally a file upload */}
-                    <div className="space-y-2">
-                        <Label htmlFor="AttachmentPath">Attachment URL (Optional)</Label>
-                        <Input 
-                            type="text" 
-                            id="AttachmentPath"
-                            name="AttachmentPath" 
-                            defaultValue={income?.AttachmentPath || ""} 
-                            placeholder="/path/to/file"
-                        />
+                       
+                        <Card className="h-full border-muted bg-muted/10 shadow-sm">
+                            <CardContent className="pt-1 space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="AttachmentName" className="font-medium text-foreground">Attachment Details</Label>
+                                    <Input 
+                                        type="text" 
+                                        id="AttachmentName"
+                                        name="AttachmentName" 
+                                        placeholder="Attachment Name (e.g. Receipt)"
+                                        className="bg-background"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <FileUpload 
+                                        name="file" 
+                                        accept="image/*"
+                                        value={null} 
+                                        currentFilePath={income?.AttachmentPath}
+                                        onUploadComplete={(url) => {
+                                            const input = document.querySelector('input[name="AttachmentPath"]') as HTMLInputElement;
+                                            if (input) input.value = url;
+                                        }}
+                                        className="bg-background"
+                                    />
+                                    <input 
+                                        type="hidden" 
+                                        name="AttachmentPath" 
+                                        defaultValue={income?.AttachmentPath || ""} 
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     <div className="flex justify-end pt-4">

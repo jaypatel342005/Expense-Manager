@@ -22,7 +22,7 @@ export function Logo({ path, alt, fallbackClassName, fallbackIcon }: LogoProps) 
     return (
         <div className={`${fallbackClassName} relative overflow-hidden bg-background`}>
              <IKImage
-                urlEndpoint={process.env.NEXT_PUBLIC_URL_ENDPOINT}
+                urlEndpoint={process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT}
                 {...(path.startsWith("http") ? { src: path } : { path: path })}
                 transformation={[{ height: "100", width: "100" }]}
                 loading="lazy"
