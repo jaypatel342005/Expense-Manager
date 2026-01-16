@@ -194,8 +194,8 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                         </Card>
 
                        
-                        <Card className="h-full border-muted bg-muted/10 shadow-sm">
-                            <CardContent className="pt-1 space-y-4">
+                        <Card className="h-full ring-0 border-0 shadow-none bg-transparent md:ring-1 md:border md:border-muted md:bg-muted/10 md:shadow-sm">
+                            <CardContent className="p-0 pt-0 md:p-6 md:pt-1 space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="AttachmentName" className="font-medium text-foreground">Attachment Details</Label>
                                     <Input 
