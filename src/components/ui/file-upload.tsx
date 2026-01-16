@@ -15,6 +15,7 @@ interface FileUploadProps {
     onChange?: (file: File | null) => void;
     onUploadComplete?: (url: string) => void;
     className?: string;
+    customName?: string;
 }
 
 export function FileUpload({
@@ -26,6 +27,7 @@ export function FileUpload({
     onChange,
     onUploadComplete,
     className,
+    customName,
 }: FileUploadProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -76,6 +78,7 @@ export function FileUpload({
 
         const formData = new FormData();
         formData.append("file", file);
+        if (customName) formData.append("customName", customName);
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/upload", true);

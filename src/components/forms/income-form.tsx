@@ -41,6 +41,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
     const [selectedSubCategory, setSelectedSubCategory] = useState<string>(income?.SubCategoryID?.toString() || "");
     const [selectedPeople, setSelectedPeople] = useState<string>(income?.PeopleID?.toString() || "");
     const [selectedProject, setSelectedProject] = useState<string>(income?.ProjectID?.toString() || "");
+    const [attachmentName, setAttachmentName] = useState<string>("");
 
     const filteredSubCategories = subCategories.filter(
         sc => sc.CategoryID.toString() === selectedCategory
@@ -203,6 +204,8 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         name="AttachmentName" 
                                         placeholder="Attachment Name (e.g. Receipt)"
                                         className="bg-background"
+                                        value={attachmentName}
+                                        onChange={(e) => setAttachmentName(e.target.value)}
                                     />
                                 </div>
 
@@ -212,6 +215,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         accept="image/*"
                                         value={null} 
                                         currentFilePath={income?.AttachmentPath}
+                                        customName={attachmentName}
                                         onUploadComplete={(url) => {
                                             const input = document.querySelector('input[name="AttachmentPath"]') as HTMLInputElement;
                                             if (input) input.value = url;

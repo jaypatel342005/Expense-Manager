@@ -5,6 +5,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const file = formData.get("file") as File;
+        const customName = formData.get("customName") as string;
         
         if (!file) {
             return NextResponse.json(
@@ -13,9 +14,27 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Generate unique ID (using timestamp for simplicity and readability)
+        // const uniqueId = Date.now().toString(); // Too long
+        const uniqueId = Math.random().toString(36).substring(2, 8); // ~6 chars, e.g. "x7z91a"
+        let finalFileName;
+
+        if (customName && customName.trim() !== "") {
+            // Case 1: Custom name provided -> Append ID
+            finalFileName = `${customName.trim()}-${uniqueId}`;
+        } else {
+            // Case 2: Default "image" -> Append ID and extension
+            const nameParts = file.name.split('.');
+            let ext = "";
+            if (nameParts.length > 1) {
+                ext = "." + nameParts.pop();
+            }
+            finalFileName = `image-${uniqueId}${ext}`;
+        }
+
         const uploadResponse = await uploadImage(
             file, 
-            file.name, 
+            finalFileName, 
             "/expense-manager/incomes"
         );
 

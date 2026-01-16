@@ -95,9 +95,11 @@ export default async function IncomeDetailPage({ params }: { params: Promise<{ i
                         </div>
                     </div>
                     <div className="flex items-center gap-2 ml-auto sm:ml-0">
-                        <Button variant="outline" size="sm" className="h-8 text-xs hover:border-primary/50 hover:bg-primary/5 transition-all px-3 hidden sm:flex">
-                            <Edit className="h-3.5 w-3.5 mr-1.5" />
-                            Edit Income
+                        <Button variant="outline" size="sm" className="h-8 text-xs hover:border-primary/50 hover:bg-primary/5 transition-all px-3 hidden sm:flex" asChild>
+                            <Link href={`/incomes/edit/${income.IncomeID}`}>
+                                <Edit className="h-3.5 w-3.5 mr-1.5" />
+                                Edit Income
+                            </Link>
                         </Button>
                         <DropdownMenu>
                              <DropdownMenuTrigger asChild>
@@ -106,8 +108,10 @@ export default async function IncomeDetailPage({ params }: { params: Promise<{ i
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                    <Edit className="mr-2 h-4 w-4" /> Edit Income
+                                <DropdownMenuItem asChild>
+                                    <Link href={`/incomes/edit/${income.IncomeID}`}>
+                                        <Edit className="mr-2 h-4 w-4" /> Edit Income
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="p-0 text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>
