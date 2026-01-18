@@ -21,12 +21,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DeleteButton from "@/components/shared/delete-button";
 
-// Helper component to reduce nesting and ensure consistent styling
 function DetailItem({ title, children }: { title: string, children: React.ReactNode }) {
     return (
         <div className="space-y-1.5">
              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</h4>
-             <div className="text-sm leading-relaxed bg-muted/40 p-3 rounded-lg border border-transparent hover:border-border transition-colors">
+             <div className="text-sm leading-relaxed bg-muted/40 p-3 rounded-lg border border-transparent hover:border-border transition-colors break-words whitespace-pre-wrap">
                 {children}
              </div>
         </div>
@@ -267,12 +266,12 @@ export default async function IncomeDetailPage({ params }: { params: Promise<{ i
                                         <div>
                                             <h4 className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wide">Attachment</h4>
                                             <div className="flex items-center justify-between p-3 border rounded-lg bg-gradient-to-r from-muted/40 to-background hover:from-muted/60 transition-all group/file cursor-pointer">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-blue-100/60 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded shadow-sm group-hover/file:scale-110 transition-transform">
+                                                <div className="flex items-center gap-3 flex-1 min-w-0 mr-3">
+                                                    <div className="p-2 bg-blue-100/60 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded shadow-sm group-hover/file:scale-110 transition-transform flex-shrink-0">
                                                         <Paperclip className="h-4 w-4" />
                                                     </div>
-                                                    <div className="space-y-0.5">
-                                                        <p className="text-sm font-semibold truncate max-w-[180px] sm:max-w-xs group-hover/file:text-blue-600 transition-colors">
+                                                    <div className="space-y-0.5 min-w-0 w-full">
+                                                        <p className="text-sm font-semibold truncate group-hover/file:text-blue-600 transition-colors">
                                                             {income.AttachmentPath.split(/[/\\]/).pop()}
                                                         </p>
                                                         <p className="text-[10px] text-muted-foreground flex items-center gap-1">

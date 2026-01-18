@@ -1,18 +1,32 @@
 "use client"
 import { SaveIncomeAction } from '@/actions/SaveIncomeAction';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox-08";
 import { FileUpload } from "@/components/ui/file-upload";
+import { toast } from "sonner";
+import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 
-type Category = { CategoryID: number; CategoryName: string };
-type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName: string };
-type People = { PeopleID: number; PeopleName: string };
-type Project = { ProjectID: number; ProjectName: string };
+type Category = { CategoryID: number; CategoryName: string; LogoPath?: string | null };
+type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName: string; LogoPath?: string | null };
+type People = { PeopleID: number; PeopleName: string; Email?: string | null };
+type Project = { ProjectID: number; ProjectName: string; ProjectLogo?: string | null };
 
 type IncomeData = {
     IncomeID?: number;
@@ -37,11 +51,18 @@ interface IncomeFormProps {
 }
 
 export default function IncomeForm({ income, categories, subCategories, people, projects }: IncomeFormProps) {
+    const router = useRouter(); 
     const [selectedCategory, setSelectedCategory] = useState<string>(income?.CategoryID?.toString() || "");
     const [selectedSubCategory, setSelectedSubCategory] = useState<string>(income?.SubCategoryID?.toString() || "");
     const [selectedPeople, setSelectedPeople] = useState<string>(income?.PeopleID?.toString() || "");
     const [selectedProject, setSelectedProject] = useState<string>(income?.ProjectID?.toString() || "");
-    const [attachmentName, setAttachmentName] = useState<string>("");
+    const [attachmentName, setAttachmentName] = useState<string>("image");
+    const [isSubmitting, setIsSubmitting] = useState(false); 
+    
+    // Date state for Calendar
+    const [date, setDate] = useState<Date | undefined>(
+        income?.IncomeDate ? new Date(income.IncomeDate) : new Date()
+    );
 
     const filteredSubCategories = subCategories.filter(
         sc => sc.CategoryID.toString() === selectedCategory
@@ -49,22 +70,57 @@ export default function IncomeForm({ income, categories, subCategories, people, 
 
     useEffect(() => {
         if (selectedCategory !== income?.CategoryID?.toString()) {
-             
              const isValid = subCategories.find(sc => sc.SubCategoryID.toString() === selectedSubCategory && sc.CategoryID.toString() === selectedCategory);
              if (!isValid) setSelectedSubCategory("");
         }
     }, [selectedCategory, subCategories, selectedSubCategory, income]);
 
-    const formatDate = (date?: Date | string) => {
-        if (!date) return new Date().toISOString().split('T')[0];
-        const d = new Date(date);
-        return d.toISOString().split('T')[0];
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        const formData = new FormData(e.currentTarget);
+
+        try {
+            const result = await SaveIncomeAction(formData);
+
+            if (result.success) {
+                toast.custom(() => (
+                    <AlertSoftSuccessDemo 
+                        title="Success"
+                        description={result.message}
+                        variant="success"
+                    />
+                ));
+                router.push("/incomes");
+            } else {
+                toast.custom(() => (
+                    <AlertSoftSuccessDemo 
+                        title="Error"
+                        description={result.message}
+                        variant="error"
+                    />
+                ));
+            }
+        } catch (error) {
+            console.error("Submission error:", error);
+            toast.custom(() => (
+                <AlertSoftSuccessDemo 
+                    title="Error"
+                    description="An unexpected error occurred."
+                    variant="error"
+                />
+            ));
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
-        <Card className="w-full md:w-[85%] mx-auto shadow-lg border-t-4 border-t-primary">
+        <Card className="w-full md:w-[85%] mx-auto shadow-lg border-1 ">
             <CardContent>
-                <form action={SaveIncomeAction} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
                     <input type="hidden" name="id" value={income?.IncomeID || ""} />
                     <input type="hidden" name="UserID" value={income?.UserID || "1"} />
                     
@@ -72,17 +128,39 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                     <input type="hidden" name="SubCategoryID" value={selectedSubCategory} />
                     <input type="hidden" name="PeopleID" value={selectedPeople} />
                     <input type="hidden" name="ProjectID" value={selectedProject} />
+                    
+                    {/* Hidden input for Date to map to server action */}
+                    <input type="hidden" name="IncomeDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex flex-col">
                             <Label htmlFor="IncomeDate">Income Date</Label>
-                            <Input 
-                                type="date" 
-                                id="IncomeDate"
-                                name="IncomeDate" 
-                                defaultValue={formatDate(income?.IncomeDate)}
-                                required 
-                            />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal h-10",
+                                            !date && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={setDate}
+                                        disabled={(date) => date > new Date()}
+                                        className="rounded-lg border shadow-sm"
+                                        captionLayout="dropdown"
+                                        fromYear={2000}
+                                        toYear={new Date().getFullYear()}
+                                    />
+                                </PopoverContent>
+                            </Popover>
                         </div>
 
                         <div className="space-y-2">
@@ -95,73 +173,77 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                 defaultValue={income?.Amount ? Number(income.Amount) : ""} 
                                 required 
                                 placeholder="0.00"
+                                className="h-10"
                             />
                         </div>
 
                         <div className="space-y-2">
                             <Label>Payer/People</Label>
-                            <Select onValueChange={setSelectedPeople} value={selectedPeople}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Payer" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {people.map(p => (
-                                        <SelectItem key={p.PeopleID} value={p.PeopleID.toString()}>
-                                            {p.PeopleName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Combobox
+                                options={people.map(p => ({ 
+                                    value: p.PeopleID.toString(), 
+                                    label: p.PeopleName,
+                                    image: "" 
+                                }))}
+                                value={selectedPeople}
+                                onChange={setSelectedPeople}
+                                placeholder="Select Payer"
+                                searchPlaceholder="Search payer..."
+                                emptyText="No payer found."
+                                className="h-10"
+                            />
                         </div>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label>Category</Label>
-                            <Select onValueChange={setSelectedCategory} value={selectedCategory}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {categories.map(cat => (
-                                        <SelectItem key={cat.CategoryID} value={cat.CategoryID.toString()}>
-                                            {cat.CategoryName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Combobox
+                                options={categories.map(c => ({ 
+                                    value: c.CategoryID.toString(), 
+                                    label: c.CategoryName,
+                                    image: c.LogoPath || "" 
+                                }))}
+                                value={selectedCategory}
+                                onChange={setSelectedCategory}
+                                placeholder="Select Category"
+                                searchPlaceholder="Search category..."
+                                emptyText="No category found."
+                                className="h-10"
+                            />
                         </div>
 
                         <div className="space-y-2">
                             <Label>Sub Category</Label>
-                            <Select onValueChange={setSelectedSubCategory} value={selectedSubCategory} disabled={!selectedCategory}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Sub Category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {filteredSubCategories.map(sub => (
-                                        <SelectItem key={sub.SubCategoryID} value={sub.SubCategoryID.toString()}>
-                                            {sub.SubCategoryName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Combobox
+                                options={filteredSubCategories.map(sc => ({ 
+                                    value: sc.SubCategoryID.toString(), 
+                                    label: sc.SubCategoryName,
+                                    image: sc.LogoPath || "" 
+                                }))}
+                                value={selectedSubCategory}
+                                onChange={setSelectedSubCategory}
+                                placeholder="Select Sub Category"
+                                searchPlaceholder="Search sub category..."
+                                emptyText="No sub category found."
+                                disabled={!selectedCategory}
+                                className="h-10"
+                            />
                         </div>
 
                         <div className="space-y-2">
                             <Label>Project</Label>
-                            <Select onValueChange={setSelectedProject} value={selectedProject}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select Project" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {projects.map(prj => (
-                                        <SelectItem key={prj.ProjectID} value={prj.ProjectID.toString()}>
-                                            {prj.ProjectName}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Combobox
+                                options={projects.map(p => ({ 
+                                    value: p.ProjectID.toString(), 
+                                    label: p.ProjectName,
+                                    image: p.ProjectLogo || ""
+                                }))}
+                                value={selectedProject}
+                                onChange={setSelectedProject}
+                                placeholder="Select Project"
+                                searchPlaceholder="Search project..."
+                                emptyText="No project found."
+                                className="h-10"
+                            />
                         </div>
                     </div>
 
@@ -176,7 +258,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         name="IncomeDetail" 
                                         defaultValue={income?.IncomeDetail || ""} 
                                         placeholder="Brief detail..."
-                                        className="bg-background"
+                                        className="bg-background h-10"
                                     />
                                 </div>
 
@@ -203,7 +285,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         id="AttachmentName"
                                         name="AttachmentName" 
                                         placeholder="Attachment Name (e.g. Receipt)"
-                                        className="bg-background"
+                                        className="bg-background h-10"
                                         value={attachmentName}
                                         onChange={(e) => setAttachmentName(e.target.value)}
                                     />
@@ -216,6 +298,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         value={null} 
                                         currentFilePath={income?.AttachmentPath}
                                         customName={attachmentName}
+                                        folder="/expense-manager/incomes"
                                         onUploadComplete={(url) => {
                                             const input = document.querySelector('input[name="AttachmentPath"]') as HTMLInputElement;
                                             if (input) input.value = url;
@@ -233,8 +316,8 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="submit" className="w-full md:w-auto">
-                            {income ? "Update Income" : "Save Income"}
+                        <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
+                            {isSubmitting ? "Saving..." : (income ? "Update Income" : "Save Income")}
                         </Button>
                     </div>
                 </form>

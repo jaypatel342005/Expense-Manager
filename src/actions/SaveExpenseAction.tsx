@@ -1,15 +1,14 @@
 "use server"
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-// import { redirect } from "next/navigation"; // Removed redirect to handle on client
 import { uploadImage } from "@/lib/imagekit";
 
-export async function SaveIncomeAction(formData: FormData) {
+export async function SaveExpenseAction(formData: FormData) {
     const id = formData.get("id");
-    const IncomeDate = formData.get("IncomeDate") as string;
+    const ExpenseDate = formData.get("ExpenseDate") as string;
     const Amount = formData.get("Amount");
     const Description = formData.get("Description") as string;
-    const IncomeDetail = formData.get("IncomeDetail") as string;
+    const ExpenseDetail = formData.get("ExpenseDetail") as string;
     let AttachmentPath = formData.get("AttachmentPath") as string;
     const UserID = formData.get("UserID");
     const file = formData.get("file") as File;
@@ -26,21 +25,19 @@ export async function SaveIncomeAction(formData: FormData) {
             const uploadResponse = await uploadImage(
                 file, 
                 AttachmentName, 
-                "/expense-manager/incomes"
+                "/expense-manager/expense"
             );
             AttachmentPath = uploadResponse.url;
         }
     } catch (error) {
         console.error("ImageKit Upload Error:", error);
-        // We continue saving even if upload fails, but maybe we should warn?
-        // For now, proceed as before.
     }
 
     const dataPayload = {
-        IncomeDate: new Date(IncomeDate),
+        ExpenseDate: new Date(ExpenseDate),
         Amount: Number(Amount),
         Description: Description || null,
-        IncomeDetail: IncomeDetail || null,
+        ExpenseDetail: ExpenseDetail || null,
         AttachmentPath: AttachmentPath || null,
         UserID: Number(UserID || 1),
         
@@ -54,12 +51,12 @@ export async function SaveIncomeAction(formData: FormData) {
 
     try {
         if (id) {
-            await prisma.incomes.update({
-                where: { IncomeID: Number(id) },
+            await prisma.expenses.update({
+                where: { ExpenseID: Number(id) },
                 data: dataPayload
             });
         } else {
-            await prisma.incomes.create({
+            await prisma.expenses.create({
                 data: {
                     ...dataPayload,
                     Created: new Date()
@@ -67,12 +64,11 @@ export async function SaveIncomeAction(formData: FormData) {
             });
         }
 
-        revalidatePath("/incomes"); 
-        // redirect("/incomes"); // Removed
-        return { success: true, message: id ? "Income updated successfully" : "Income saved successfully" };
+        revalidatePath("/expenses"); 
+        return { success: true, message: id ? "Expense updated successfully" : "Expense saved successfully" };
 
     } catch (error) {
         console.error("Database Error:", error);
-        return { success: false, message: "Failed to save income. Please try again." };
+        return { success: false, message: "Failed to save expense. Please try again." };
     }
 }

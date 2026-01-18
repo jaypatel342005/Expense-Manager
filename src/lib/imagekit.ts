@@ -21,7 +21,6 @@ export const deleteImage = async (url: string) => {
         const urlParts = url.split("/");
         const fileName = urlParts[urlParts.length - 1];
 
-        // 1. Find the file ID by name
         const files = await imagekit.listFiles({
             searchQuery: `name = "${fileName}"`
         });
@@ -29,7 +28,6 @@ export const deleteImage = async (url: string) => {
         if (files && files.length > 0) {
             // @ts-ignore - We are searching for files, not folders
             const fileId = files[0].fileId;
-            // 2. Delete using ID
             await imagekit.deleteFile(fileId);
             return true;
         }

@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
         const file = formData.get("file") as File;
         const customName = formData.get("customName") as string;
         
+        const folder = formData.get("folder") as string || "/expense-manager";
+
         if (!file) {
             return NextResponse.json(
                 { error: "No file provided" },
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
         const uploadResponse = await uploadImage(
             file, 
             finalFileName, 
-            "/expense-manager/incomes"
+            folder
         );
 
         return NextResponse.json({

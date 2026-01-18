@@ -16,6 +16,7 @@ interface FileUploadProps {
     onUploadComplete?: (url: string) => void;
     className?: string;
     customName?: string;
+    folder?: string;
 }
 
 export function FileUpload({
@@ -28,6 +29,7 @@ export function FileUpload({
     onUploadComplete,
     className,
     customName,
+    folder,
 }: FileUploadProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -36,6 +38,7 @@ export function FileUpload({
     
     // Upload State
     const [isUploading, setIsUploading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false); // Add isDeleting state
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(currentFilePath || null);
     const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
@@ -50,6 +53,18 @@ export function FileUpload({
             return () => URL.revokeObjectURL(objectUrl);
         }
     }, [value, currentFilePath]);
+
+    // ... (keep handleDrag and validateFile as is) ...
+    // Note: Since replace_file_content replaces a chunk, I need to be careful with context. 
+    // I will replace the state definition block first.
+    
+    // Actually, I'll do this in multiple chunks to be safe or just target specific small blocks if possible.
+    // But the instructions say "use multi_replace" for non-contiguous. Here I need to touch state, removeFile, and verify render.
+    // They are separated. So I should use multi_replace.
+    
+    // Switching to multi_replace tool in separate call? 
+    // Wait, I am in one tool call. I should use multi_replace_file_content directly.
+
 
     const handleDrag = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -79,6 +94,7 @@ export function FileUpload({
         const formData = new FormData();
         formData.append("file", file);
         if (customName) formData.append("customName", customName);
+        if (folder) formData.append("folder", folder);
 
         const xhr = new XMLHttpRequest();
         xhr.open("POST", "/api/upload", true);
@@ -149,10 +165,12 @@ export function FileUpload({
     const removeFile = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
+        
+        setIsDeleting(true);
 
-        // 1. If we have a file ID, delete it from the server
-        if (uploadedFileId) {
-            try {
+        try {
+            // 1. If we have a file ID, delete it from the server
+            if (uploadedFileId) {
                 await fetch("/api/upload", {
                     method: "DELETE",
                     headers: {
@@ -160,23 +178,27 @@ export function FileUpload({
                     },
                     body: JSON.stringify({ fileId: uploadedFileId })
                 });
-            } catch (err) {
-                console.error("Failed to delete file on cancel:", err);
             }
-        }
 
-        if (inputRef.current) {
-            inputRef.current.value = "";
+            if (inputRef.current) {
+                inputRef.current.value = "";
+            }
+            setUploadedFileUrl(null);
+            setUploadedFileName(null);
+            setUploadedFileId(null);
+            setPreview(null);
+            setUploadProgress(0);
+            
+            if (onUploadComplete) onUploadComplete(""); // Clear URL
+            if (onChange) onChange(null);
+            setError(null);
+            
+        } catch (err) {
+            console.error("Failed to delete file on cancel:", err);
+            // Optionally set an error state here if needed
+        } finally {
+            setIsDeleting(false);
         }
-        setUploadedFileUrl(null);
-        setUploadedFileName(null);
-        setUploadedFileId(null);
-        setPreview(null);
-        setUploadProgress(0);
-        
-        if (onUploadComplete) onUploadComplete(""); // Clear URL
-        if (onChange) onChange(null);
-        setError(null);
     };
 
     const triggerSelect = () => {
@@ -264,8 +286,13 @@ export function FileUpload({
                                 size="icon"
                                 className="h-8 w-8 text-muted-foreground hover:text-destructive"
                                 onClick={removeFile}
+                                disabled={isDeleting}
                             >
-                                <X className="h-4 w-4" />
+                                {isDeleting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                    <X className="h-4 w-4" />
+                                )}
                             </Button>
                         </div>
                     )}

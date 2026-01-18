@@ -70,7 +70,7 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "relative cn-calendar-dropdown-root rounded-(--cell-radius)",
+          "relative cn-calendar-dropdown-root rounded-(--cell-radius) border border-input p-1 hover:bg-accent hover:text-accent-foreground flex items-center justify-center bg-transparent",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(
@@ -107,7 +107,7 @@ function Calendar({
           defaultClassNames.day
         ),
         range_start: cn(
-          "rounded-l-(--cell-radius) bg-muted elative after:bg-muted after:absolute after:inset-y-0 after:w-4 after:right-0 -z-0 isolate",
+          "rounded-l-(--cell-radius) bg-muted relative after:bg-muted after:absolute after:inset-y-0 after:w-4 after:right-0 -z-0 isolate",
           defaultClassNames.range_start
         ),
         range_middle: cn("rounded-none", defaultClassNames.range_middle),

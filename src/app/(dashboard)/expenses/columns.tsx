@@ -172,6 +172,7 @@ export const columns: ColumnDef<Expense>[] = [
                 <ActionMenu
                     align="end"
                     viewHref={`/expenses/${expense.ExpenseID}`}
+                    editHref={`/expenses/edit/${expense.ExpenseID}`}
                     model="expenses"
                     id={expense.ExpenseID.toString()}
                     deletePath="/expenses"
