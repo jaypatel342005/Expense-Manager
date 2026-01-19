@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -12,7 +11,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,7 +57,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
     const [attachmentName, setAttachmentName] = useState<string>("image");
     const [isSubmitting, setIsSubmitting] = useState(false); 
     
-    // Date state for Calendar
     const [date, setDate] = useState<Date | undefined>(
         income?.IncomeDate ? new Date(income.IncomeDate) : new Date()
     );
@@ -129,7 +126,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                     <input type="hidden" name="PeopleID" value={selectedPeople} />
                     <input type="hidden" name="ProjectID" value={selectedProject} />
                     
-                    {/* Hidden input for Date to map to server action */}
                     <input type="hidden" name="IncomeDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

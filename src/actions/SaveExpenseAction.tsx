@@ -14,7 +14,6 @@ export async function SaveExpenseAction(formData: FormData) {
     const file = formData.get("file") as File;
     const AttachmentName = formData.get("AttachmentName") as string;
     
-    // Relation IDs (can be empty strings)
     const CategoryID = formData.get("CategoryID");
     const SubCategoryID = formData.get("SubCategoryID");
     const PeopleID = formData.get("PeopleID");

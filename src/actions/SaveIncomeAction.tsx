@@ -1,7 +1,6 @@
 "use server"
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-// import { redirect } from "next/navigation"; // Removed redirect to handle on client
 import { uploadImage } from "@/lib/imagekit";
 
 export async function SaveIncomeAction(formData: FormData) {
@@ -15,7 +14,7 @@ export async function SaveIncomeAction(formData: FormData) {
     const file = formData.get("file") as File;
     const AttachmentName = formData.get("AttachmentName") as string;
     
-    // Relation IDs (can be empty strings)
+    
     const CategoryID = formData.get("CategoryID");
     const SubCategoryID = formData.get("SubCategoryID");
     const PeopleID = formData.get("PeopleID");
