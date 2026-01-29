@@ -118,7 +118,7 @@ export default function ExpenseForm({ expense, categories, subCategories, people
     };
 
     return (
-        <Card className="w-full md:w-[85%] mx-auto shadow-lg border-1 ">
+        <Card  className="w-full max-w-7xl mx-auto pb-10">
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <input type="hidden" name="id" value={expense?.ExpenseID || ""} />
@@ -129,7 +129,6 @@ export default function ExpenseForm({ expense, categories, subCategories, people
                     <input type="hidden" name="PeopleID" value={selectedPeople} />
                     <input type="hidden" name="ProjectID" value={selectedProject} />
                     
-                    {/* Hidden input for Date to map to server action */}
                     <input type="hidden" name="ExpenseDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

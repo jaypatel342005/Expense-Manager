@@ -65,7 +65,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 <ActionMenu 
                     align="end"
                     viewHref={`/admin/projects/${project.ProjectID}`}
-                    editHref={`/admin/projects/${project.ProjectID}`} 
+                    editHref={`/admin/projects/edit/${project.ProjectID}`} 
                     editLabel="Edit Project"
                     model="projects"
                     id={project.ProjectID.toString()}
@@ -117,7 +117,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                  </div>
 
                  <div className="bg-white/50 dark:bg-slate-900/50 rounded-lg p-3 border border-slate-100 dark:border-slate-800 min-h-[4.5rem]">
-                    <p className="text-xs text-muted-foreground line-clamp-3 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed break-words break-all">
                         {project.Description || "No description provided for this project."}
                     </p>
                  </div>

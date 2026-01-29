@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { format } from "date-fns";
 import { 
     Folder, Tag, Plus, Calendar, ArrowUpRight, ArrowDownLeft, 
@@ -24,9 +25,10 @@ interface SubCategoryListProps {
     subCategories: any[];
     expenses?: any[];
     incomes?: any[];
+    categoryId: number;
 }
 
-export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: SubCategoryListProps) {
+export function SubCategoryList({ subCategories, expenses = [], incomes = [], categoryId }: SubCategoryListProps) {
     return (
         <Card className="shadow-md bg-gradient-to-br from-white/90 to-muted/50 dark:from-card/90 dark:to-muted/20 backdrop-blur-xl relative overflow-hidden transition-all hover:shadow-lg group border border-transparent hover:border-primary/30 h-full flex flex-col">
             <div className="absolute top-0 right-0 p-4 opacity-50">
@@ -42,10 +44,12 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: 
                     </CardTitle>
                     <CardDescription>Detailed breakdown by sub-category</CardDescription>
                 </div>
-                <Button size="sm" variant="outline" className="h-8 gap-1.5 bg-background/50 hover:bg-background hover:text-primary transition-colors">
-                    <Plus className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Add New</span>
-                    <span className="sm:hidden">Add</span>
+                <Button asChild size="sm" variant="outline" className="h-8 gap-1.5 bg-background/50 hover:bg-background hover:text-primary transition-colors">
+                    <Link href={`/admin/categories/${categoryId}/subcategories/new`}>
+                        <Plus className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Add New</span>
+                        <span className="sm:hidden">Add</span>
+                    </Link>
                 </Button>
             </CardHeader>
             <CardContent className="space-y-3 relative z-10 p-3 pt-0 flex-1 min-h-0">
@@ -132,11 +136,11 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [] }: 
 
                                                 <ActionMenu
                                                     align="end"
-                                                    editHref="#" // TODO: Add subcategory edit
+                                                    editHref={`/admin/categories/${categoryId}/subcategories/edit/${sub.SubCategoryID}`}
                                                     editLabel="Edit Sub-Category"
                                                     model="sub_categories"
                                                     id={sub.SubCategoryID.toString()}
-                                                    deletePath="/admin/categories"
+                                                    deletePath={`/admin/categories/${categoryId}`}
                                                     deleteLabel="Delete Sub-Category"
                                                     className="h-8 w-8 -mr-2 rounded-full hover:bg-muted"
                                                 />

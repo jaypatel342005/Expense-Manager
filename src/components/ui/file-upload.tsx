@@ -19,6 +19,10 @@ interface FileUploadProps {
     folder?: string;
 }
 
+import { ImageCropper } from "@/components/ui/image-cropper";
+
+// ... existing imports
+
 export function FileUpload({
     name = "file",
     accept = "image/*",
@@ -36,13 +40,15 @@ export function FileUpload({
     const [error, setError] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     
-    // Upload State
     const [isUploading, setIsUploading] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false); // Add isDeleting state
+    const [isDeleting, setIsDeleting] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(currentFilePath || null);
     const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
     const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
+
+    const [fileToCrop, setFileToCrop] = useState<File | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
 
     React.useEffect(() => {
         if (!value && currentFilePath && !uploadedFileUrl) {
@@ -53,17 +59,6 @@ export function FileUpload({
             return () => URL.revokeObjectURL(objectUrl);
         }
     }, [value, currentFilePath]);
-
-    // ... (keep handleDrag and validateFile as is) ...
-    // Note: Since replace_file_content replaces a chunk, I need to be careful with context. 
-    // I will replace the state definition block first.
-    
-    // Actually, I'll do this in multiple chunks to be safe or just target specific small blocks if possible.
-    // But the instructions say "use multi_replace" for non-contiguous. Here I need to touch state, removeFile, and verify render.
-    // They are separated. So I should use multi_replace.
-    
-    // Switching to multi_replace tool in separate call? 
-    // Wait, I am in one tool call. I should use multi_replace_file_content directly.
 
 
     const handleDrag = (e: DragEvent<HTMLDivElement>) => {
@@ -111,10 +106,10 @@ export function FileUpload({
                 const response = JSON.parse(xhr.responseText);
                 setUploadedFileUrl(response.url);
                 setUploadedFileName(response.name || file.name);
-                setUploadedFileId(response.fileId); // Save file ID for deletion
+                setUploadedFileId(response.fileId); 
                 setUploadProgress(100);
                 if (onUploadComplete) onUploadComplete(response.url);
-                if (onChange) onChange(null); // Clear raw file from parent since we have URL now
+                if (onChange) onChange(null); 
             } else {
                 setError("Upload failed.");
             }
@@ -129,6 +124,21 @@ export function FileUpload({
         xhr.send(formData);
     };
 
+    const handleFileSelect = (file: File) => {
+        if (validateFile(file)) {
+             if (file.type.startsWith("image/")) {
+                setFileToCrop(file);
+                setIsCropperOpen(true);
+             } else {
+                const objectUrl = URL.createObjectURL(file);
+                setPreview(objectUrl);
+                uploadFile(file);
+             }
+        } else {
+             if (inputRef.current) inputRef.current.value = "";
+        }
+    }
+
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
@@ -136,14 +146,7 @@ export function FileUpload({
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
-            if (validateFile(file)) {
-                // updateFile(file); // Don't just update, upload!
-                // set preview immediately
-                const objectUrl = URL.createObjectURL(file);
-                setPreview(objectUrl);
-                
-                uploadFile(file);
-            }
+            handleFileSelect(file);
         }
     };
 
@@ -151,15 +154,16 @@ export function FileUpload({
         e.preventDefault();
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            if (validateFile(file)) {
-               const objectUrl = URL.createObjectURL(file);
-               setPreview(objectUrl);
-               
-               uploadFile(file);
-            } else {
-                if (inputRef.current) inputRef.current.value = "";
-            }
+            handleFileSelect(file);
         }
+    };
+
+    const onCropComplete = (croppedFile: File) => {
+        const objectUrl = URL.createObjectURL(croppedFile);
+        setPreview(objectUrl);
+        uploadFile(croppedFile);
+        
+        setFileToCrop(null); // Reset
     };
 
     const removeFile = async (e: React.MouseEvent) => {
@@ -169,7 +173,6 @@ export function FileUpload({
         setIsDeleting(true);
 
         try {
-            // 1. If we have a file ID, delete it from the server
             if (uploadedFileId) {
                 await fetch("/api/upload", {
                     method: "DELETE",
@@ -189,13 +192,12 @@ export function FileUpload({
             setPreview(null);
             setUploadProgress(0);
             
-            if (onUploadComplete) onUploadComplete(""); // Clear URL
+            if (onUploadComplete) onUploadComplete("");     
             if (onChange) onChange(null);
             setError(null);
             
         } catch (err) {
             console.error("Failed to delete file on cancel:", err);
-            // Optionally set an error state here if needed
         } finally {
             setIsDeleting(false);
         }
@@ -209,6 +211,13 @@ export function FileUpload({
 
     return (
         <div className={cn("space-y-2", className)}>
+             <ImageCropper 
+                imageFile={fileToCrop}
+                open={isCropperOpen}
+                onOpenChange={setIsCropperOpen}
+                onCropComplete={onCropComplete}
+            />
+
             <div
                 className={cn(
                     "relative flex flex-col items-center justify-center w-full min-h-[150px] p-6 border-2 border-dashed rounded-lg transition-colors bg-background",
@@ -226,16 +235,15 @@ export function FileUpload({
             >
                 <input
                     ref={inputRef}
-                    type="file" // We keep this for selection, but we won't use it for form submission directly now
+                    type="file" 
+                    name={name}
                     className="hidden"
                     onChange={handleChange}
                     accept={accept}
                 />
 
-                {/* Content View */}
                 <div className="flex flex-col items-center justify-center gap-2 text-center w-full">
                     
-                    {/* State 1: Uploading */}
                     {isUploading && (
                         <div className="w-full max-w-xs flex flex-col items-center gap-4">
                              {preview && (
@@ -253,11 +261,10 @@ export function FileUpload({
                         </div>
                     )}
 
-                    {/* State 2: Uploaded (Show the Card style from screenshot) */}
                     {!isUploading && uploadedFileUrl && (
                         <div className="flex items-center gap-4 w-full max-w-sm p-2 border rounded-lg bg-card shadow-sm cursor-default">
                             <div className="h-12 w-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
-                                {uploadedFileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) || preview ? (
+                                {(uploadedFileUrl && (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(uploadedFileUrl) || accept?.startsWith("image/"))) || preview ? (
                                      <img 
                                         src={uploadedFileUrl || preview || ""} 
                                         alt="Uploaded" 
@@ -297,7 +304,6 @@ export function FileUpload({
                         </div>
                     )}
 
-                    {/* State 3: Idle / Empty */}
                     {!isUploading && !uploadedFileUrl && (
                         <>
                             <div className="p-3 bg-muted rounded-full">

@@ -71,7 +71,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
                 <ActionMenu
                     align="end"
                     viewHref={`/admin/categories/${category.CategoryID}`}
-                    editHref={`/admin/categories/${category.CategoryID}`}
+                    editHref={`/admin/categories/edit/${category.CategoryID}`}
                     editLabel="Edit Category"
                     model="categories"
                     id={category.CategoryID.toString()}

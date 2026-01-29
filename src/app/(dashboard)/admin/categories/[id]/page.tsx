@@ -71,6 +71,7 @@ export default async function CategoryDetailPage({ params }: PageProps) {
                             subCategories={serializedCategory.sub_categories} 
                             expenses={effectiveExpenses} 
                             incomes={effectiveIncomes} 
+                            categoryId={serializedCategory.CategoryID}
                         />
                     </div>
 

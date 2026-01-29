@@ -115,7 +115,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
     };
 
     return (
-        <Card className="w-full md:w-[85%] mx-auto shadow-lg border-1 ">
+        <Card className="w-full max-w-7xl mx-auto pb-10">
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <input type="hidden" name="id" value={income?.IncomeID || ""} />
