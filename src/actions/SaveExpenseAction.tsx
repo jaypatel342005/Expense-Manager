@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage } from "@/lib/imagekit";
 
+import { deleteImage } from "@/lib/imagekit";
+
 export async function SaveExpenseAction(formData: FormData) {
     const id = formData.get("id");
     const ExpenseDate = formData.get("ExpenseDate") as string;
@@ -50,6 +52,15 @@ export async function SaveExpenseAction(formData: FormData) {
 
     try {
         if (id) {
+             // Find existing to cleanup old image
+            const existingExpense = await prisma.expenses.findUnique({
+                where: { ExpenseID: Number(id) }
+            });
+
+            if (existingExpense?.AttachmentPath && existingExpense.AttachmentPath !== AttachmentPath) {
+                await deleteImage(existingExpense.AttachmentPath);
+            }
+
             await prisma.expenses.update({
                 where: { ExpenseID: Number(id) },
                 data: dataPayload

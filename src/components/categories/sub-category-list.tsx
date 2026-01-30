@@ -88,7 +88,7 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [], ca
                                 const avgAmount = txCount > 0 ? totalActivity / txCount : 0;
 
                                 return (
-                                    <div key={sub.SubCategoryID} className="bg-background/80 p-3 rounded-xl border flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group/item hover:border-primary/20">
+                                    <div key={sub.SubCategoryID} className="bg-background/80 p-3 rounded-xl border flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group/item hover:border-primary/20 min-w-0">
                                         
                                         {/* Top Row: Identity & Actions */}
                                         <div className="flex items-start justify-between gap-3">
@@ -104,12 +104,12 @@ export function SubCategoryList({ subCategories, expenses = [], incomes = [], ca
                                                         <Tag className="h-5 w-5" />
                                                     )}
                                                 </div>
-                                                <div className="space-y-0.5 min-w-0">
+                                                <div className="space-y-0.5 min-w-0 w-full">
                                                     <div className="flex items-center gap-2">
                                                         <p className="font-bold text-sm text-slate-900 dark:text-slate-100 line-clamp-1">{sub.SubCategoryName}</p>
                                                         {!sub.IsActive && <Badge variant="destructive" className="h-4 text-[9px] px-1 py-0">Inactive</Badge>}
                                                     </div>
-                                                    <p className="text-[10px] text-muted-foreground line-clamp-1">
+                                                    <p className="text-[10px] text-muted-foreground truncate w-full block" title={sub.Description || "No description"}>
                                                         {sub.Description || "No description"}
                                                     </p>
                                                 </div>

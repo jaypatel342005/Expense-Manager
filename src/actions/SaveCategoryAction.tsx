@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+import { deleteImage } from "@/lib/imagekit";
+
 export async function SaveCategoryAction(formData: FormData) {
     try {
         const id = formData.get("id")?.toString();
@@ -38,6 +40,15 @@ export async function SaveCategoryAction(formData: FormData) {
         };
 
         if (categoryId) {
+            // Find existing to cleanup old image
+            const existingCategory = await prisma.categories.findUnique({
+                where: { CategoryID: categoryId }
+            });
+
+            if (existingCategory?.LogoPath && existingCategory.LogoPath !== logoPath) {
+                await deleteImage(existingCategory.LogoPath);
+            }
+
             // Update
             await prisma.categories.update({
                 where: { CategoryID: categoryId },

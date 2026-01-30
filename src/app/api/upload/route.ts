@@ -1,4 +1,4 @@
-import { imagekit, uploadImage } from "@/lib/imagekit";
+import { imagekit, uploadImage, deleteImage } from "@/lib/imagekit"; // Add deleteImage import
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -21,16 +21,18 @@ export async function POST(request: NextRequest) {
         const uniqueId = Math.random().toString(36).substring(2, 8); // ~6 chars, e.g. "x7z91a"
         let finalFileName;
 
+        // Extract extension
+        const nameParts = file.name.split('.');
+        let ext = "";
+        if (nameParts.length > 1) {
+            ext = "." + nameParts.pop();
+        }
+
         if (customName && customName.trim() !== "") {
-            // Case 1: Custom name provided -> Append ID
-            finalFileName = `${customName.trim()}-${uniqueId}`;
+            // Case 1: Custom name provided -> Append ID AND Extension
+            finalFileName = `${customName.trim()}-${uniqueId}${ext}`;
         } else {
             // Case 2: Default "image" -> Append ID and extension
-            const nameParts = file.name.split('.');
-            let ext = "";
-            if (nameParts.length > 1) {
-                ext = "." + nameParts.pop();
-            }
             finalFileName = `image-${uniqueId}${ext}`;
         }
 
@@ -57,18 +59,25 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
     try {
-        const { fileId } = await request.json();
+        const { fileId, url } = await request.json();
 
-        if (!fileId) {
-            return NextResponse.json(
-                { error: "No file ID provided" },
-                { status: 400 }
-            );
+        if (fileId) {
+             await imagekit.deleteFile(fileId);
+             return NextResponse.json({ success: true });
+        } else if (url) {
+             const success = await deleteImage(url);
+             if (success) {
+                 return NextResponse.json({ success: true });
+             } else {
+                 return NextResponse.json({ error: "File not found or failed to delete" }, { status: 404 });
+             }
         }
 
-        await imagekit.deleteFile(fileId);
+        return NextResponse.json(
+            { error: "No file ID or URL provided" },
+            { status: 400 }
+        );
 
-        return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Delete error:", error);
         return NextResponse.json(

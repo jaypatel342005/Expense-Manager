@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage } from "@/lib/imagekit";
 
+import { deleteImage } from "@/lib/imagekit";
+
 export async function SaveProjectAction(formData: FormData) {
     const id = formData.get("id");
     const ProjectName = formData.get("ProjectName") as string;
@@ -43,6 +45,15 @@ export async function SaveProjectAction(formData: FormData) {
 
     try {
         if (id) {
+            // Find existing to cleanup old image
+            const existingProject = await prisma.projects.findUnique({
+                where: { ProjectID: Number(id) }
+            });
+
+            if (existingProject?.ProjectLogo && existingProject.ProjectLogo !== ProjectLogo) {
+                await deleteImage(existingProject.ProjectLogo);
+            }
+
             await prisma.projects.update({
                 where: { ProjectID: Number(id) },
                 data: dataPayload

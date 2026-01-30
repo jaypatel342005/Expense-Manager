@@ -5,6 +5,7 @@ import React from 'react';
 export default async function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
     const { id: paramId } = await params;
     const id = parseInt(paramId);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     const project = await prisma.projects.findUnique({
         where: { ProjectID: id }
     });

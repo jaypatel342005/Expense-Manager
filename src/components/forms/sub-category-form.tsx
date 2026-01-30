@@ -51,6 +51,9 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
 
     const [isActive, setIsActive] = useState<boolean>(subCategory?.IsActive ?? true);
     const [attachmentName, setAttachmentName] = useState<string>(subCategory?.SubCategoryName || "subcategory-logo");
+    
+    // Controlled state for Logo Path
+    const [logoPath, setLogoPath] = useState<string | null>(subCategory?.LogoPath || null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -230,19 +233,18 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                                     name="file" 
                                     accept="image/*"
                                     value={null} 
-                                    currentFilePath={subCategory?.LogoPath}
+                                    currentFilePath={logoPath}
                                     customName={attachmentName}
                                     folder="/expense-manager/subcategories"
                                     onUploadComplete={(url) => {
-                                        const input = document.querySelector('input[name="LogoPath"]') as HTMLInputElement;
-                                        if (input) input.value = url;
+                                        setLogoPath(url);
                                     }}
                                     className="bg-background"
                                 />
                                 <input 
                                     type="hidden" 
                                     name="LogoPath" 
-                                    defaultValue={subCategory?.LogoPath || ""} 
+                                    value={logoPath || ""} 
                                 />
                             </div>
                         </CardContent>

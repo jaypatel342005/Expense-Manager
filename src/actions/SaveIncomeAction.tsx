@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { uploadImage } from "@/lib/imagekit";
 
+import { deleteImage } from "@/lib/imagekit";
+
 export async function SaveIncomeAction(formData: FormData) {
     const id = formData.get("id");
     const IncomeDate = formData.get("IncomeDate") as string;
@@ -53,6 +55,15 @@ export async function SaveIncomeAction(formData: FormData) {
 
     try {
         if (id) {
+             // Find existing to cleanup old image
+            const existingIncome = await prisma.incomes.findUnique({
+                where: { IncomeID: Number(id) }
+            });
+
+            if (existingIncome?.AttachmentPath && existingIncome.AttachmentPath !== AttachmentPath) {
+                await deleteImage(existingIncome.AttachmentPath);
+            }
+
             await prisma.incomes.update({
                 where: { IncomeID: Number(id) },
                 data: dataPayload

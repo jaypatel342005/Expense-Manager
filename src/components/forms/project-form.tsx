@@ -43,6 +43,9 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false); 
     const [attachmentName, setAttachmentName] = useState<string>(project?.ProjectName || "project-logo");
     const [isActive, setIsActive] = useState<boolean>(project?.IsActive !== false); // Default true
+    
+    // Controlled state for Project Logo
+    const [logoPath, setLogoPath] = useState<string | null>(project?.ProjectLogo || null);
 
     const [startDate, setStartDate] = useState<Date | undefined>(
         project?.ProjectStartDate ? new Date(project.ProjectStartDate) : undefined
@@ -59,9 +62,6 @@ export default function ProjectForm({ project }: ProjectFormProps) {
         
         if (startDate) formData.set("ProjectStartDate", format(startDate, "yyyy-MM-dd"));
         if (endDate) formData.set("ProjectEndDate", format(endDate, "yyyy-MM-dd"));
-        
-        // Handle Switch manually since it doesn't emit native form value easily if not properly wrapped
-        // But we added a hidden input for it below linked to state
         
         try {
             const result = await SaveProjectAction(formData);
@@ -265,19 +265,18 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                                     name="file" 
                                     accept="image/*"
                                     value={null} 
-                                    currentFilePath={project?.ProjectLogo}
+                                    currentFilePath={logoPath}
                                     customName={attachmentName}
-                                    folder="/project/expensemanager"
+                                    folder="/expense-manager/projects"
                                     onUploadComplete={(url) => {
-                                        const input = document.querySelector('input[name="ProjectLogo"]') as HTMLInputElement;
-                                        if (input) input.value = url;
+                                        setLogoPath(url);
                                     }}
                                     className="bg-background"
                                 />
                                 <input 
                                     type="hidden" 
                                     name="ProjectLogo" 
-                                    defaultValue={project?.ProjectLogo || ""} 
+                                    value={logoPath || ""} 
                                 />
                             </div>
                         </CardContent>

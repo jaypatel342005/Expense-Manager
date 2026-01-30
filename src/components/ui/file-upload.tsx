@@ -15,6 +15,7 @@ interface FileUploadProps {
     onChange?: (file: File | null) => void;
     onUploadComplete?: (url: string) => void;
     className?: string;
+    dropzoneClassName?: string;
     customName?: string;
     folder?: string;
 }
@@ -32,6 +33,7 @@ export function FileUpload({
     onChange,
     onUploadComplete,
     className,
+    dropzoneClassName,
     customName,
     folder,
 }: FileUploadProps) {
@@ -82,9 +84,29 @@ export function FileUpload({
     };
 
     const uploadFile = async (file: File) => {
+        // Capture previous upload ID and URL to cleanup
+        const previousFileId = uploadedFileId;
+        const previousUrl = uploadedFileUrl;
+
         setIsUploading(true);
         setUploadProgress(0);
         setError(null);
+
+        // cleanup previous session upload or existing file
+        if (previousFileId || previousUrl) {
+             try {
+                 await fetch("/api/upload", {
+                     method: "DELETE",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ 
+                        fileId: previousFileId,
+                        url: previousFileId ? undefined : previousUrl
+                     })
+                 });
+             } catch (err) {
+                 console.error("Failed to cleanup overwritten file:", err);
+             }
+        }
 
         const formData = new FormData();
         formData.append("file", file);
@@ -108,6 +130,10 @@ export function FileUpload({
                 setUploadedFileName(response.name || file.name);
                 setUploadedFileId(response.fileId); 
                 setUploadProgress(100);
+                
+                // CRITICAL FIX: Clear the input value so it's not re-submitted with the form
+                if (inputRef.current) inputRef.current.value = "";
+
                 if (onUploadComplete) onUploadComplete(response.url);
                 if (onChange) onChange(null); 
             } else {
@@ -125,6 +151,8 @@ export function FileUpload({
     };
 
     const handleFileSelect = (file: File) => {
+        if (isUploading) return; // Block interaction during upload
+
         if (validateFile(file)) {
              if (file.type.startsWith("image/")) {
                 setFileToCrop(file);
@@ -173,13 +201,16 @@ export function FileUpload({
         setIsDeleting(true);
 
         try {
-            if (uploadedFileId) {
+            if (uploadedFileId || uploadedFileUrl) {
                 await fetch("/api/upload", {
                     method: "DELETE",
                     headers: {
                        "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ fileId: uploadedFileId })
+                    body: JSON.stringify({ 
+                        fileId: uploadedFileId,
+                        url: uploadedFileUrl 
+                    })
                 });
             }
 
@@ -225,7 +256,8 @@ export function FileUpload({
                         ? "border-primary bg-primary/5"
                         : "border-muted-foreground/25",
                      !uploadedFileUrl && !isUploading && "cursor-pointer hover:border-primary/50 hover:bg-muted/25",
-                     error ? "border-destructive/50 bg-destructive/5" : ""
+                     error ? "border-destructive/50 bg-destructive/5" : "",
+                     dropzoneClassName
                 )}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}

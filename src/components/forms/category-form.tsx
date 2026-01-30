@@ -51,6 +51,9 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     const [isExpense, setIsExpense] = useState<boolean>(category?.IsExpense ?? false);
     const [isIncome, setIsIncome] = useState<boolean>(category?.IsIncome ?? false);
     const [attachmentName, setAttachmentName] = useState<string>(category?.CategoryName || "category-logo");
+    
+    // Controlled state for Logo Path
+    const [logoPath, setLogoPath] = useState<string | null>(category?.LogoPath || null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -200,11 +203,11 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                         <CardHeader>
                             <CardTitle>Status</CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg bg-muted/20">
+                        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="flex flex-col space-y-3 border p-3 rounded-lg bg-muted/20">
                                 <div className="space-y-0.5">
-                                    <Label htmlFor="IsActive-switch" className="text-base">Active</Label>
-                                    <p className="text-xs text-muted-foreground">
+                                    <Label htmlFor="IsActive-switch" className="text-base font-medium">Active</Label>
+                                    <p className="text-xs text-muted-foreground pb-2">
                                         Enable/Disable category.
                                     </p>
                                 </div>
@@ -212,24 +215,13 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     id="IsActive-switch"
                                     checked={isActive}
                                     onCheckedChange={setIsActive}
+                                    className="data-[state=checked]:bg-primary"
                                 />
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Right Column - Sidebar */}
-                <div className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Type Settings</CardTitle>
-                            <CardDescription>Specify where this category matches.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                             <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg bg-muted/20">
+                             <div className="flex flex-col space-y-3 border p-3 rounded-lg bg-muted/20">
                                 <div className="space-y-0.5">
-                                    <Label htmlFor="IsExpense-switch" className="text-base">Expense</Label>
-                                    <p className="text-xs text-muted-foreground">
+                                    <Label htmlFor="IsExpense-switch" className="text-base font-medium">Expense</Label>
+                                    <p className="text-xs text-muted-foreground pb-2">
                                         Use for expense transactions.
                                     </p>
                                 </div>
@@ -237,12 +229,13 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     id="IsExpense-switch"
                                     checked={isExpense}
                                     onCheckedChange={setIsExpense}
+                                    className="data-[state=checked]:bg-primary"
                                 />
                             </div>
-                            <div className="flex items-center justify-between space-x-2 border p-3 rounded-lg bg-muted/20">
+                            <div className="flex flex-col space-y-3 border p-3 rounded-lg bg-muted/20">
                                 <div className="space-y-0.5">
-                                    <Label htmlFor="IsIncome-switch" className="text-base">Income</Label>
-                                    <p className="text-xs text-muted-foreground">
+                                    <Label htmlFor="IsIncome-switch" className="text-base font-medium">Income</Label>
+                                    <p className="text-xs text-muted-foreground pb-2">
                                         Use for income transactions.
                                     </p>
                                 </div>
@@ -250,11 +243,15 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     id="IsIncome-switch"
                                     checked={isIncome}
                                     onCheckedChange={setIsIncome}
+                                    className="data-[state=checked]:bg-primary"
                                 />
                             </div>
                         </CardContent>
                     </Card>
+                </div>
 
+                {/* Right Column - Sidebar */}
+                <div className="space-y-6">                    
                     <Card>
                         <CardHeader>
                             <CardTitle>Icon / Logo</CardTitle>
@@ -265,19 +262,19 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     name="file" 
                                     accept="image/*"
                                     value={null} 
-                                    currentFilePath={category?.LogoPath}
+                                    currentFilePath={logoPath}
                                     customName={attachmentName}
                                     folder="/expense-manager/categories"
                                     onUploadComplete={(url) => {
-                                        const input = document.querySelector('input[name="LogoPath"]') as HTMLInputElement;
-                                        if (input) input.value = url;
+                                        setLogoPath(url);
                                     }}
                                     className="bg-background"
+                                    dropzoneClassName="min-h-[250px]"
                                 />
                                 <input 
                                     type="hidden" 
                                     name="LogoPath" 
-                                    defaultValue={category?.LogoPath || ""} 
+                                    value={logoPath || ""} 
                                 />
                             </div>
                         </CardContent>
