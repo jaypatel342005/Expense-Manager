@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 export default async function NewPeoplePage() {
     // const session = await auth();
-    if (!session?.user) return redirect("/sign-in");
+    // if (!session?.user) return redirect("/sign-in");
 
     return (
         <div className="container mx-auto py-10">
