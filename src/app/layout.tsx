@@ -11,8 +11,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Expense Manager",
+  title: "ExpenXO - Expense Manager",
   description: "Manage your expenses and incomes efficiently",
+  icons: {
+    icon: "/expenXO_logo.png",
+  },
 };
 
 export default function RootLayout({

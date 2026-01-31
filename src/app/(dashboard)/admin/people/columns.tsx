@@ -114,8 +114,8 @@ export const columns: ColumnDef<PeopleWithUser>[] = [
             return (
                 <ActionMenu
                     align="end"
-                    viewHref={`/admin/people/${person.PeopleID}`}
-                    editHref={`/admin/people/${person.PeopleID}`} // Assuming edit page is same for now
+                    viewHref={`/admin/people/edit/${person.PeopleID}`} // Use edit page for view for now as well
+                    editHref={`/admin/people/edit/${person.PeopleID}`}
                     editLabel="Edit Person"
                     model="peoples"
                     id={person.PeopleID.toString()}

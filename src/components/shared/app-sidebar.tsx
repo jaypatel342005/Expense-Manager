@@ -18,6 +18,7 @@ import {
     Wallet,
 } from "lucide-react"
 import Link from "next/link"
+import NextImage from "next/image"
 import { usePathname } from "next/navigation"
 
 import {
@@ -115,12 +116,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                                    <Wallet className="size-4" />
+                                <div className="flex aspect-square size-8 items-center justify-center bg-transparent">
+                                    <NextImage 
+                                        src="/expenXO_logo.png" 
+                                        alt="Expenxo Logo" 
+                                        width={32} 
+                                        height={32} 
+                                        className="object-contain" 
+                                        priority
+                                    />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">Expense Manager</span>
-                                    <span className="truncate text-xs">v1.0.0</span>
+                                    <span className="truncate font-semibold">ExpenXO</span>
+                                    <span className="truncate text-xs">Expense Manager</span>
                                 </div>
                             </Link>
                         </SidebarMenuButton>

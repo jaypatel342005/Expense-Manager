@@ -9,6 +9,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import NextImage from "next/image"
 
 export function LoginForm({
   className,
@@ -21,9 +22,19 @@ export function LoginForm({
           <form className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
+                <div className="flex aspect-square size-10 items-center justify-center bg-transparent mb-2">
+                    <NextImage 
+                        src="/expenXO_logo.png" 
+                        alt="Expenxo Logo" 
+                        width={40} 
+                        height={40} 
+                        className="object-contain" 
+                        priority
+                    />
+                </div>
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground text-balance">
-                  Login to your Acme Inc account
+                  Login to your ExpenXO account
                 </p>
               </div>
               <Field>

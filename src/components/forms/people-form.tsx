@@ -1,6 +1,5 @@
 "use client"
-import { SaveSubCategoryAction } from '@/actions/SaveSubCategoryAction';
-import { uploadFileToServer } from '@/lib/client-upload';
+import { SavePeopleAction } from '@/actions/SavePeopleAction';
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react"
@@ -10,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUpload } from "@/components/ui/file-upload";
 import { toast } from "sonner";
 import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 import { Switch } from "@/components/ui/switch";
@@ -27,37 +25,29 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-type SubCategoryData = {
-    SubCategoryID?: number;
-    CategoryID: number;
-    SubCategoryName?: string;
-    LogoPath?: string | null;
-    IsActive?: boolean | null;
+type PeopleData = {
+    PeopleID?: number;
+    PeopleName?: string;
+    PeopleCode?: string | null;
+    Email?: string;
+    MobileNo?: string;
+    Password?: string;
     Description?: string | null;
+    IsActive?: boolean | null;
     UserID?: number;
 }
 
-interface SubCategoryFormProps {
-    subCategory?: SubCategoryData;
-    categoryId?: number; // For new sub-categories
+interface PeopleFormProps {
+    person?: PeopleData;
 }
 
-export default function SubCategoryForm({ subCategory, categoryId }: SubCategoryFormProps) {
+export default function PeopleForm({ person }: PeopleFormProps) {
     const router = useRouter(); 
     const [isSubmitting, setIsSubmitting] = useState(false); 
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // If editing, use subCategory.CategoryID, else use passed categoryId
-    const effectiveCategoryId = subCategory?.CategoryID || categoryId;
-
-    const [isActive, setIsActive] = useState<boolean>(subCategory?.IsActive ?? true);
-    const [attachmentName, setAttachmentName] = useState<string>(subCategory?.SubCategoryName || "subcategory-logo");
-    
-    // Controlled state for Logo Path
-    const [logoPath, setLogoPath] = useState<string | null>(subCategory?.LogoPath || null);
-    
-    // Staged file for manual upload
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // Controlled state
+    const [isActive, setIsActive] = useState<boolean>(person?.IsActive ?? true);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -66,28 +56,7 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
         const formData = new FormData(e.currentTarget);
         
         try {
-            // Manual Upload Step
-            if (selectedFile) {
-                try {
-                    toast.info("Uploading icon...");
-                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/subcategories", attachmentName);
-                     if (uploadResult?.url) {
-                        formData.set("LogoPath", uploadResult.url);
-                        setLogoPath(uploadResult.url); 
-                    }
-                } catch (uploadError) {
-                    console.error("File upload failed", uploadError);
-                    toast.error("Failed to upload icon.");
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else if (logoPath === null || logoPath === "") {
-                formData.set("LogoPath", "");
-            } else {
-                 formData.set("LogoPath", logoPath);
-            }
-
-            const result = await SaveSubCategoryAction(formData);
+            const result = await SavePeopleAction(formData);
 
             if (result.success) {
                 toast.custom(() => (
@@ -97,7 +66,7 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                         variant="success"
                     />
                 ));
-                router.push(`/admin/categories/${effectiveCategoryId}`);
+                router.push("/admin/people");
                 router.refresh();
             } else {
                 toast.custom(() => (
@@ -123,46 +92,41 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
     };
 
     const handleDelete = async () => {
-        if (!subCategory?.SubCategoryID || !effectiveCategoryId) return;
+        if (!person?.PeopleID) return;
         setIsDeleting(true);
         try {
-            await deleteRow("sub_categories", subCategory.SubCategoryID.toString(), `/admin/categories/${effectiveCategoryId}`);
+            await deleteRow("peoples", person.PeopleID.toString(), "/admin/people");
             toast.custom(() => (
-                <AlertSoftSuccessDemo title="Deleted" description="Sub-Category deleted successfully." variant="success" />
+                <AlertSoftSuccessDemo title="Deleted" description="Person deleted successfully." variant="success" />
             ));
-            router.push(`/admin/categories/${effectiveCategoryId}`);
+            router.push("/admin/people");
             router.refresh();
         } catch (error) {
              console.error(error);
              toast.custom(() => (
-                <AlertSoftSuccessDemo title="Error" description={error instanceof Error ? error.message : "Failed to delete sub-category."} variant="error" />
+                <AlertSoftSuccessDemo title="Error" description={error instanceof Error ? error.message : "Failed to delete person."} variant="error" />
             ));
         } finally {
             setIsDeleting(false);
         }
     }
 
-    if (!effectiveCategoryId) {
-        return <div>Error: Category ID missing</div>;
-    }
-
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-5xl mx-auto pb-10">
-            <input type="hidden" name="id" value={subCategory?.SubCategoryID || ""} />
-            <input type="hidden" name="CategoryID" value={effectiveCategoryId} />
-            <input type="hidden" name="UserID" value={subCategory?.UserID || "1"} />
+        <form onSubmit={handleSubmit} className="w-full max-w-7xl mx-auto pb-10">
+            <input type="hidden" name="id" value={person?.PeopleID || ""} />
+            <input type="hidden" name="UserID" value={person?.UserID || "1"} />
             <input type="hidden" name="IsActive" value={String(isActive)} />
 
             <div className="flex items-center justify-between mb-6">
                  <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        {subCategory ? "Edit Sub-Category" : "Create Sub-Category"}
+                        {person ? "Edit Person" : "Add Person"}
                     </h1>
                      <p className="text-muted-foreground">
-                        {subCategory ? `Manage details for ${subCategory.SubCategoryName}` : "Add a new sub-category."}
+                        {person ? `Manage details for ${person.PeopleName}` : "Add a new person to your system."}
                     </p>
                 </div>
-                {subCategory && (
+                {person && (
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                              <Button variant="destructive" size="sm" type="button">
@@ -174,7 +138,7 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                             <AlertDialogHeader>
                                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This action cannot be undone.
+                                    This action cannot be undone. This will permanently delete this person record.
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -194,30 +158,83 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                 <div className="lg:col-span-2 space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Details</CardTitle>
+                            <CardTitle>Personal Details</CardTitle>
+                            <CardDescription>Basic contact information.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="SubCategoryName">Name</Label>
-                                <Input 
-                                    type="text" 
-                                    id="SubCategoryName"
-                                    name="SubCategoryName" 
-                                    defaultValue={subCategory?.SubCategoryName || ""} 
-                                    required 
-                                    placeholder="e.g. Electricity, Bonus"
-                                    className="h-10"
-                                    onChange={(e) => setAttachmentName(e.target.value)}
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="PeopleName">Full Name</Label>
+                                    <Input 
+                                        type="text" 
+                                        id="PeopleName"
+                                        name="PeopleName" 
+                                        defaultValue={person?.PeopleName || ""} 
+                                        required 
+                                        placeholder="e.g. John Doe"
+                                        className="h-10"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="PeopleCode">Code / ID</Label>
+                                    <Input 
+                                        type="text" 
+                                        id="PeopleCode"
+                                        name="PeopleCode" 
+                                        defaultValue={person?.PeopleCode || ""} 
+                                        placeholder="e.g. EMP-001"
+                                        className="h-10"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="Email">Email Address</Label>
+                                    <Input 
+                                        type="email" 
+                                        id="Email"
+                                        name="Email" 
+                                        defaultValue={person?.Email || ""} 
+                                        required 
+                                        placeholder="john@example.com"
+                                        className="h-10"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="MobileNo">Mobile Number</Label>
+                                    <Input 
+                                        type="tel" 
+                                        id="MobileNo"
+                                        name="MobileNo" 
+                                        defaultValue={person?.MobileNo || ""} 
+                                        required 
+                                        placeholder="+1 234 567 890"
+                                        className="h-10"
+                                    />
+                                </div>
                             </div>
                             
+                            <div className="space-y-2">
+                                <Label htmlFor="Password">Password</Label>
+                                <Input 
+                                    type="password" 
+                                    id="Password"
+                                    name="Password" 
+                                    // Don't show existing password hash
+                                    placeholder={person ? "Leave blank to keep current password" : "Enter password"}
+                                    required={!person}
+                                    className="h-10"
+                                />
+                            </div>
+
                             <div className="space-y-2">
                                 <Label htmlFor="Description">Description</Label>
                                 <Textarea 
                                     id="Description"
                                     name="Description" 
-                                    defaultValue={subCategory?.Description || ""} 
-                                    placeholder="Optional notes..."
+                                    defaultValue={person?.Description || ""} 
+                                    placeholder="Additional notes..."
                                     className="min-h-[100px] resize-y"
                                 />
                             </div>
@@ -236,42 +253,13 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                                 <div className="space-y-0.5">
                                     <Label htmlFor="IsActive-switch" className="text-base">Active</Label>
                                     <p className="text-xs text-muted-foreground">
-                                        Enable/Disable.
+                                        Enable/Disable account.
                                     </p>
                                 </div>
                                 <Switch
                                     id="IsActive-switch"
                                     checked={isActive}
                                     onCheckedChange={setIsActive}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Icon</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                <FileUpload 
-                                    name="file" 
-                                    accept="image/*"
-                                    value={null} 
-                                    currentFilePath={logoPath}
-                                    customName={attachmentName}
-                                    folder="/expense-manager/subcategories"
-                                    manualUpload={true}
-                                    onFileChange={(file) => {
-                                        setSelectedFile(file);
-                                        if (file === null) setLogoPath(null);
-                                    }}
-                                    className="bg-background"
-                                />
-                                <input 
-                                    type="hidden" 
-                                    name="LogoPath" 
-                                    value={logoPath || ""} 
                                 />
                             </div>
                         </CardContent>
@@ -285,7 +273,7 @@ export default function SubCategoryForm({ subCategory, categoryId }: SubCategory
                                     Saving...
                                 </>
                             ) : (
-                                subCategory ? "Update Sub-Category" : "Create Sub-Category"
+                                person ? "Update Person" : "Create Person"
                             )}
                         </Button>
                         <Button 

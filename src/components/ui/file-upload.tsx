@@ -16,6 +16,8 @@ interface FileUploadProps {
     onUploadComplete?: (url: string) => void;
     className?: string;
     dropzoneClassName?: string;
+    manualUpload?: boolean;
+    onFileChange?: (file: File | null) => void;
     customName?: string;
     folder?: string;
 }
@@ -36,6 +38,8 @@ export function FileUpload({
     dropzoneClassName,
     customName,
     folder,
+    manualUpload = false,
+    onFileChange
 }: FileUploadProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -53,14 +57,14 @@ export function FileUpload({
     const [isCropperOpen, setIsCropperOpen] = useState(false);
 
     React.useEffect(() => {
-        if (!value && currentFilePath && !uploadedFileUrl) {
+        if (!value && currentFilePath && !uploadedFileUrl && !preview) {
            setUploadedFileUrl(currentFilePath);
-        } else if (value) {
+        } else if (value && !preview) { // Ensure we don't overwrite manual preview
             const objectUrl = URL.createObjectURL(value);
             setPreview(objectUrl);
             return () => URL.revokeObjectURL(objectUrl);
         }
-    }, [value, currentFilePath]);
+    }, [value, currentFilePath, uploadedFileUrl, preview]);
 
 
     const handleDrag = (e: DragEvent<HTMLDivElement>) => {
@@ -160,7 +164,15 @@ export function FileUpload({
              } else {
                 const objectUrl = URL.createObjectURL(file);
                 setPreview(objectUrl);
-                uploadFile(file);
+                
+                if (manualUpload) {
+                    // Skip auto upload
+                    if (onFileChange) onFileChange(file);
+                    // Clear previous URL visual if replacing
+                    setUploadedFileUrl(null); 
+                } else {
+                    uploadFile(file);
+                }
              }
         } else {
              if (inputRef.current) inputRef.current.value = "";
@@ -189,7 +201,13 @@ export function FileUpload({
     const onCropComplete = (croppedFile: File) => {
         const objectUrl = URL.createObjectURL(croppedFile);
         setPreview(objectUrl);
-        uploadFile(croppedFile);
+        
+        if (manualUpload) {
+             if (onFileChange) onFileChange(croppedFile);
+             setUploadedFileUrl(null);
+        } else {
+             uploadFile(croppedFile);
+        }
         
         setFileToCrop(null); // Reset
     };
@@ -198,10 +216,12 @@ export function FileUpload({
         e.preventDefault();
         e.stopPropagation();
         
-        setIsDeleting(true);
+        if (!manualUpload) {
+             setIsDeleting(true);
+        }
 
         try {
-            if (uploadedFileId || uploadedFileUrl) {
+            if (!manualUpload && (uploadedFileId || uploadedFileUrl)) {
                 await fetch("/api/upload", {
                     method: "DELETE",
                     headers: {
@@ -223,6 +243,7 @@ export function FileUpload({
             setPreview(null);
             setUploadProgress(0);
             
+            if (manualUpload && onFileChange) onFileChange(null);
             if (onUploadComplete) onUploadComplete("");     
             if (onChange) onChange(null);
             setError(null);
@@ -230,7 +251,7 @@ export function FileUpload({
         } catch (err) {
             console.error("Failed to delete file on cancel:", err);
         } finally {
-            setIsDeleting(false);
+            if (!manualUpload) setIsDeleting(false);
         }
     };
 
@@ -255,7 +276,7 @@ export function FileUpload({
                     dragActive
                         ? "border-primary bg-primary/5"
                         : "border-muted-foreground/25",
-                     !uploadedFileUrl && !isUploading && "cursor-pointer hover:border-primary/50 hover:bg-muted/25",
+                     (!uploadedFileUrl && !preview) && !isUploading && "cursor-pointer hover:border-primary/50 hover:bg-muted/25",
                      error ? "border-destructive/50 bg-destructive/5" : "",
                      dropzoneClassName
                 )}
@@ -293,7 +314,7 @@ export function FileUpload({
                         </div>
                     )}
 
-                    {!isUploading && uploadedFileUrl && (
+                    {!isUploading && (uploadedFileUrl || preview) && (
                         <div className="flex items-center gap-4 w-full max-w-sm p-2 border rounded-lg bg-card shadow-sm cursor-default">
                             <div className="h-12 w-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
                                 {(uploadedFileUrl && (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(uploadedFileUrl) || accept?.startsWith("image/"))) || preview ? (
@@ -336,7 +357,7 @@ export function FileUpload({
                         </div>
                     )}
 
-                    {!isUploading && !uploadedFileUrl && (
+                    {!isUploading && !uploadedFileUrl && !preview && (
                         <>
                             <div className="p-3 bg-muted rounded-full">
                                 <Upload className="w-5 h-5 text-muted-foreground" />

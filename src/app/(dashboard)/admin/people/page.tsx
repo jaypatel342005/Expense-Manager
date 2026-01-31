@@ -41,8 +41,8 @@ export default async function PeoplePage() {
                 </div>
                 {/* Placeholder for Add People - functionality deferred */}
                 <div className="flex items-center space-x-2">
-                    <Button asChild disabled variant="outline">
-                        <Link href="#">
+                    <Button asChild>
+                        <Link href="/admin/people/new">
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add People
                         </Link>

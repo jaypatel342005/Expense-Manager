@@ -1,7 +1,7 @@
 "use server"
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { uploadImage } from "@/lib/imagekit";
+
 
 import { deleteImage } from "@/lib/imagekit";
 
@@ -15,21 +15,7 @@ export async function SaveProjectAction(formData: FormData) {
     let ProjectLogo = formData.get("ProjectLogo") as string;
     const IsActive = formData.get("IsActive") === "true";
     const UserID = formData.get("UserID");
-    const file = formData.get("file") as File;
-    const AttachmentName = formData.get("AttachmentName") as string || "project-logo";
 
-    try {
-        if (file && file.size > 0) {
-            const uploadResponse = await uploadImage(
-                file, 
-                AttachmentName, 
-                "/expense-manager/projects"
-            );
-            ProjectLogo = uploadResponse.url;
-        }
-    } catch (error) {
-        console.error("ImageKit Upload Error:", error);
-    }
 
     const dataPayload = {
         ProjectName,

@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 import { Switch } from "@/components/ui/switch";
 import { deleteRow } from '@/actions/delete-action';
+import { uploadFileToServer } from '@/lib/client-upload';
 import { 
     AlertDialog,
     AlertDialogAction,
@@ -54,16 +55,38 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     
     // Controlled state for Logo Path
     const [logoPath, setLogoPath] = useState<string | null>(category?.LogoPath || null);
+    
+    // Staged file for manual upload
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         const formData = new FormData(e.currentTarget);
-        // Appending boolean states manually as hidden inputs might miss if not present or unchecked
-        // (Though we use hidden inputs below, ensuring they are synced is good practice)
         
         try {
+            // Manual Upload Step
+            if (selectedFile) {
+                try {
+                    toast.info("Uploading logo...");
+                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/categories", attachmentName);
+                     if (uploadResult?.url) {
+                        formData.set("LogoPath", uploadResult.url);
+                        setLogoPath(uploadResult.url);
+                    }
+                } catch (uploadError) {
+                    console.error("File upload failed", uploadError);
+                    toast.error("Failed to upload logo image.");
+                    setIsSubmitting(false);
+                    return;
+                }
+            } else if (logoPath === null || logoPath === "") {
+                formData.set("LogoPath", "");
+            } else {
+                 formData.set("LogoPath", logoPath);
+            }
+
             const result = await SaveCategoryAction(formData);
 
             if (result.success) {
@@ -228,7 +251,10 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                 <Switch
                                     id="IsExpense-switch"
                                     checked={isExpense}
-                                    onCheckedChange={setIsExpense}
+                                    onCheckedChange={(checked) => {
+                                        setIsExpense(checked);
+                                        if (checked) setIsIncome(false);
+                                    }}
                                     className="data-[state=checked]:bg-primary"
                                 />
                             </div>
@@ -242,7 +268,10 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                 <Switch
                                     id="IsIncome-switch"
                                     checked={isIncome}
-                                    onCheckedChange={setIsIncome}
+                                    onCheckedChange={(checked) => {
+                                        setIsIncome(checked);
+                                        if (checked) setIsExpense(false);
+                                    }}
                                     className="data-[state=checked]:bg-primary"
                                 />
                             </div>
@@ -265,11 +294,13 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     currentFilePath={logoPath}
                                     customName={attachmentName}
                                     folder="/expense-manager/categories"
-                                    onUploadComplete={(url) => {
-                                        setLogoPath(url);
-                                    }}
                                     className="bg-background"
                                     dropzoneClassName="min-h-[250px]"
+                                    manualUpload={true}
+                                    onFileChange={(file) => {
+                                        setSelectedFile(file);
+                                        if (file === null) setLogoPath(null);
+                                    }}
                                 />
                                 <input 
                                     type="hidden" 

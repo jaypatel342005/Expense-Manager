@@ -1,5 +1,6 @@
 "use client"
 import { SaveIncomeAction } from '@/actions/SaveIncomeAction';
+import { uploadFileToServer } from '@/lib/client-upload';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { format } from "date-fns"
@@ -61,6 +62,10 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         income?.IncomeDate ? new Date(income.IncomeDate) : new Date()
     );
 
+    // Staged file for manual upload
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [attachmentPath, setAttachmentPath] = useState<string | null>(income?.AttachmentPath || null);
+
     const filteredSubCategories = subCategories.filter(
         sc => sc.CategoryID.toString() === selectedCategory
     );
@@ -80,6 +85,27 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         const formData = new FormData(e.currentTarget);
 
         try {
+            // Manual Upload Step
+            if (selectedFile) {
+                try {
+                    toast.info("Uploading attachment...");
+                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/incomes", attachmentName);
+                     if (uploadResult?.url) {
+                        formData.set("AttachmentPath", uploadResult.url);
+                        setAttachmentPath(uploadResult.url);
+                    }
+                } catch (uploadError) {
+                    console.error("File upload failed", uploadError);
+                    toast.error("Failed to upload attachment.");
+                    setIsSubmitting(false);
+                    return;
+                }
+            } else if (attachmentPath === null || attachmentPath === "") {
+                formData.set("AttachmentPath", "");
+            } else {
+                 formData.set("AttachmentPath", attachmentPath || "");
+            }
+
             const result = await SaveIncomeAction(formData);
 
             if (result.success) {
@@ -292,19 +318,20 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         name="file" 
                                         accept="image/*"
                                         value={null} 
-                                        currentFilePath={income?.AttachmentPath}
+                                        currentFilePath={attachmentPath}
                                         customName={attachmentName}
                                         folder="/expense-manager/incomes"
-                                        onUploadComplete={(url) => {
-                                            const input = document.querySelector('input[name="AttachmentPath"]') as HTMLInputElement;
-                                            if (input) input.value = url;
+                                        manualUpload={true}
+                                        onFileChange={(file) => {
+                                            setSelectedFile(file);
+                                            if (file === null) setAttachmentPath(null);
                                         }}
                                         className="bg-background"
                                     />
                                     <input 
                                         type="hidden" 
                                         name="AttachmentPath" 
-                                        defaultValue={income?.AttachmentPath || ""} 
+                                        value={attachmentPath || ""} 
                                     />
                                 </div>
                             </CardContent>
