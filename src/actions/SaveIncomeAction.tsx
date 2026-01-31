@@ -13,6 +13,11 @@ export async function SaveIncomeAction(formData: FormData) {
     const IncomeDetail = formData.get("IncomeDetail") as string;
     let AttachmentPath = formData.get("AttachmentPath") as string;
     const UserID = formData.get("UserID");
+    
+    const CategoryID = formData.get("CategoryID");
+    const SubCategoryID = formData.get("SubCategoryID");
+    const PeopleID = formData.get("PeopleID");
+    const ProjectID = formData.get("ProjectID");
 
 
     const dataPayload = {
