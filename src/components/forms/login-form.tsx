@@ -22,7 +22,7 @@ export function LoginForm({
           <form className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <div className="flex aspect-square size-10 items-center justify-center bg-transparent mb-2">
+                <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-white p-1 mb-2">
                     <NextImage 
                         src="/expenXO_logo.png" 
                         alt="Expenxo Logo" 

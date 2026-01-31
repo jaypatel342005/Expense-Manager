@@ -116,17 +116,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/" onClick={() => isMobile && setOpenMobile(false)}>
-                                <div className="flex aspect-square size-8 items-center justify-center bg-transparent">
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-2xl bg-white p-0.5">
                                     <NextImage 
                                         src="/expenXO_logo.png" 
                                         alt="Expenxo Logo" 
-                                        width={32} 
-                                        height={32} 
+                                        width={40} 
+                                        height={40} 
                                         className="object-contain" 
                                         priority
                                     />
                                 </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                <div className="p-1 grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">ExpenXO</span>
                                     <span className="truncate text-xs">Expense Manager</span>
                                 </div>
