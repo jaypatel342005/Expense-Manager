@@ -20,6 +20,7 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/', req.nextUrl))
   }
   
+  
   if (path.startsWith('/admin') && session?.role !== 'ADMIN') {
      return NextResponse.redirect(new URL('/', req.nextUrl))
   }
