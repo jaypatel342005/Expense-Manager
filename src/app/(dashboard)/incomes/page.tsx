@@ -12,7 +12,6 @@ import { IncomeStats } from "@/components/incomes/income-stats";
 import { columns } from "./columns";
 
 export default async function IncomesPage() {
-    // Fetch incomes with all related data for display
     const rawIncomes = await prisma.incomes.findMany({
         orderBy: {
             IncomeDate: 'desc'
@@ -57,6 +56,7 @@ export default async function IncomesPage() {
                 averageIncome={averageIncome}
                 highestIncome={highestIncome}
             />
+
 
             <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
                 <Card className="col-span-1">
