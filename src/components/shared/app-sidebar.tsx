@@ -105,9 +105,17 @@ const navItems: { group: string; items: NavItem[] }[] = [
     },
 ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ userRole = "USER", user, ...props }: React.ComponentProps<typeof Sidebar> & { userRole?: string; user?: any }) {
     const pathname = usePathname()
     const { state, isMobile, setOpenMobile } = useSidebar()
+
+    // Filter navItems based on role
+    const filteredNavItems = navItems.filter(group => {
+        if (group.group === "Management") {
+            return userRole === "ADMIN"
+        }
+        return true
+    })
 
     return (
         <Sidebar collapsible="icon" {...props}>
@@ -136,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                {navItems.map((group) => (
+                {filteredNavItems.map((group) => (
                     <SidebarGroup key={group.group}>
                         <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
                         <SidebarMenu>
@@ -279,8 +287,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                             <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">User Name</span>
-                                            <span className="truncate text-xs">user@example.com</span>
+                                            <span className="truncate font-semibold">{user?.UserName || 'User Name'}</span>
+                                            <span className="truncate text-xs">{user?.EmailAddress || 'user@example.com'}</span>
                                         </div>
                                     </div>
                                 </DropdownMenuLabel>
@@ -296,7 +304,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                     <LogOut className="mr-2 h-4 w-4" />
-                                    Log out
+                                    <span onClick={() => {
+                                        import('@/actions/auth').then(({ logout }) => logout())
+                                    }} className="cursor-pointer w-full">Log out</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

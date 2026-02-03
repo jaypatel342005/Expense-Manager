@@ -6,11 +6,17 @@ datasource db {
   provider = "mysql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model users {
   UserID         Int              @id @default(autoincrement())
   UserName       String           @db.VarChar(250)
   EmailAddress   String           @unique(map: "EmailAddress") @db.VarChar(500)
-  Password       String           @db.VarChar(50)
+  Password       String           @db.VarChar(255)
+  Role           Role             @default(USER)
   MobileNo       String           @db.VarChar(50)
   ProfileImage   String?          @db.VarChar(500)
   Created        DateTime         @default(now()) @db.DateTime(0)

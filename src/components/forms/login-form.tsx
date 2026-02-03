@@ -1,3 +1,7 @@
+'use client'
+
+import { useActionState } from 'react'
+import { login } from '@/actions/auth'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -15,11 +19,13 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [state, action, isPending] = useActionState(login, undefined)
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form action={action} className="p-6 md:p-8">
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-white p-1 mb-2">
@@ -38,13 +44,17 @@ export function LoginForm({
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">Email or Username</FieldLabel>
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  name="email"
+                  type="text"
+                  placeholder="Email or Username"
                   required
                 />
+                {state?.errors?.email && (
+                  <p className="text-red-500 text-sm">{state.errors.email}</p>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -56,10 +66,15 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
+                 {state?.errors?.password && (
+                  <p className="text-red-500 text-sm">{state.errors.password}</p>
+                )}
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? 'Logging in...' : 'Login'}
+                </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
@@ -94,7 +109,7 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <a href="#">Sign up</a>
+                Don&apos;t have an account? <a href="/signup">Sign up</a>
               </FieldDescription>
             </FieldGroup>
           </form>

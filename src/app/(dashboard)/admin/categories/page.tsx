@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function CategoriesPage() {
-    // Fetch categories including sub-categories for the grid view
     const categoriesList = await prisma.categories.findMany({
         include: {
             sub_categories: true
