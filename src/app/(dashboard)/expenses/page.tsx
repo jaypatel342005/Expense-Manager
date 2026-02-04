@@ -4,6 +4,7 @@ import { PlusCircle } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { serializeData } from "@/lib/serialization";
 import { Expense } from "./columns";
+import { verifySession } from "@/lib/session";
 
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,13 @@ import { ExpenseStats } from "@/components/expenses/expense-stats";
 import { columns } from "./columns";
 
 export default async function ExpensesPage() {
+    const session = await verifySession();
+    const isNormalUser = session?.role !== 'ADMIN';
+    const userId = session?.userId ? Number(session.userId) : undefined;
+
     // Fetch expenses with all related data for display
     const rawExpenses = await prisma.expenses.findMany({
+        where: isNormalUser ? { UserID: userId } : undefined,
         orderBy: {
             ExpenseDate: 'desc'
         },

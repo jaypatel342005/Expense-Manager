@@ -2,13 +2,12 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { verifySession } from '@/lib/session'
 
-const protectedRoutes = ['/']
 const publicRoutes = ['/login', '/signup']
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
-  const isProtectedRoute = protectedRoutes.includes(path) || path.startsWith('/dashboard')
   const isPublicRoute = publicRoutes.includes(path)
+  const isProtectedRoute = !isPublicRoute
 
   const session = await verifySession()
 
