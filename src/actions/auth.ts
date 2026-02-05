@@ -18,7 +18,15 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email(),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character'),
+  confirmPassword: z.string().min(1, 'Confirm Password is required'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 })
 
 export async function login(prevState: any, formData: FormData) {
@@ -101,8 +109,7 @@ export async function signup(prevState: any, formData: FormData) {
 
   const hashedPassword = await hash(password, 10)
 
-  // Default role is USER. If you need ADMIN, you'd change this or have a separate admin signup/seed.
-  // We use string 'USER' to avoid Enum dependency issues if generator failed
+
   const user = await prisma.users.create({
     data: {
       UserName: name,
@@ -110,11 +117,10 @@ export async function signup(prevState: any, formData: FormData) {
       Password: hashedPassword,
       MobileNo: '', // Optional or add field to form
       Role: 'USER', // Default
-    } as any, // Cast data to any to avoid type error if Role field is missing in input type
+    } as any, 
   })
 
-  // Cast user to any to access Role
   const userRole = (user as any).Role || 'USER'
   await createSession(user.UserID.toString(), userRole)
-  redirect('/')
+  redirect('/complete-profile')
 }

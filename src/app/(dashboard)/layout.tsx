@@ -19,7 +19,7 @@ export default async function DashboardLayout({
     if (session?.userId) {
         user = await prisma.users.findUnique({
             where: { UserID: parseInt(session.userId as string) },
-            select: { UserName: true, EmailAddress: true, Role: true }
+            select: { UserName: true, EmailAddress: true, Role: true, ProfileImage: true }
         });
         if (user) {
             userRole = user.Role;
