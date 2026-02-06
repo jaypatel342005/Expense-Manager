@@ -17,7 +17,6 @@ export default async function ExpensesPage() {
     const isNormalUser = session?.role !== 'ADMIN';
     const userId = session?.userId ? Number(session.userId) : undefined;
 
-    // Fetch expenses with all related data for display
     const rawExpenses = await prisma.expenses.findMany({
         where: isNormalUser ? { UserID: userId } : undefined,
         orderBy: {

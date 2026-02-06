@@ -1,4 +1,4 @@
-import { DollarSign, CreditCard, Activity, TrendingUp } from "lucide-react"
+import { IndianRupee, CreditCard, Activity, TrendingUp } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
@@ -22,7 +22,7 @@ export function IncomeStats({
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
                     <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center dark:bg-emerald-900">
-                        <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
+                        <IndianRupee className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
                     </div>
                 </CardHeader>
                 <CardContent>

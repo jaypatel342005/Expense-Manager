@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 
 import { deleteImage } from "@/lib/imagekit";
+import { verifySession } from "@/lib/session";
 
 export async function SaveExpenseAction(formData: FormData) {
     const id = formData.get("id");
@@ -20,13 +21,28 @@ export async function SaveExpenseAction(formData: FormData) {
     const ProjectID = formData.get("ProjectID");
 
 
+    const session = await verifySession();
+    const isUser = session?.role === 'USER';
+    const sessionUserId = session?.userId ? Number(session.userId) : undefined;
+
+    // Determine final UserID
+    let finalUserId = Number(UserID); // Default from form
+    if (isUser && sessionUserId) {
+        finalUserId = sessionUserId;
+    } else if (sessionUserId && !finalUserId) {
+         // Admin but didn't provide specific ID, or fallback
+        finalUserId = sessionUserId;
+    }
+    // Fallback to 1 if everything fails (legacy behavior)
+    if (!finalUserId) finalUserId = 1;
+
     const dataPayload = {
         ExpenseDate: new Date(ExpenseDate),
         Amount: Number(Amount),
         Description: Description || null,
         ExpenseDetail: ExpenseDetail || null,
         AttachmentPath: AttachmentPath || null,
-        UserID: Number(UserID || 1),
+        UserID: finalUserId,
         
         CategoryID: CategoryID ? Number(CategoryID) : null,
         SubCategoryID: SubCategoryID ? Number(SubCategoryID) : null,

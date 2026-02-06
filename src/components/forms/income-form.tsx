@@ -62,7 +62,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         income?.IncomeDate ? new Date(income.IncomeDate) : new Date()
     );
 
-    // Staged file for manual upload
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [attachmentPath, setAttachmentPath] = useState<string | null>(income?.AttachmentPath || null);
 
@@ -85,7 +84,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         const formData = new FormData(e.currentTarget);
 
         try {
-            // Manual Upload Step
             if (selectedFile) {
                 try {
                     toast.info("Uploading attachment...");

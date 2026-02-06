@@ -1,5 +1,6 @@
 import ExpenseForm from '@/components/forms/expense-form';
 import { prisma } from '@/lib/prisma';
+import { verifySession } from '@/lib/session';
 import React from 'react';
 
 export default async function AddExpensePage() {
@@ -9,8 +10,15 @@ export default async function AddExpensePage() {
     const subCategories = await prisma.sub_categories.findMany({
         where: { IsActive: true }
     });
+    const session = await verifySession();
+    const isUser = session?.role === 'USER';
+    const userId = session?.userId ? Number(session.userId) : undefined;
+
     const peoples = await prisma.peoples.findMany({
-        where: { IsActive: true }
+        where: { 
+            IsActive: true,
+            ...(isUser && userId ? { UserID: userId } : {})
+        }
     });
     const projects = await prisma.projects.findMany({
         where: { IsActive: true }

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { verifySession } from '@/lib/session';
 import IncomeForm from '@/components/forms/income-form';
 import React from 'react';
 
@@ -6,11 +7,20 @@ import React from 'react';
 export default async function EditIncomePage({ params }: { params: Promise<{ id: number }> }) {
     const { id } = await params;
 
+    const session = await verifySession();
+    const isUser = session?.role === 'USER';
+    const userId = session?.userId ? Number(session.userId) : undefined;
+
     const [income, categories, subCategories, peoples, projects] = await Promise.all([
         prisma.incomes.findFirst({ where: { IncomeID: Number(id) } }),
         prisma.categories.findMany({ where: { IsActive: true } }),
         prisma.sub_categories.findMany({ where: { IsActive: true } }),
-        prisma.peoples.findMany({ where: { IsActive: true } }),
+        prisma.peoples.findMany({ 
+            where: { 
+                IsActive: true,
+                ...(isUser && userId ? { UserID: userId } : {})
+            } 
+        }),
         prisma.projects.findMany({ where: { IsActive: true } })
     ]);
 
