@@ -18,6 +18,13 @@ export default async function AddIncomePage() {
         where: { 
             IsActive: true,
             ...(isUser && userId ? { UserID: userId } : {})
+        },
+        include: {
+            users: {
+                select: {
+                    ProfileImage: true
+                }
+            }
         }
     });
 

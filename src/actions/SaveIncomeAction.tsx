@@ -36,6 +36,17 @@ export async function SaveIncomeAction(formData: FormData) {
     // Fallback to 1 if everything fails (legacy behavior)
     if (!finalUserId) finalUserId = 1;
 
+    // Auto-link PeopleID for normal users if not provided
+    let finalPeopleId = PeopleID ? Number(PeopleID) : null;
+    if (!finalPeopleId && isUser && finalUserId) {
+        const userPerson = await prisma.peoples.findFirst({
+            where: { UserID: finalUserId }
+        });
+        if (userPerson) {
+            finalPeopleId = userPerson.PeopleID;
+        }
+    }
+
     const dataPayload = {
         IncomeDate: new Date(IncomeDate),
         Amount: Number(Amount),
@@ -46,7 +57,7 @@ export async function SaveIncomeAction(formData: FormData) {
         
         CategoryID: CategoryID ? Number(CategoryID) : null,
         SubCategoryID: SubCategoryID ? Number(SubCategoryID) : null,
-        PeopleID: PeopleID ? Number(PeopleID) : null,
+        PeopleID: finalPeopleId,
         ProjectID: ProjectID ? Number(ProjectID) : null,
         
         Modified: new Date()

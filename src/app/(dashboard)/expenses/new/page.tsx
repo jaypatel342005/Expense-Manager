@@ -18,6 +18,13 @@ export default async function AddExpensePage() {
         where: { 
             IsActive: true,
             ...(isUser && userId ? { UserID: userId } : {})
+        },
+        include: {
+            users: {
+                select: {
+                    ProfileImage: true
+                }
+            }
         }
     });
     const projects = await prisma.projects.findMany({

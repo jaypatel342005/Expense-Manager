@@ -76,7 +76,7 @@ export function LoginForm({
                   {isPending ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+              {/* <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
               <Field className="grid grid-cols-3 gap-4">
@@ -107,18 +107,28 @@ export function LoginForm({
                   </svg>
                   <span className="sr-only">Login with Meta</span>
                 </Button>
-              </Field>
+              </Field> */}
               <FieldDescription className="text-center">
                 Don&apos;t have an account? <a href="/signup">Sign up</a>
               </FieldDescription>
             </FieldGroup>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+            <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center text-muted-foreground p-10">
+              <div className="text-center space-y-4">
+                <NextImage
+                  src="/expenXO_logo.png"
+                  alt="Expenxo Logo"
+                  width={150}
+                  height={150}
+                  className="object-contain opacity-50 mx-auto"
+                />
+                <h3 className="text-xl font-semibold opacity-70">Welcome Back</h3>
+                <p className="text-sm opacity-60 max-w-xs mx-auto">
+                  Login to access your dashboard and track your expenses effectively.
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

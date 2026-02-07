@@ -33,8 +33,18 @@ export async function SaveExpenseAction(formData: FormData) {
          // Admin but didn't provide specific ID, or fallback
         finalUserId = sessionUserId;
     }
-    // Fallback to 1 if everything fails (legacy behavior)
     if (!finalUserId) finalUserId = 1;
+
+    
+    let finalPeopleId = PeopleID ? Number(PeopleID) : null;
+    if (!finalPeopleId && isUser && finalUserId) {
+        const userPerson = await prisma.peoples.findFirst({
+            where: { UserID: finalUserId }
+        });
+        if (userPerson) {
+            finalPeopleId = userPerson.PeopleID;
+        }
+    }
 
     const dataPayload = {
         ExpenseDate: new Date(ExpenseDate),
@@ -46,7 +56,7 @@ export async function SaveExpenseAction(formData: FormData) {
         
         CategoryID: CategoryID ? Number(CategoryID) : null,
         SubCategoryID: SubCategoryID ? Number(SubCategoryID) : null,
-        PeopleID: PeopleID ? Number(PeopleID) : null,
+        PeopleID: finalPeopleId,
         ProjectID: ProjectID ? Number(ProjectID) : null,
         
         Modified: new Date()

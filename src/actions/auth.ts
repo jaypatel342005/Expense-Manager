@@ -107,6 +107,18 @@ export async function signup(prevState: any, formData: FormData) {
     }
   }
 
+  const existingUserName = await prisma.users.findFirst({
+    where: { UserName: name },
+  })
+
+  if (existingUserName) {
+    return {
+      errors: {
+        name: ['Username already taken'],
+      },
+    }
+  }
+
   const hashedPassword = await hash(password, 10)
 
 

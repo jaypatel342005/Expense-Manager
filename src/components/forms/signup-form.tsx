@@ -77,8 +77,8 @@ useEffect(() => {
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="name">Name</FieldLabel>
-                <Input id="name" name="name" type="text" placeholder="John Doe" required />
+                <FieldLabel htmlFor="name">Username</FieldLabel>
+                <Input id="name" name="name" type="text" placeholder="johndoe123" required />
                 {state?.errors?.name && (
                   <p className="text-red-500 text-sm">{state.errors.name}</p>
                 )}
@@ -187,11 +187,21 @@ useEffect(() => {
             </FieldGroup>
           </form>
           <div className="bg-muted relative hidden md:block">
-            <img
-              src="/placeholder.svg"
-              alt="Image"
-              className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-            />
+            <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center text-muted-foreground p-10">
+              <div className="text-center space-y-4">
+                <NextImage
+                  src="/expenXO_logo.png"
+                  alt="Expenxo Logo"
+                  width={150}
+                  height={150}
+                  className="object-contain opacity-50 mx-auto"
+                />
+                <h3 className="text-xl font-semibold opacity-70">Join ExpenXO</h3>
+                <p className="text-sm opacity-60 max-w-xs mx-auto">
+                  Create an account to start managing your finances and tracking expenses today.
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

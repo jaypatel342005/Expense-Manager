@@ -88,6 +88,14 @@ export function CompleteProfileForm({
                                 </div>
 
                                 <Field>
+                                    <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                                    <Input id="name" name="name" type="text" placeholder="John Doe" required={step === 1} />
+                                    {state?.errors?.name && (
+                                        <p className="text-red-500 text-sm">{state.errors.name}</p>
+                                    )}
+                                </Field>
+
+                                <Field>
                                     <FieldLabel htmlFor="mobile">Mobile Number</FieldLabel>
                                     <Input id="mobile" name="mobile" type="tel" placeholder="+1 234 567 890" required={step === 1} />
                                     {state?.errors?.mobile && (
@@ -154,7 +162,7 @@ export function CompleteProfileForm({
                     </form>
 
                     <div className="bg-muted relative hidden md:block">
-                        <div className="absolute inset-0 h-full w-full bg-primary/5 flex items-center justify-center text-muted-foreground p-10">
+                        <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-primary/40 via-primary/20 to-background flex items-center justify-center text-muted-foreground p-10">
                             <div className="text-center space-y-4">
                                 <NextImage
                                     src="/expenXO_logo.png"

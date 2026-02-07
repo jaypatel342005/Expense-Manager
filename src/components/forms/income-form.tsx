@@ -24,7 +24,7 @@ import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 
 type Category = { CategoryID: number; CategoryName: string; LogoPath?: string | null };
 type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName: string; LogoPath?: string | null };
-type People = { PeopleID: number; PeopleName: string; Email?: string | null };
+type People = { PeopleID: number; PeopleName: string; Email?: string | null; users?: { ProfileImage: string | null } | null };
 type Project = { ProjectID: number; ProjectName: string; ProjectLogo?: string | null };
 
 type IncomeData = {
@@ -203,7 +203,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                 options={people.map(p => ({ 
                                     value: p.PeopleID.toString(), 
                                     label: p.PeopleName,
-                                    image: "" 
+                                    image: p.users?.ProfileImage || "" 
                                 }))}
                                 value={selectedPeople}
                                 onChange={setSelectedPeople}

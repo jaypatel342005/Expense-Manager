@@ -26,190 +26,190 @@ import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 
 type Category = { CategoryID: number; CategoryName: string; LogoPath?: string | null };
 type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName: string; LogoPath?: string | null };
-type People = { PeopleID: number; PeopleName: string; Email?: string | null };
-type Project = { ProjectID: number; ProjectName: string; ProjectLogo?: string | null };
+    type People = { PeopleID: number; PeopleName: string; Email?: string | null; users?: { ProfileImage: string | null } | null };
+    type Project = { ProjectID: number; ProjectName: string; ProjectLogo?: string | null };
 
-type ExpenseData = {
-    ExpenseID?: number;
-    Amount?: any;
-    ExpenseDate?: Date | string;
-    Description?: string | null;
-    UserID?: number;
-    CategoryID?: number | null;
-    SubCategoryID?: number | null;
-    PeopleID?: number | null;
-    ProjectID?: number | null;
-    ExpenseDetail?: string | null;
-    AttachmentPath?: string | null;
-}
+    type ExpenseData = {
+        ExpenseID?: number;
+        Amount?: any;
+        ExpenseDate?: Date | string;
+        Description?: string | null;
+        UserID?: number;
+        CategoryID?: number | null;
+        SubCategoryID?: number | null;
+        PeopleID?: number | null;
+        ProjectID?: number | null;
+        ExpenseDetail?: string | null;
+        AttachmentPath?: string | null;
+    }
 
-interface ExpenseFormProps {
-    expense?: ExpenseData;
-    categories: Category[];
-    subCategories: SubCategory[];
-    people: People[];
-    projects: Project[];
-}
+    interface ExpenseFormProps {
+        expense?: ExpenseData;
+        categories: Category[];
+        subCategories: SubCategory[];
+        people: People[];
+        projects: Project[];
+    }
 
-export default function ExpenseForm({ expense, categories, subCategories, people, projects }: ExpenseFormProps) {
-    const router = useRouter(); 
-    const [selectedCategory, setSelectedCategory] = useState<string>(expense?.CategoryID?.toString() || "");
-    const [selectedSubCategory, setSelectedSubCategory] = useState<string>(expense?.SubCategoryID?.toString() || "");
-    const [selectedPeople, setSelectedPeople] = useState<string>(expense?.PeopleID?.toString() || "");
-    const [selectedProject, setSelectedProject] = useState<string>(expense?.ProjectID?.toString() || "");
-    const [attachmentName, setAttachmentName] = useState<string>("image");
-    const [isSubmitting, setIsSubmitting] = useState(false); 
-    
-    // Date state for Calendar
-    const [date, setDate] = useState<Date | undefined>(
-        expense?.ExpenseDate ? new Date(expense.ExpenseDate) : new Date()
-    );
+    export default function ExpenseForm({ expense, categories, subCategories, people, projects }: ExpenseFormProps) {
+        const router = useRouter(); 
+        const [selectedCategory, setSelectedCategory] = useState<string>(expense?.CategoryID?.toString() || "");
+        const [selectedSubCategory, setSelectedSubCategory] = useState<string>(expense?.SubCategoryID?.toString() || "");
+        const [selectedPeople, setSelectedPeople] = useState<string>(expense?.PeopleID?.toString() || "");
+        const [selectedProject, setSelectedProject] = useState<string>(expense?.ProjectID?.toString() || "");
+        const [attachmentName, setAttachmentName] = useState<string>("image");
+        const [isSubmitting, setIsSubmitting] = useState(false); 
+        
+        // Date state for Calendar
+        const [date, setDate] = useState<Date | undefined>(
+            expense?.ExpenseDate ? new Date(expense.ExpenseDate) : new Date()
+        );
 
-    // Staged file for manual upload
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [attachmentPath, setAttachmentPath] = useState<string | null>(expense?.AttachmentPath || null);
+        // Staged file for manual upload
+        const [selectedFile, setSelectedFile] = useState<File | null>(null);
+        const [attachmentPath, setAttachmentPath] = useState<string | null>(expense?.AttachmentPath || null);
 
-    const filteredSubCategories = subCategories.filter(
-        sc => sc.CategoryID.toString() === selectedCategory
-    );
+        const filteredSubCategories = subCategories.filter(
+            sc => sc.CategoryID.toString() === selectedCategory
+        );
 
-    useEffect(() => {
-        if (selectedCategory !== expense?.CategoryID?.toString()) {
-             const isValid = subCategories.find(sc => sc.SubCategoryID.toString() === selectedSubCategory && sc.CategoryID.toString() === selectedCategory);
-             if (!isValid) setSelectedSubCategory("");
-        }
-    }, [selectedCategory, subCategories, selectedSubCategory, expense]);
-
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        const formData = new FormData(e.currentTarget);
-
-        try {
-             // Manual Upload Step
-            if (selectedFile) {
-                try {
-                    toast.info("Uploading attachment...");
-                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/expense", attachmentName);
-                     if (uploadResult?.url) {
-                        formData.set("AttachmentPath", uploadResult.url);
-                        setAttachmentPath(uploadResult.url);
-                    }
-                } catch (uploadError) {
-                    console.error("File upload failed", uploadError);
-                    toast.error("Failed to upload attachment.");
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else if (attachmentPath === null || attachmentPath === "") {
-                formData.set("AttachmentPath", "");
-            } else {
-                 formData.set("AttachmentPath", attachmentPath || "");
+        useEffect(() => {
+            if (selectedCategory !== expense?.CategoryID?.toString()) {
+                 const isValid = subCategories.find(sc => sc.SubCategoryID.toString() === selectedSubCategory && sc.CategoryID.toString() === selectedCategory);
+                 if (!isValid) setSelectedSubCategory("");
             }
+        }, [selectedCategory, subCategories, selectedSubCategory, expense]);
 
-            const result = await SaveExpenseAction(formData);
 
-            if (result.success) {
-                toast.custom(() => (
-                    <AlertSoftSuccessDemo 
-                        title="Success"
-                        description={result.message}
-                        variant="success"
-                    />
-                ));
-                router.push("/expenses");
-            } else {
+        const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
+            setIsSubmitting(true);
+
+            const formData = new FormData(e.currentTarget);
+
+            try {
+                 // Manual Upload Step
+                if (selectedFile) {
+                    try {
+                        toast.info("Uploading attachment...");
+                        const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/expense", attachmentName);
+                         if (uploadResult?.url) {
+                            formData.set("AttachmentPath", uploadResult.url);
+                            setAttachmentPath(uploadResult.url);
+                        }
+                    } catch (uploadError) {
+                        console.error("File upload failed", uploadError);
+                        toast.error("Failed to upload attachment.");
+                        setIsSubmitting(false);
+                        return;
+                    }
+                } else if (attachmentPath === null || attachmentPath === "") {
+                    formData.set("AttachmentPath", "");
+                } else {
+                     formData.set("AttachmentPath", attachmentPath || "");
+                }
+
+                const result = await SaveExpenseAction(formData);
+
+                if (result.success) {
+                    toast.custom(() => (
+                        <AlertSoftSuccessDemo 
+                            title="Success"
+                            description={result.message}
+                            variant="success"
+                        />
+                    ));
+                    router.push("/expenses");
+                } else {
+                    toast.custom(() => (
+                        <AlertSoftSuccessDemo 
+                            title="Error"
+                            description={result.message}
+                            variant="error"
+                        />
+                    ));
+                }
+            } catch (error) {
+                console.error("Submission error:", error);
                 toast.custom(() => (
                     <AlertSoftSuccessDemo 
                         title="Error"
-                        description={result.message}
+                        description="An unexpected error occurred."
                         variant="error"
                     />
                 ));
+            } finally {
+                setIsSubmitting(false);
             }
-        } catch (error) {
-            console.error("Submission error:", error);
-            toast.custom(() => (
-                <AlertSoftSuccessDemo 
-                    title="Error"
-                    description="An unexpected error occurred."
-                    variant="error"
-                />
-            ));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+        };
 
-    return (
-        <Card  className="w-full max-w-7xl mx-auto pb-10">
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <input type="hidden" name="id" value={expense?.ExpenseID || ""} />
-                    <input type="hidden" name="UserID" value={expense?.UserID || "1"} />
-                    
-                    <input type="hidden" name="CategoryID" value={selectedCategory} />
-                    <input type="hidden" name="SubCategoryID" value={selectedSubCategory} />
-                    <input type="hidden" name="PeopleID" value={selectedPeople} />
-                    <input type="hidden" name="ProjectID" value={selectedProject} />
-                    
-                    <input type="hidden" name="ExpenseDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
+        return (
+            <Card  className="w-full max-w-7xl mx-auto pb-10">
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <input type="hidden" name="id" value={expense?.ExpenseID || ""} />
+                        <input type="hidden" name="UserID" value={expense?.UserID || "1"} />
+                        
+                        <input type="hidden" name="CategoryID" value={selectedCategory} />
+                        <input type="hidden" name="SubCategoryID" value={selectedSubCategory} />
+                        <input type="hidden" name="PeopleID" value={selectedPeople} />
+                        <input type="hidden" name="ProjectID" value={selectedProject} />
+                        
+                        <input type="hidden" name="ExpenseDate" value={date ? format(date, "yyyy-MM-dd") : ""} />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-2 flex flex-col">
-                            <Label htmlFor="ExpenseDate">Expense Date</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal h-10",
-                                            !date && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                        mode="single"
-                                        selected={date}
-                                        onSelect={setDate}
-                                        disabled={(date) => date > new Date()}
-                                        className="rounded-lg border shadow-sm"
-                                        captionLayout="dropdown"
-                                        fromYear={2000}
-                                        toYear={new Date().getFullYear()}
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2 flex flex-col">
+                                <Label htmlFor="ExpenseDate">Expense Date</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal h-10",
+                                                !date && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={date}
+                                            onSelect={setDate}
+                                            disabled={(date) => date > new Date()}
+                                            className="rounded-lg border shadow-sm"
+                                            captionLayout="dropdown"
+                                            fromYear={2000}
+                                            toYear={new Date().getFullYear()}
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="Amount">Amount</Label>
-                            <Input 
-                                type="number" 
-                                step="0.01" 
-                                id="Amount"
-                                name="Amount" 
-                                defaultValue={expense?.Amount ? Number(expense.Amount) : ""} 
-                                required 
-                                placeholder="0.00"
-                                className="h-10"
-                            />
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="Amount">Amount</Label>
+                                <Input 
+                                    type="number" 
+                                    step="0.01" 
+                                    id="Amount"
+                                    name="Amount" 
+                                    defaultValue={expense?.Amount ? Number(expense.Amount) : ""} 
+                                    required 
+                                    placeholder="0.00"
+                                    className="h-10"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label>Payer/People</Label>
-                            <Combobox
-                                options={people.map(p => ({ 
-                                    value: p.PeopleID.toString(), 
-                                    label: p.PeopleName,
-                                    image: "" 
-                                }))}
+                            <div className="space-y-2">
+                                <Label>Payer/People</Label>
+                                <Combobox
+                                    options={people.map(p => ({ 
+                                        value: p.PeopleID.toString(), 
+                                        label: p.PeopleName,
+                                        image: p.users?.ProfileImage || "" 
+                                    }))}
                                 value={selectedPeople}
                                 onChange={setSelectedPeople}
                                 placeholder="Select Payer"
