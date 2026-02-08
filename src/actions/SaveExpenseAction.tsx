@@ -25,12 +25,10 @@ export async function SaveExpenseAction(formData: FormData) {
     const isUser = session?.role === 'USER';
     const sessionUserId = session?.userId ? Number(session.userId) : undefined;
 
-    // Determine final UserID
     let finalUserId = Number(UserID); // Default from form
     if (isUser && sessionUserId) {
         finalUserId = sessionUserId;
     } else if (sessionUserId && !finalUserId) {
-         // Admin but didn't provide specific ID, or fallback
         finalUserId = sessionUserId;
     }
     if (!finalUserId) finalUserId = 1;

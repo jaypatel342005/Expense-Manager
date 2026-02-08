@@ -14,6 +14,7 @@ import {
     Tags,
     TrendingDown,
     TrendingUp,
+    User as UserIcon,
     Users,
     Wallet,
 } from "lucide-react"
@@ -293,6 +294,12 @@ export function AppSidebar({ userRole = "USER", user, ...props }: React.Componen
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
+                                <DropdownMenuItem asChild>
+                                    <Link href="/profile" className="cursor-pointer w-full flex items-center">
+                                        <UserIcon className="mr-2 h-4 w-4" />
+                                        Profile
+                                    </Link>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <CreditCard className="mr-2 h-4 w-4" />
                                     Billing
