@@ -18,7 +18,12 @@ export default async function ExpensesPage() {
     const userId = session?.userId ? Number(session.userId) : undefined;
 
     const rawExpenses = await prisma.expenses.findMany({
-        where: isNormalUser ? { UserID: userId } : undefined,
+        where: isNormalUser ? {
+            OR: [
+                { UserID: userId },
+                { peoples: { UserID: userId } }
+            ]
+        } : undefined,
         orderBy: {
             ExpenseDate: 'desc'
         },

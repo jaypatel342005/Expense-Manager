@@ -12,7 +12,12 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import NextImage from "next/image"
-import { Check, X, Eye, EyeOff } from "lucide-react"
+import { ImageCropper } from "@/components/ui/image-cropper"
+import { uploadFileToServer } from "@/lib/client-upload"
+import { toast } from "sonner"
+import { Camera, Loader2, Save, User as UserIcon, Check, X, Eye, EyeOff } from "lucide-react"
+
+// ... imports
 
 export function SignupForm({
   className,
@@ -34,43 +39,105 @@ export function SignupForm({
   const [passwordsMatch, setPasswordsMatch] = useState(true)
   const [isTouched, setIsTouched] = useState(false)
 
-  // ... (useEffect hooks remain same) ...
-
   useEffect(() => {
     setPasswordCriteria({
         length: password.length >= 8,
         number: /[0-9]/.test(password),
         special: /[^a-zA-Z0-9]/.test(password) // Simplified special char check
     })
-}, [password])
+  }, [password])
 
-useEffect(() => {
+  useEffect(() => {
     if (confirmPassword) {
         setPasswordsMatch(password === confirmPassword)
     }
-}, [password, confirmPassword])
+  }, [password, confirmPassword])
 
   const isPasswordValid = Object.values(passwordCriteria).every(Boolean)
   const isFormValid = isPasswordValid && passwordsMatch && password && confirmPassword
 
+  // Image Upload State
+  const [fileToCrop, setFileToCrop] = useState<File | null>(null)
+  const [isCropperOpen, setIsCropperOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [uploadedUrl, setUploadedUrl] = useState<string>("")
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          setFileToCrop(e.target.files[0])
+          setIsCropperOpen(true)
+          e.target.value = "" // Reset input
+      }
+  }
+
+  const onCropComplete = async (croppedFile: File) => {
+      // Set preview immediately
+      const objectUrl = URL.createObjectURL(croppedFile)
+      setPreviewUrl(objectUrl)
+      
+      // Upload
+      setIsUploading(true)
+      try {
+          const result = await uploadFileToServer(croppedFile, "/expense-manager/users")
+          if (result?.url) {
+              setUploadedUrl(result.url)
+              toast.success("Profile image uploaded!")
+          }
+      } catch (error) {
+          console.error("Upload failed", error)
+          toast.error("Failed to upload image")
+      } finally {
+          setIsUploading(false)
+      }
+  }
+
+  // ... check validity
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <ImageCropper 
+        imageFile={fileToCrop} 
+        open={isCropperOpen} 
+        onOpenChange={setIsCropperOpen} 
+        onCropComplete={onCropComplete} 
+        aspectRatio={1} // Square for profile
+      />
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form action={action} className="p-6 md:p-8">
             <FieldGroup>
-             {/* ... (Header and other fields same) ... */}
+             {/* ... */}
               <div className="flex flex-col items-center gap-2 text-center">
-                <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-white p-1 mb-2">
-                    <NextImage 
-                        src="/expenXO_logo.png" 
-                        alt="Expenxo Logo" 
-                        width={40} 
-                        height={40} 
-                        className="object-contain" 
-                        priority
+                <div className="relative group cursor-pointer mb-2">
+                     <div className="size-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors">
+                        {previewUrl ? (
+                            <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-muted-foreground">
+                                <UserIcon className="h-8 w-8 mb-1" />
+                                <span className="text-[10px]">Add Photo</span>
+                            </div>
+                        )}
+                        {isUploading && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <Loader2 className="h-6 w-6 text-white animate-spin" />
+                            </div>
+                        )}
+                    </div>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileSelect}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                        disabled={isUploading}
                     />
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full z-0 pointer-events-none">
+                        <Camera className="h-6 w-6 text-white" />
+                    </div>
                 </div>
+                <input type="hidden" name="profileImage" value={uploadedUrl} />
+
                 <h1 className="text-2xl font-bold">Create Account</h1>
                 <p className="text-muted-foreground text-balance">
                   Sign up for ExpenXO

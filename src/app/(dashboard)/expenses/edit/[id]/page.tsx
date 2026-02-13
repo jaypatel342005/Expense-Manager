@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { verifySession } from '@/lib/session';
 import ExpenseForm from '@/components/forms/expense-form';
+import { serializeData } from '@/lib/serialization';
 import React from 'react';
 
 export default async function EditExpensePage({ params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +33,7 @@ export default async function EditExpensePage({ params }: { params: Promise<{ id
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Edit Expense</h1>
             <ExpenseForm 
-                expense={expense}
+                expense={serializeData(expense)}
                 categories={categories}
                 subCategories={subCategories}
                 people={peoples}

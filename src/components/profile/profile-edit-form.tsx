@@ -11,13 +11,22 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Camera, Loader2, Save } from "lucide-react"
+import { ImageCropper } from "@/components/ui/image-cropper"
+import { useRef } from "react"
+import { Camera, Loader2, Save, Eye } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { uploadFileToServer } from "@/lib/client-upload"
+import { toast } from "sonner"
 
 interface ProfileEditFormProps extends React.ComponentProps<"div"> {
     user: any;
     person: any;
     onSuccess?: () => void;
 }
+
+
+
+// ...
 
 export function ProfileEditForm({
     className,
@@ -28,28 +37,68 @@ export function ProfileEditForm({
 }: ProfileEditFormProps) {
     const [state, action, isPending] = useActionState(updateProfile, undefined)
     const [previewUrl, setPreviewUrl] = useState<string | null>(user.ProfileImage);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    
+    // Cropper State
+    const [fileToCrop, setFileToCrop] = useState<File | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadedUrl, setUploadedUrl] = useState<string>(user.ProfileImage || "");
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Effect to handle success
     useEffect(() => {
         if (state?.success) {
             onSuccess?.();
+            toast.success("Profile updated successfully!");
         }
     }, [state, onSuccess]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
+            setFileToCrop(file);
+            setIsCropperOpen(true);
+            e.target.value = ""; // Reset to allow re-selection
+        }
+    };
+
+    const onCropComplete = async (croppedFile: File) => {
+        // Update preview
+        const url = URL.createObjectURL(croppedFile);
+        setPreviewUrl(url);
+
+        // Upload to server (Client-side upload)
+        setIsUploading(true);
+        try {
+            const result = await uploadFileToServer(croppedFile, "/expense-manager/users");
+            if (result?.url) {
+                setUploadedUrl(result.url);
+                toast.success("Profile image uploaded!");
+            }
+        } catch (error) {
+            console.error("Upload failed", error);
+            toast.error("Failed to upload image");
+        } finally {
+            setIsUploading(false);
         }
     };
 
     return (
         <div className={cn("grid gap-6", className)} {...props}>
+            <ImageCropper 
+                imageFile={fileToCrop}
+                open={isCropperOpen}
+                onOpenChange={setIsCropperOpen}
+                onCropComplete={onCropComplete}
+                aspectRatio={1}
+            />
             <form action={action} className="flex flex-col gap-6">
+                <input type="hidden" name="profileImage" value={uploadedUrl} />
                 <FieldGroup>
                     {/* Profile Image Upload */}
                     <div className="flex flex-col items-center gap-4 mb-4">
+                        {/* Image Preview Area */}
                         <div className="relative group cursor-pointer">
                             <div className="size-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors">
                                 {previewUrl ? (
@@ -57,17 +106,58 @@ export function ProfileEditForm({
                                 ) : (
                                     <Camera className="h-8 w-8 text-muted-foreground" />
                                 )}
+                                {isUploading && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
+                                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                                    </div>
+                                )}
                             </div>
+                            
+                            {/* File Input */}
                             <input 
+                                ref={fileInputRef}
                                 type="file" 
-                                name="file" 
+                                name="file_upload" // changed name so it's not picked up by server action as 'file'
                                 accept="image/*" 
                                 onChange={handleFileChange}
-                                className="absolute inset-0 opacity-0 cursor-pointer" 
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                                disabled={isUploading}
                             />
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                            
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full z-10 pointer-events-none">
                                 <Camera className="h-6 w-6 text-white" />
                             </div>
+
+                            
+                           {previewUrl && (
+                                <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setIsPreviewOpen(true);
+                                        }}
+                                        className="absolute -bottom-2 -right-2 bg-background border shadow-sm rounded-full p-2 text-muted-foreground hover:text-primary z-30 pointer-events-auto transition-transform hover:scale-110"
+                                        title="View Image"
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </button>
+                                    <DialogContent className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col">
+                                         <div className="p-4 border-b flex items-center justify-between">
+                                            <h3 className="font-semibold">Profile Image</h3>
+                                         </div>
+                                         <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4">
+                                            <img 
+                                                src={previewUrl} 
+                                                alt="Profile Preview" 
+                                                className="max-w-full max-h-[75vh] object-contain rounded-md shadow-sm"
+                                            />
+                                         </div>
+                                    </DialogContent>
+                                </Dialog>
+                           )}
                         </div>
                         <span className="text-xs text-muted-foreground">Click to change profile picture</span>
                     </div>

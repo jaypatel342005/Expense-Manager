@@ -18,7 +18,12 @@ export default async function IncomesPage() {
     const userId = session?.userId ? Number(session.userId) : undefined;
 
     const rawIncomes = await prisma.incomes.findMany({
-        where: isNormalUser ? { UserID: userId } : undefined,
+        where: isNormalUser ? {
+            OR: [
+                { UserID: userId },
+                { peoples: { UserID: userId } }
+            ]
+        } : undefined,
         orderBy: {
             IncomeDate: 'desc'
         },

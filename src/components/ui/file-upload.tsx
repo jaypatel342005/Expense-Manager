@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Upload, X, File, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Upload, X, File, Image as ImageIcon, Loader2, Eye } from "lucide-react";
 import React, { useRef, useState, ChangeEvent, DragEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress"; // Assuming shadcn progress exists, if not I'll fallback
+import { Progress } from "@/components/ui/progress"; 
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 interface FileUploadProps {
     name?: string;
@@ -45,6 +46,7 @@ export function FileUpload({
     const [dragActive, setDragActive] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     
     const [isUploading, setIsUploading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -256,7 +258,7 @@ export function FileUpload({
     };
 
     const triggerSelect = () => {
-        if (!uploadedFileUrl) {
+        if (!uploadedFileUrl && !preview) {
             inputRef.current?.click();
         }
     };
@@ -315,7 +317,10 @@ export function FileUpload({
                     )}
 
                     {!isUploading && (uploadedFileUrl || preview) && (
-                        <div className="flex items-center gap-4 w-full max-w-sm p-2 border rounded-lg bg-card shadow-sm cursor-default">
+                        <div 
+                            className="flex items-center gap-4 w-full max-w-sm p-2 border rounded-lg bg-card shadow-sm cursor-default"
+                            onClick={(e) => e.stopPropagation()} 
+                        >
                             <div className="h-12 w-12 rounded-md overflow-hidden bg-muted flex-shrink-0">
                                 {(uploadedFileUrl && (/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i.test(uploadedFileUrl) || accept?.startsWith("image/"))) || preview ? (
                                      <img 
@@ -340,20 +345,55 @@ export function FileUpload({
                                 </div>
                             </div>
 
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                onClick={removeFile}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <X className="h-4 w-4" />
-                                )}
-                            </Button>
+                            <div className="flex items-center gap-1">
+                                <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                        title="View Image"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setIsPreviewOpen(true);
+                                        }}
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </Button>
+                                    <DialogContent 
+                                        className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                         <div className="p-4 border-b flex items-center justify-between">
+                                            <h3 className="font-semibold text-foreground">Attachment Preview</h3>
+                                         </div>
+                                         <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4">
+                                            <img 
+                                                src={uploadedFileUrl || preview || ""} 
+                                                alt="Preview" 
+                                                className="max-w-full max-h-[75vh] object-contain rounded-md shadow-sm"
+                                            />
+                                         </div>
+                                    </DialogContent>
+                                </Dialog>
+                                
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                    onClick={removeFile}
+                                    disabled={isDeleting}
+                                    title="Remove Image"
+                                >
+                                    {isDeleting ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <X className="h-4 w-4" />
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     )}
 

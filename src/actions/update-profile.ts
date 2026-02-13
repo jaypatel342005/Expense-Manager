@@ -36,6 +36,7 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
     }
 
     const file = formData.get('file') as File | null;
+    const profileImage = formData.get('profileImage') as string; // Get URL from hidden input
     const mobile = formData.get('mobile') as string;
     const username = formData.get('username') as string;
     const name = formData.get('name') as string;
@@ -68,6 +69,7 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
                 where: { UserName: username }
             })
             if (existingUser) {
+         
                 return {
                      errors: {
                         username: ['Username is already taken. Please choose another.']
@@ -76,18 +78,10 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
             }
         }
 
-        let profileImageUrl = null;
+        let finalProfileImageUrl = null;
 
-        if (file && file.size > 0 && file.name !== 'undefined') {
-            try {
-                const uploadResult = await uploadImage(file, `user-${userId}-profile`);
-                if (uploadResult && uploadResult.url) {
-                    profileImageUrl = uploadResult.url;
-                }
-            } catch (imageError) {
-                console.error("Image Upload Failed:", imageError);
-                // Continue execution even if image upload fails, but maybe warn?
-            }
+        if (profileImage && profileImage.trim() !== "") {
+            finalProfileImageUrl = profileImage;
         }
 
         const userUpdateData: any = {
@@ -96,8 +90,8 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
             Modified: new Date(),
         };
         
-        if (profileImageUrl) {
-            userUpdateData.ProfileImage = profileImageUrl;
+        if (finalProfileImageUrl) {
+            userUpdateData.ProfileImage = finalProfileImageUrl;
         }
 
         // Update User

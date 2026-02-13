@@ -295,7 +295,7 @@ export function AppSidebar({ userRole = "USER", user, ...props }: React.Componen
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                    <Link href="/profile" className="cursor-pointer w-full flex items-center">
+                                    <Link href="/profile" className="cursor-pointer w-full flex items-center" onClick={() => isMobile && setOpenMobile(false)}>
                                         <UserIcon className="mr-2 h-4 w-4" />
                                         Profile
                                     </Link>
