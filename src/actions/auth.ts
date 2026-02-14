@@ -100,7 +100,15 @@ export async function signup(prevState: any, formData: FormData) {
     where: { EmailAddress: email },
   })
 
-  // ... (existing checks)
+  if (existingUser) {
+    return {
+      errors: {
+        email: ['User with this email already exists'],
+      },
+    }
+  }
+
+  const hashedPassword = await hash(password, 10)
 
   const user = await prisma.users.create({
     data: {

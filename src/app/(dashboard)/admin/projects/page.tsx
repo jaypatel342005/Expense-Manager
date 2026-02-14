@@ -31,7 +31,7 @@ export default async function ProjectsPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Button asChild variant="default" className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 dark:shadow-none">
+                    <Button asChild variant="default" >
                         <Link href="/admin/projects/new">
                             <PlusCircle className="mr-2 h-4 w-4" />
                             New Project

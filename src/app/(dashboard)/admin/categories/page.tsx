@@ -39,7 +39,7 @@ export default async function CategoriesPage() {
                     </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <Button asChild variant="outline">
+                    <Button asChild >
                         <Link href="/admin/categories/new">
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Add Category
