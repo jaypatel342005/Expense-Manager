@@ -1,6 +1,5 @@
 "use client"
 import { SaveExpenseAction } from '@/actions/SaveExpenseAction';
-import { uploadFileToServer } from '@/lib/client-upload';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { format } from "date-fns"
@@ -66,7 +65,7 @@ type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName:
         );
 
         // Staged file for manual upload
-        const [selectedFile, setSelectedFile] = useState<File | null>(null);
+        // const [selectedFile, setSelectedFile] = useState<File | null>(null); // Removed
         const [attachmentPath, setAttachmentPath] = useState<string | null>(expense?.AttachmentPath || null);
 
         const filteredSubCategories = subCategories.filter(
@@ -88,26 +87,9 @@ type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName:
             const formData = new FormData(e.currentTarget);
 
             try {
-                 // Manual Upload Step
-                if (selectedFile) {
-                    try {
-                        toast.info("Uploading attachment...");
-                        const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/expense", attachmentName);
-                         if (uploadResult?.url) {
-                            formData.set("AttachmentPath", uploadResult.url);
-                            setAttachmentPath(uploadResult.url);
-                        }
-                    } catch (uploadError) {
-                        console.error("File upload failed", uploadError);
-                        toast.error("Failed to upload attachment.");
-                        setIsSubmitting(false);
-                        return;
-                    }
-                } else if (attachmentPath === null || attachmentPath === "") {
-                    formData.set("AttachmentPath", "");
-                } else {
-                     formData.set("AttachmentPath", attachmentPath || "");
-                }
+                // Manual upload removed - handled by Server Action
+                // if (selectedFile) ... removed
+                // The file is now in formData.get('file') thanks to FileUpload update
 
                 const result = await SaveExpenseAction(formData);
 
@@ -326,7 +308,6 @@ type SubCategory = { SubCategoryID: number; CategoryID: number; SubCategoryName:
                                         folder="/expense-manager/expense"
                                         manualUpload={true}
                                         onFileChange={(file) => {
-                                            setSelectedFile(file);
                                             if (file === null) setAttachmentPath(null);
                                         }}
                                         className="bg-background"

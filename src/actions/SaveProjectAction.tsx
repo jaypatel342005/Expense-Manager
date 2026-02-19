@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 
-import { deleteImage } from "@/lib/imagekit";
+import { deleteImage, uploadImage } from "@/lib/imagekit";
 
 export async function SaveProjectAction(formData: FormData) {
     const id = formData.get("id");
@@ -15,6 +15,20 @@ export async function SaveProjectAction(formData: FormData) {
     let ProjectLogo = formData.get("ProjectLogo") as string;
     const IsActive = formData.get("IsActive") === "true";
     const UserID = formData.get("UserID");
+
+    const file = formData.get("file") as File | null;
+    if (file && file.size > 0 && file.name !== 'undefined') {
+        try {
+            // Use ProjectName if available, else fallback to timestamped name
+            const fileName = ProjectName ? `project-${ProjectName.replace(/\s+/g, '-')}-${Date.now()}` : undefined;
+            const uploadResult = await uploadImage(file, fileName, "/expense-manager/projects");
+            if (uploadResult && uploadResult.url) {
+                ProjectLogo = uploadResult.url;
+            }
+        } catch (error) {
+            console.error("Image Upload Failed:", error);
+        }
+    }
 
 
     const dataPayload = {

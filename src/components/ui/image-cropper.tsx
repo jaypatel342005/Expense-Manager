@@ -20,6 +20,7 @@ interface ImageCropperProps {
   onOpenChange: (open: boolean) => void;
   onCropComplete: (croppedFile: File) => void;
   aspectRatio?: number; // Optional aspect ratio (e.g., 1 for square)
+  circular?: boolean;
 }
 
 function centerAspectCrop(
@@ -48,6 +49,7 @@ export function ImageCropper({
   onOpenChange,
   onCropComplete,
   aspectRatio = undefined, // Freeform by default
+  circular = false,
 }: ImageCropperProps) {
   const [imgSrc, setImgSrc] = useState("");
   const [crop, setCrop] = useState<Crop>();
@@ -178,6 +180,7 @@ export function ImageCropper({
               onChange={(_, percentCrop) => setCrop(percentCrop)}
               onComplete={(c) => setCompletedCrop(c)}
               aspect={aspectRatio}
+              circularCrop={circular}
               className="max-h-[500px]"
             >
               <img
@@ -185,7 +188,7 @@ export function ImageCropper({
                 alt="Crop me"
                 src={imgSrc}
                 onLoad={onImageLoad}
-                style={{ maxHeight: "500px", maxWidth: "100%", objectFit: 'contain' }}
+                style={{ maxHeight: "70vh", maxWidth: "100%" }}
               />
             </ReactCrop>
            )}

@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import AlertSoftSuccessDemo from '@/components/ui/alert-23';
 import { Switch } from "@/components/ui/switch";
 import { deleteRow } from '@/actions/delete-action';
-import { uploadFileToServer } from '@/lib/client-upload';
 import { 
     AlertDialog,
     AlertDialogAction,
@@ -57,7 +56,7 @@ export default function CategoryForm({ category }: CategoryFormProps) {
     const [logoPath, setLogoPath] = useState<string | null>(category?.LogoPath || null);
     
     // Staged file for manual upload
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // const [selectedFile, setSelectedFile] = useState<File | null>(null); // Removed
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -66,26 +65,8 @@ export default function CategoryForm({ category }: CategoryFormProps) {
         const formData = new FormData(e.currentTarget);
         
         try {
-            // Manual Upload Step
-            if (selectedFile) {
-                try {
-                    toast.info("Uploading logo...");
-                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/categories", attachmentName);
-                     if (uploadResult?.url) {
-                        formData.set("LogoPath", uploadResult.url);
-                        setLogoPath(uploadResult.url);
-                    }
-                } catch (uploadError) {
-                    console.error("File upload failed", uploadError);
-                    toast.error("Failed to upload logo image.");
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else if (logoPath === null || logoPath === "") {
-                formData.set("LogoPath", "");
-            } else {
-                 formData.set("LogoPath", logoPath);
-            }
+            // Manual Upload logic removed - handled by Server Action via FileUpload input
+            // if (selectedFile) ... removed
 
             const result = await SaveCategoryAction(formData);
 
@@ -298,7 +279,6 @@ export default function CategoryForm({ category }: CategoryFormProps) {
                                     dropzoneClassName="min-h-[250px]"
                                     manualUpload={true}
                                     onFileChange={(file) => {
-                                        setSelectedFile(file);
                                         if (file === null) setLogoPath(null);
                                     }}
                                 />

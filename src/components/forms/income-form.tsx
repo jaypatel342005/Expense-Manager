@@ -1,6 +1,5 @@
 "use client"
 import { SaveIncomeAction } from '@/actions/SaveIncomeAction';
-import { uploadFileToServer } from '@/lib/client-upload';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { format } from "date-fns"
@@ -62,7 +61,7 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         income?.IncomeDate ? new Date(income.IncomeDate) : new Date()
     );
 
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // const [selectedFile, setSelectedFile] = useState<File | null>(null); // Removed
     const [attachmentPath, setAttachmentPath] = useState<string | null>(income?.AttachmentPath || null);
 
     const filteredSubCategories = subCategories.filter(
@@ -84,25 +83,8 @@ export default function IncomeForm({ income, categories, subCategories, people, 
         const formData = new FormData(e.currentTarget);
 
         try {
-            if (selectedFile) {
-                try {
-                    toast.info("Uploading attachment...");
-                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/incomes", attachmentName);
-                     if (uploadResult?.url) {
-                        formData.set("AttachmentPath", uploadResult.url);
-                        setAttachmentPath(uploadResult.url);
-                    }
-                } catch (uploadError) {
-                    console.error("File upload failed", uploadError);
-                    toast.error("Failed to upload attachment.");
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else if (attachmentPath === null || attachmentPath === "") {
-                formData.set("AttachmentPath", "");
-            } else {
-                 formData.set("AttachmentPath", attachmentPath || "");
-            }
+            // Manual Upload logic removed - handled by Server Action via FileUpload input
+            // if (selectedFile) ... removed
 
             const result = await SaveIncomeAction(formData);
 
@@ -321,7 +303,6 @@ export default function IncomeForm({ income, categories, subCategories, people, 
                                         folder="/expense-manager/incomes"
                                         manualUpload={true}
                                         onFileChange={(file) => {
-                                            setSelectedFile(file);
                                             if (file === null) setAttachmentPath(null);
                                         }}
                                         className="bg-background"

@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-import { deleteImage } from "@/lib/imagekit";
+import { deleteImage, uploadImage } from "@/lib/imagekit";
 
 export async function SaveCategoryAction(formData: FormData) {
     try {
@@ -22,7 +22,21 @@ export async function SaveCategoryAction(formData: FormData) {
         const userId = parseInt(formData.get("UserID")?.toString() || "1");
 
         // Handle Logo
-        const logoPath = formData.get("LogoPath")?.toString();
+        let logoPath = formData.get("LogoPath")?.toString();
+
+    const file = formData.get("file") as File | null;
+        if (file && file.size > 0 && file.name !== 'undefined') {
+            try {
+                // Use CategoryName if available, else fallback to timestamped name
+                const fileName = categoryName ? `category-${categoryName.replace(/\s+/g, '-')}-${Date.now()}` : undefined;
+                const uploadResult = await uploadImage(file, fileName, "/expense-manager/categories");
+                if (uploadResult && uploadResult.url) {
+                    logoPath = uploadResult.url;
+                }
+            } catch (error) {
+                console.error("Image Upload Failed:", error);
+            }
+        }
 
         if (!categoryName) {
             return { success: false, message: "Category Name is required." };

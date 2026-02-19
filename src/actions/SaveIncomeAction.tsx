@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 
-import { deleteImage } from "@/lib/imagekit";
+import { deleteImage, uploadImage } from "@/lib/imagekit";
 import { verifySession } from "@/lib/session";
 
 export async function SaveIncomeAction(formData: FormData) {
@@ -44,6 +44,22 @@ export async function SaveIncomeAction(formData: FormData) {
         });
         if (userPerson) {
             finalPeopleId = userPerson.PeopleID;
+        }
+    }
+
+    const file = formData.get("file") as File | null;
+    const AttachmentName = formData.get("AttachmentName") as string;
+
+    if (file && file.size > 0 && file.name !== 'undefined') {
+        try {
+            // Use AttachmentName if available, else fallback to timestamped name
+            const fileName = AttachmentName ? `${AttachmentName.replace(/\s+/g, '-')}-${Date.now()}` : undefined;
+            const uploadResult = await uploadImage(file, fileName, "/expense-manager/incomes");
+            if (uploadResult && uploadResult.url) {
+                AttachmentPath = uploadResult.url;
+            }
+        } catch (error) {
+            console.error("Image Upload Failed:", error);
         }
     }
 

@@ -1,6 +1,5 @@
 "use client"
 import { SaveProjectAction } from '@/actions/SaveProjectAction';
-import { uploadFileToServer } from '@/lib/client-upload';
 import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import { format } from "date-fns"
@@ -49,7 +48,7 @@ export default function ProjectForm({ project }: ProjectFormProps) {
     const [logoPath, setLogoPath] = useState<string | null>(project?.ProjectLogo || null);
     
     // Staged file for manual upload
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    // const [selectedFile, setSelectedFile] = useState<File | null>(null); // Removed
 
     const [startDate, setStartDate] = useState<Date | undefined>(
         project?.ProjectStartDate ? new Date(project.ProjectStartDate) : undefined
@@ -68,26 +67,8 @@ export default function ProjectForm({ project }: ProjectFormProps) {
         if (endDate) formData.set("ProjectEndDate", format(endDate, "yyyy-MM-dd"));
         
         try {
-            // Manual Upload Step
-            if (selectedFile) {
-                try {
-                    toast.info("Uploading logo...");
-                    const uploadResult = await uploadFileToServer(selectedFile, "/expense-manager/projects", attachmentName);
-                     if (uploadResult?.url) {
-                        formData.set("ProjectLogo", uploadResult.url);
-                        setLogoPath(uploadResult.url); 
-                    }
-                } catch (uploadError) {
-                    console.error("File upload failed", uploadError);
-                    toast.error("Failed to upload project logo.");
-                    setIsSubmitting(false);
-                    return;
-                }
-            } else if (logoPath === null || logoPath === "") {
-                formData.set("ProjectLogo", "");
-            } else {
-                 formData.set("ProjectLogo", logoPath);
-            }
+            // Manual Upload logic removed - handled by Server Action via FileUpload input
+            // if (selectedFile) ... removed
 
             const result = await SaveProjectAction(formData);
 
@@ -295,7 +276,6 @@ export default function ProjectForm({ project }: ProjectFormProps) {
                                     folder="/expense-manager/projects"
                                     manualUpload={true}
                                     onFileChange={(file) => {
-                                        setSelectedFile(file);
                                         if (file === null) setLogoPath(null);
                                     }}
                                     className="bg-background"

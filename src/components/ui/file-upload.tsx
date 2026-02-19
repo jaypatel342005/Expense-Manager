@@ -5,7 +5,7 @@ import { Upload, X, File, Image as ImageIcon, Loader2, Eye } from "lucide-react"
 import React, { useRef, useState, ChangeEvent, DragEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress"; 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog";
 
 interface FileUploadProps {
     name?: string;
@@ -204,6 +204,13 @@ export function FileUpload({
         const objectUrl = URL.createObjectURL(croppedFile);
         setPreview(objectUrl);
         
+        // Update the actual input file
+        if (inputRef.current) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            inputRef.current.files = dataTransfer.files;
+        }
+
         if (manualUpload) {
              if (onFileChange) onFileChange(croppedFile);
              setUploadedFileUrl(null);
@@ -364,9 +371,10 @@ export function FileUpload({
                                     <DialogContent 
                                         className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col"
                                         onClick={(e) => e.stopPropagation()}
+                                        aria-describedby={undefined}
                                     >
                                          <div className="p-4 border-b flex items-center justify-between">
-                                            <h3 className="font-semibold text-foreground">Attachment Preview</h3>
+                                            <DialogTitle className="font-semibold text-foreground">Attachment Preview</DialogTitle>
                                          </div>
                                          <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4">
                                             <img 

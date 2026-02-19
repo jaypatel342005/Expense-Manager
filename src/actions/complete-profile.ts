@@ -4,7 +4,8 @@ import { z } from 'zod'
 import { verifySession } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { uploadImage } from '@/lib/imagekit'
+import { revalidatePath } from 'next/cache'
+import { uploadImage, deleteImage } from '@/lib/imagekit'
 
 const completeProfileSchema = z.object({
     mobile: z.string().min(10, 'Mobile number must be at least 10 digits'),
@@ -56,7 +57,17 @@ export async function completeProfile(prevState: CompleteProfileState, formData:
 
         if (file && file.size > 0 && file.name !== 'undefined') {
             try {
-                const uploadResult = await uploadImage(file, `user-${userId}-profile`);
+                // Fetch current user to check for existing image
+                const currentUser = await prisma.users.findUnique({
+                    where: { UserID: userId },
+                    select: { ProfileImage: true }
+                });
+
+                if (currentUser?.ProfileImage) {
+                    await deleteImage(currentUser.ProfileImage);
+                }
+
+                const uploadResult = await uploadImage(file, `user-${userId}-profile-${Date.now()}`, "/expense-manager/users");
                 if (uploadResult && uploadResult.url) {
                     profileImageUrl = uploadResult.url;
                 }
@@ -118,5 +129,6 @@ export async function completeProfile(prevState: CompleteProfileState, formData:
         }
     }
 
+    revalidatePath('/', 'layout')
     redirect('/')
 }

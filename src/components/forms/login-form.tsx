@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { login } from '@/actions/auth'
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import NextImage from "next/image"
 
 export function LoginForm({
@@ -20,6 +21,8 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const [state, action, isPending] = useActionState(login, undefined)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -51,6 +54,8 @@ export function LoginForm({
                   type="text"
                   placeholder="Email or Username"
                   required
+                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
                 />
                 {state?.errors?.email && (
                   <p className="text-red-500 text-sm">{state.errors.email}</p>
@@ -66,13 +71,20 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" name="password" type="password" required />
+                <PasswordInput 
+                  id="password" 
+                  name="password" 
+                  required 
+                  placeholder="Enter your password" 
+                  onChange={(e) => setPassword(e.target.value)}
+                  value={password}
+                />
                  {state?.errors?.password && (
                   <p className="text-red-500 text-sm">{state.errors.password}</p>
                 )}
               </Field>
               <Field>
-                <Button type="submit" disabled={isPending}>
+                <Button type="submit" disabled={isPending || !email || !password}>
                   {isPending ? 'Logging in...' : 'Login'}
                 </Button>
               </Field>

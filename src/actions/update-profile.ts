@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { verifySession } from '@/lib/session'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { uploadImage } from '@/lib/imagekit'
+import { uploadImage, deleteImage } from '@/lib/imagekit'
 
 const updateProfileSchema = z.object({
     mobile: z.string().min(10, 'Mobile number must be at least 10 digits'),
@@ -59,7 +59,8 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
     try {
         // Check if username is taken (if changed)
         const currentUser = await prisma.users.findUnique({
-            where: { UserID: userId }
+            where: { UserID: userId },
+            select: { UserName: true, ProfileImage: true, EmailAddress: true, UserID: true } // Select needed fields
         })
 
         if (!currentUser) return { errors: { mobile: ['User not found'] } }
@@ -80,8 +81,20 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
 
         let finalProfileImageUrl = null;
 
-        if (profileImage && profileImage.trim() !== "") {
-            finalProfileImageUrl = profileImage;
+        if (file && file.size > 0 && file.name !== 'undefined') {
+            try {
+                // Delete old image if exists
+                if (currentUser.ProfileImage) {
+                    await deleteImage(currentUser.ProfileImage);
+                }
+
+                const uploadResult = await uploadImage(file, `user-${userId}-profile-${Date.now()}`, "/expense-manager/users");
+                if (uploadResult && uploadResult.url) {
+                    finalProfileImageUrl = uploadResult.url;
+                }
+            } catch (imageError) {
+                console.error("Image Upload Failed:", imageError);
+            }
         }
 
         const userUpdateData: any = {

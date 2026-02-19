@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImageCropper } from "@/components/ui/image-cropper"
 import { useRef } from "react"
 import { Camera, Loader2, Save, Eye } from "lucide-react"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { uploadFileToServer } from "@/lib/client-upload"
 import { toast } from "sonner"
 
@@ -42,9 +42,15 @@ export function ProfileEditForm({
     // Cropper State
     const [fileToCrop, setFileToCrop] = useState<File | null>(null);
     const [isCropperOpen, setIsCropperOpen] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    const [uploadedUrl, setUploadedUrl] = useState<string>(user.ProfileImage || "");
+    
+    // const [isUploading, setIsUploading] = useState(false); // Removed
+    // const [uploadedUrl, setUploadedUrl] = useState<string>(user.ProfileImage || ""); // Removed
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Sync previewUrl with user.ProfileImage when it updates (e.g. after save)
+    useEffect(() => {
+        setPreviewUrl(user.ProfileImage);
+    }, [user.ProfileImage]);
 
     // Effect to handle success
     useEffect(() => {
@@ -63,25 +69,19 @@ export function ProfileEditForm({
         }
     };
 
-    const onCropComplete = async (croppedFile: File) => {
+    const onCropComplete = (croppedFile: File) => {
         // Update preview
         const url = URL.createObjectURL(croppedFile);
         setPreviewUrl(url);
 
-        // Upload to server (Client-side upload)
-        setIsUploading(true);
-        try {
-            const result = await uploadFileToServer(croppedFile, "/expense-manager/users");
-            if (result?.url) {
-                setUploadedUrl(result.url);
-                toast.success("Profile image uploaded!");
-            }
-        } catch (error) {
-            console.error("Upload failed", error);
-            toast.error("Failed to upload image");
-        } finally {
-            setIsUploading(false);
+        // Set file input value using DataTransfer
+        if (fileInputRef.current) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            fileInputRef.current.files = dataTransfer.files;
         }
+
+        setIsCropperOpen(false);
     };
 
     return (
@@ -92,24 +92,22 @@ export function ProfileEditForm({
                 onOpenChange={setIsCropperOpen}
                 onCropComplete={onCropComplete}
                 aspectRatio={1}
+                circular={true}
             />
             <form action={action} className="flex flex-col gap-6">
-                <input type="hidden" name="profileImage" value={uploadedUrl} />
                 <FieldGroup>
                     {/* Profile Image Upload */}
                     <div className="flex flex-col items-center gap-4 mb-4">
                         {/* Image Preview Area */}
                         <div className="relative group cursor-pointer">
-                            <div className="size-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors">
+                            <div className={cn(
+                                "size-24 rounded-full flex items-center justify-center overflow-hidden border-2 transition-colors",
+                                previewUrl ? "border-solid border-primary/20" : "bg-muted border-dashed border-muted-foreground/30 hover:border-primary/50"
+                            )}>
                                 {previewUrl ? (
                                     <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
                                 ) : (
                                     <Camera className="h-8 w-8 text-muted-foreground" />
-                                )}
-                                {isUploading && (
-                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
-                                        <Loader2 className="h-6 w-6 text-white animate-spin" />
-                                    </div>
                                 )}
                             </div>
                             
@@ -117,11 +115,10 @@ export function ProfileEditForm({
                             <input 
                                 ref={fileInputRef}
                                 type="file" 
-                                name="file_upload" // changed name so it's not picked up by server action as 'file'
+                                name="file" 
                                 accept="image/*" 
                                 onChange={handleFileChange}
                                 className="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                                disabled={isUploading}
                             />
                             
                             {/* Hover Overlay */}
@@ -144,9 +141,12 @@ export function ProfileEditForm({
                                     >
                                         <Eye className="h-4 w-4" />
                                     </button>
-                                    <DialogContent className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col">
+                                    <DialogContent 
+                                        className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col" 
+                                        aria-describedby={undefined}
+                                    >
                                          <div className="p-4 border-b flex items-center justify-between">
-                                            <h3 className="font-semibold">Profile Image</h3>
+                                            <DialogTitle className="font-semibold">Profile Image</DialogTitle>
                                          </div>
                                          <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4">
                                             <img 

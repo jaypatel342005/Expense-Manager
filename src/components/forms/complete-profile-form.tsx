@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import NextImage from "next/image"
 import { Textarea } from "@/components/ui/textarea"
 import { Camera, ChevronRight, SkipForward, ArrowLeft } from "lucide-react"
+import { ImageCropper } from "@/components/ui/image-cropper"
 
 export function CompleteProfileForm({
     className,
@@ -22,12 +23,28 @@ export function CompleteProfileForm({
     const [state, action, isPending] = useActionState(completeProfile, undefined)
     const [step, setStep] = useState(1);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isCropperOpen, setIsCropperOpen] = useState(false);
+    const [fileInputRef, setFileInputRef] = useState<HTMLInputElement | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
+            setSelectedFile(file);
+            setIsCropperOpen(true);
+            // Reset input so same file can be selected again if needed
+            e.target.value = ''; 
+        }
+    };
+
+    const handleCropComplete = (croppedFile: File) => {
+        const url = URL.createObjectURL(croppedFile);
+        setPreviewUrl(url);
+        
+        if (fileInputRef) {
+             const dataTransfer = new DataTransfer();
+             dataTransfer.items.add(croppedFile);
+             fileInputRef.files = dataTransfer.files;
         }
     };
 
@@ -38,7 +55,7 @@ export function CompleteProfileForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card className="overflow-hidden p-0 relative">
                  {/* Progress Indicator */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-muted">
+                <div className="absolute top-0 left-0 right-0 h-0 bg-muted">
                     <div 
                         className="h-full bg-primary transition-all duration-300 ease-in-out" 
                         style={{ width: `${(step / 2) * 100}%` }}
@@ -69,27 +86,31 @@ export function CompleteProfileForm({
                             <div className={step === 1 ? "space-y-4 animate-in fade-in slide-in-from-right-4 duration-300" : "hidden"}>
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="relative group cursor-pointer">
-                                        <div className="size-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed border-muted-foreground/30 hover:border-primary/50 transition-colors">
-                                            {previewUrl ? (
-                                                <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
-                                            ) : (
-                                                <Camera className="h-8 w-8 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <input 
-                                            type="file" 
-                                            name="file" 
-                                            accept="image/*" 
-                                            onChange={handleFileChange}
-                                            className="absolute inset-0 opacity-0 cursor-pointer" 
-                                        />
-                                        <span className="text-xs text-muted-foreground mt-2 block text-center">Tap to upload photo</span>
+                                        <div className={cn(
+                                        "size-24 rounded-full flex items-center justify-center overflow-hidden border-2 transition-colors",
+                                        previewUrl ? "border-solid border-primary/20" : "bg-muted border-dashed border-muted-foreground/30 hover:border-primary/50"
+                                    )}>
+                                        {previewUrl ? (
+                                            <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                                        ) : (
+                                            <Camera className="h-8 w-8 text-muted-foreground" />
+                                        )}
                                     </div>
+                                    <input 
+                                        type="file" 
+                                        name="file" 
+                                        accept="image/*" 
+                                        onChange={handleFileChange}
+                                        ref={(ref) => setFileInputRef(ref)}
+                                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                                    />
+                                    <span className="text-xs text-muted-foreground mt-2 block text-center">Tap to upload photo</span>
                                 </div>
+                            </div>
 
                                 <Field>
                                     <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                                    <Input id="name" name="name" type="text" placeholder="John Doe" required={step === 1} />
+                                    <Input id="name" name="name" type="text" placeholder="Enter Full Name" required={step === 1} />
                                     {state?.errors?.name && (
                                         <p className="text-red-500 text-sm">{state.errors.name}</p>
                                     )}
@@ -97,7 +118,7 @@ export function CompleteProfileForm({
 
                                 <Field>
                                     <FieldLabel htmlFor="mobile">Mobile Number</FieldLabel>
-                                    <Input id="mobile" name="mobile" type="tel" placeholder="+1 234 567 890" required={step === 1} />
+                                    <Input id="mobile" name="mobile" type="tel" placeholder="9999999999" minLength={10} maxLength={10} required={step === 1} />
                                     {state?.errors?.mobile && (
                                         <p className="text-red-500 text-sm">{state.errors.mobile}</p>
                                     )}
@@ -154,6 +175,7 @@ export function CompleteProfileForm({
                                 name="intent" 
                                 value="skip" 
                                 variant="ghost" 
+                                formNoValidate
                                 className="w-full text-muted-foreground hover:text-foreground"
                             >
                                 Skip for now
@@ -183,6 +205,14 @@ export function CompleteProfileForm({
                     </div>
                 </CardContent>
             </Card>
+             <ImageCropper
+                imageFile={selectedFile}
+                open={isCropperOpen}
+                onOpenChange={setIsCropperOpen}
+                onCropComplete={handleCropComplete}
+                aspectRatio={1} // Square crop for profile picture
+                circular={true}
+            />
         </div>
     )
 }
