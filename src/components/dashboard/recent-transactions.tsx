@@ -39,7 +39,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
     }
 
     return (
-        <Card className="col-span-1 lg:col-span-1 hover:shadow-lg transition-all duration-300 border-zinc-200 dark:border-zinc-800 flex flex-col h-full bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900/80">
+        <Card className="hover:shadow-lg transition-all duration-300 border-zinc-200 dark:border-zinc-800 flex flex-col h-full bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900/80">
             <CardHeader className="pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
                 <div className="flex items-center justify-between">
                     <div>

@@ -257,10 +257,10 @@ export async function getIncomeByCategory(userId?: number) {
 export async function getMonthlyTrends(userId?: number) {
     const whereClause = await getUserFilter(userId);
     
-    // Get last 6 months including current year
+    // Get last 12 months including current year
     const now = new Date();
-    const months = Array.from({ length: 6 }, (_, i) => {
-        const d = subMonths(now, 5 - i);
+    const months = Array.from({ length: 12 }, (_, i) => {
+        const d = subMonths(now, 11 - i);
         return {
             start: startOfMonth(d),
             end: endOfMonth(d),
@@ -270,7 +270,7 @@ export async function getMonthlyTrends(userId?: number) {
     });
 
     const startDate = months[0].start;
-    const endDate = months[5].end;
+    const endDate = months[11].end;
 
     const incomes = await prisma.incomes.findMany({
         where: { ...whereClause, IncomeDate: { gte: startDate, lte: endDate } },
@@ -390,6 +390,43 @@ export async function getProjectAllocation(userId?: number) {
     return expenses.map(e => ({
         subject: projectMap.get(e.ProjectID as number) || 'Unknown',
         amount: Number(e._sum.Amount || 0),
+        fullMark: fullMark
+    })).sort((a, b) => b.amount - a.amount);
+}
+
+export async function getProjectIncomeAllocation(userId?: number) {
+    const whereClause = await getUserFilter(userId);
+
+    // Get current month's incomes by project
+    const now = new Date();
+    const currentMonthStart = startOfMonth(now);
+    const currentMonthEnd = endOfMonth(now);
+
+    const incomes = await prisma.incomes.groupBy({
+        by: ['ProjectID'],
+        _sum: { Amount: true },
+        where: { ...whereClause, IncomeDate: { gte: currentMonthStart, lte: currentMonthEnd }, ProjectID: { not: null } },
+    });
+
+    const projectIds = incomes.map(i => i.ProjectID).filter((id): id is number => id !== null);
+
+    if (projectIds.length === 0) return [];
+
+    const projects = await prisma.projects.findMany({
+        where: { ProjectID: { in: projectIds } },
+        select: { ProjectID: true, ProjectName: true }
+    });
+
+    const projectMap = new Map(projects.map(p => [p.ProjectID, p.ProjectName]));
+    
+    // Find the max amount to set a dynamic fullMark for the Radar chart
+    const maxAmount = Math.max(...incomes.map(i => Number(i._sum.Amount || 0)), 100);
+    // Add 20% padding to fullMark
+    const fullMark = Math.ceil(maxAmount * 1.2);
+
+    return incomes.map(i => ({
+        subject: projectMap.get(i.ProjectID as number) || 'Unknown',
+        amount: Number(i._sum.Amount || 0),
         fullMark: fullMark
     })).sort((a, b) => b.amount - a.amount);
 }

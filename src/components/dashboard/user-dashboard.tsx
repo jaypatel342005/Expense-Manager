@@ -58,11 +58,13 @@ export async function UserDashboard({ userId }: { userId: number }) {
                 <ProjectAllocation data={projectAlloc} />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 border-none">
                 <div className="lg:col-span-2">
                     <RecentTransactions transactions={recentTransactions} />
                 </div>
-                <RecentAdditions data={recentAdditions} />
+                <div className="lg:col-span-1">
+                    <RecentAdditions data={recentAdditions} />
+                </div>
             </div>
         </div>
     );

@@ -18,7 +18,7 @@ interface RecentAdditionsProps {
 
 export function RecentAdditions({ data }: RecentAdditionsProps) {
     return (
-        <Card className="col-span-1 lg:col-span-1 border-zinc-200 dark:border-zinc-800 flex flex-col h-full bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900/80 hover:shadow-lg transition-all duration-300">
+        <Card className="border-zinc-200 dark:border-zinc-800 flex flex-col h-full bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-950 dark:to-zinc-900/80 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-4 border-b border-zinc-100 dark:border-zinc-800/50">
                 <CardTitle className="text-xl font-bold bg-gradient-to-r from-zinc-800 to-zinc-500 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
                     System Resources

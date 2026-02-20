@@ -1,6 +1,6 @@
 "use client"
 
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, Legend } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
@@ -22,7 +22,7 @@ export function MonthlyTrends({ data }: MonthlyTrendsProps) {
                 <CardHeader>
                     <CardTitle>Monthly Trends</CardTitle>
                     <CardDescription>
-                        Income vs Expenses over the last 6 months.
+                        Income vs Expenses over the last 12 months.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -39,14 +39,24 @@ export function MonthlyTrends({ data }: MonthlyTrendsProps) {
             <CardHeader>
                 <CardTitle>Monthly Trends</CardTitle>
                 <CardDescription>
-                    Income vs Expenses over the last 6 months.
+                    Income vs Expenses over the last 12 months.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <ScrollArea className="w-full whitespace-nowrap md:overflow-x-hidden">
                     <div className="h-[220px] min-w-[600px] md:min-w-0">
                         <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+                            <AreaChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="oklch(0.51 0.23 277)" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="oklch(0.51 0.23 277)" stopOpacity={0}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="oklch(0.577 0.245 27.325)" stopOpacity={0.3}/>
+                                        <stop offset="95%" stopColor="oklch(0.577 0.245 27.325)" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e5e5" className="dark:stroke-zinc-800" />
                                 <XAxis
                                     dataKey="name"
@@ -100,23 +110,27 @@ export function MonthlyTrends({ data }: MonthlyTrendsProps) {
                                     iconType="circle"
                                     formatter={(value) => <span className="text-sm font-medium text-foreground">{value.charAt(0).toUpperCase() + value.slice(1)}</span>}
                                 />
-                                <Line
+                                <Area
                                     type="monotone"
                                     dataKey="income"
                                     stroke="oklch(0.51 0.23 277)"
+                                    fillOpacity={1}
+                                    fill="url(#colorIncome)"
                                     strokeWidth={3}
                                     dot={{ r: 4, fill: "oklch(0.51 0.23 277)", strokeWidth: 0 }}
                                     activeDot={{ r: 6, strokeWidth: 0 }}
                                 />
-                                <Line
+                                <Area
                                     type="monotone"
                                     dataKey="expense"
                                     stroke="oklch(0.577 0.245 27.325)"
+                                    fillOpacity={1}
+                                    fill="url(#colorExpense)"
                                     strokeWidth={3}
                                     dot={{ r: 4, fill: "oklch(0.577 0.245 27.325)", strokeWidth: 0 }}
                                     activeDot={{ r: 6, strokeWidth: 0 }}
                                 />
-                            </LineChart>
+                            </AreaChart>
                         </ResponsiveContainer>
                     </div>
                     <ScrollBar orientation="horizontal" />

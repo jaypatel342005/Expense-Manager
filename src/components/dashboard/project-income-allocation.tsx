@@ -2,7 +2,6 @@
 
 import { Legend, PolarAngleAxis, RadialBar, RadialBarChart, ResponsiveContainer, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
 function formatRupee(value: number): string {
     if (value >= 10000000) return `₹${(value / 10000000).toFixed(1)}Cr`;
@@ -11,23 +10,23 @@ function formatRupee(value: number): string {
     return `₹${value.toFixed(2)}`;
 }
 
-interface ProjectAllocationProps {
+interface ProjectIncomeAllocationProps {
     data: { subject: string; amount: number; fullMark: number }[];
 }
 
-export function ProjectAllocation({ data }: ProjectAllocationProps) {
+export function ProjectIncomeAllocation({ data }: ProjectIncomeAllocationProps) {
     if (!data || data.length === 0) {
         return (
-            <Card className="col-span-3 hover:shadow-lg transition-shadow duration-200 border-zinc-200 dark:border-zinc-800">
+            <Card className="col-span-3 hover:shadow-lg transition-shadow duration-200 border-zinc-200 dark:border-zinc-800 flex flex-col h-full">
                 <CardHeader>
-                    <CardTitle>Project Allocation</CardTitle>
+                    <CardTitle>Project Income</CardTitle>
                     <CardDescription>
-                        Expense distribution across active projects.
+                        Income distribution across active projects.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col items-center justify-center h-[220px] text-center text-muted-foreground">
-                        <p>No project expenses found.</p>
+                <CardContent className="flex-1">
+                    <div className="flex flex-col items-center justify-center h-full min-h-[220px] text-center text-muted-foreground">
+                        <p>No project incomes found.</p>
                     </div>
                 </CardContent>
             </Card>
@@ -35,15 +34,15 @@ export function ProjectAllocation({ data }: ProjectAllocationProps) {
     }
 
     return (
-        <Card className="col-span-3 hover:shadow-lg transition-shadow duration-200 border-zinc-200 dark:border-zinc-800">
+        <Card className="col-span-3 hover:shadow-lg transition-shadow duration-200 border-zinc-200 dark:border-zinc-800 flex flex-col h-full">
             <CardHeader>
-                <CardTitle>Project Allocation</CardTitle>
+                <CardTitle>Project Income</CardTitle>
                 <CardDescription>
-                    Expense distribution across active projects.
+                    Income distribution across active projects.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
-                <div className="flex flex-col items-center justify-center w-full pb-4">
+            <CardContent className="flex-1">
+                <div className="flex flex-col items-center justify-center w-full h-full pb-0">
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <RadialBarChart 
@@ -54,8 +53,8 @@ export function ProjectAllocation({ data }: ProjectAllocationProps) {
                                 barSize={12} 
                                 data={data.map((item, index) => {
                                     const colors = [
+                                        "oklch(0.51 0.23 277)", // emerald (income color first)
                                         "oklch(0.648 0.2 31.396)", // orange
-                                        "oklch(0.51 0.23 277)", // emerald
                                         "oklch(0.6 0.118 258.336)", // blue
                                         "oklch(0.536 0.2 284)", // purple
                                         "oklch(0.577 0.245 27.325)", // rose
@@ -91,7 +90,7 @@ export function ProjectAllocation({ data }: ProjectAllocationProps) {
                                                         <span className="text-[0.70rem] uppercase text-muted-foreground font-semibold">
                                                             {payload[0].payload.subject}
                                                         </span>
-                                                        <span className="font-bold text-orange-500">
+                                                        <span className="font-bold text-emerald-500">
                                                             {formatRupee(payload[0].value)}
                                                         </span>
                                                     </div>
@@ -109,8 +108,8 @@ export function ProjectAllocation({ data }: ProjectAllocationProps) {
                     <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-4 px-2 w-full">
                         {data.map((item, index) => {
                             const colors = [
-                                "oklch(0.648 0.2 31.396)",
                                 "oklch(0.51 0.23 277)",
+                                "oklch(0.648 0.2 31.396)",
                                 "oklch(0.6 0.118 258.336)",
                                 "oklch(0.536 0.2 284)",
                                 "oklch(0.577 0.245 27.325)",

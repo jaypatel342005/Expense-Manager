@@ -3,7 +3,8 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { CategoryBreakdown } from "@/components/dashboard/category-breakdown";
 import { MonthlyTrends } from "@/components/dashboard/monthly-trends";
-import { PlatformActivity } from "@/components/dashboard/platform-activity";
+import { ProjectAllocation } from "@/components/dashboard/project-allocation";
+import { ProjectIncomeAllocation } from "@/components/dashboard/project-income-allocation";
 import { StatisticalInfo } from "@/components/dashboard/statistical-info";
 import { RecentAdditions } from "@/components/dashboard/recent-additions";
 
@@ -16,21 +17,23 @@ import {
     getSpendingByCategory,
     getIncomeByCategory,
     getMonthlyTrends,
-    getPlatformActivity,
+    getProjectAllocation,
+    getProjectIncomeAllocation,
     getStatisticalInfo,
     getRecentAdditions
 } from "@/lib/dashboard-data";
 
 export async function AdminDashboard() {
     // Admin dashboard fetches platform-wide statistics
-    const [stats, chartData, recentTransactions, spendingByCategory, incomeByCategory, monthlyTrends, activityData, statisticalData, recentAdditions] = await Promise.all([
+    const [stats, chartData, recentTransactions, spendingByCategory, incomeByCategory, monthlyTrends, projectAlloc, projectIncomeAlloc, statisticalData, recentAdditions] = await Promise.all([
         getDashboardStats(),
         getChartData(),
         getRecentTransactions(),
         getSpendingByCategory(),
         getIncomeByCategory(),
         getMonthlyTrends(),
-        getPlatformActivity(),
+        getProjectAllocation(),
+        getProjectIncomeAllocation(),
         getStatisticalInfo(),
         getRecentAdditions()
     ]);
@@ -60,16 +63,30 @@ export async function AdminDashboard() {
                 <StatisticalInfo data={statisticalData} />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-8">
-                <MonthlyTrends data={monthlyTrends} />
-                <PlatformActivity data={activityData} />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+                <div className="lg:col-span-2">
+                    <MonthlyTrends data={monthlyTrends} />
+                </div>
+                
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-4 border-none">
                 <div className="lg:col-span-2">
+                    <ProjectAllocation data={projectAlloc} />
+                </div>
+                <div className="lg:col-span-2">
+                    <ProjectIncomeAllocation data={projectIncomeAlloc} />
+                </div>
+            
+            </div>
+
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-5 border-none">
+                <div className="lg:col-span-3">
                     <RecentTransactions transactions={recentTransactions} />
                 </div>
-                <RecentAdditions data={recentAdditions} />
+                <div className="lg:col-span-2">
+                    <RecentAdditions data={recentAdditions} />
+                </div>
             </div>
         </div>
     );
