@@ -94,15 +94,21 @@ export function ProfileEditForm({
                 aspectRatio={1}
                 circular={true}
             />
-            <form action={action} className="flex flex-col gap-6">
-                <FieldGroup className="bg-card rounded-xl border p-6 shadow-sm relative dark:bg-card/50 dark:backdrop-blur-sm dark:border-white/10">
+            <form action={action} className="flex flex-col gap-6 relative z-10">
+                <FieldGroup className="bg-white/40 dark:bg-black/30 backdrop-blur-2xl rounded-xl border border-white/60 dark:border-white/10 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] relative overflow-hidden">
+                    {/* Specular Edge Highlight */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-transparent opacity-50 dark:from-white/10 pointer-events-none z-0"></div>
+                    
                     {/* Profile Image Upload */}
-                    <div className="flex flex-col items-center gap-4 mb-6">
+                    <div className="flex flex-col items-center gap-4 mb-6 relative z-10">
                         {/* Image Preview Area */}
                         <div className="relative group cursor-pointer">
+                            {/* Avatar Glow */}
+                            <div className="absolute -inset-2 bg-primary/30 rounded-full opacity-0 blur-xl transition-all duration-300 group-hover:opacity-100 group-hover:blur-2xl pointer-events-none"></div>
+
                             <div className={cn(
-                                "size-28 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all duration-300 relative z-10 shadow-sm dark:shadow-md dark:shadow-black/40",
-                                previewUrl ? "border-primary/20 dark:border-primary/40" : "bg-muted border-dashed border-muted-foreground/30 dark:bg-muted/20 dark:border-white/10"
+                                "size-28 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all duration-300 relative z-10 shadow-sm dark:shadow-md dark:shadow-black/40 bg-white/50 dark:bg-black/50 backdrop-blur-md",
+                                previewUrl ? "border-white/80 dark:border-white/20" : "border-dashed border-white/60 dark:border-white/10"
                             )}>
                                 {previewUrl ? (
                                     <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
@@ -261,11 +267,11 @@ export function ProfileEditForm({
                     </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-4 border-t pt-5 dark:border-white/10">
-                    <Button type="button" variant="outline" onClick={() => onSuccess?.()} className="dark:border-white/10 dark:bg-transparent dark:hover:bg-white/5">
+                <div className="flex justify-end gap-3 mt-4 border-t border-black/5 dark:border-white/10 pt-5 relative z-10">
+                    <Button type="button" variant="outline" onClick={() => onSuccess?.()} className="bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 backdrop-blur-md border border-white/60 dark:border-white/10 transition-all shadow-sm dark:shadow-none">
                         Cancel
                     </Button>
-                    <Button type="submit" disabled={isPending} className="dark:shadow-md dark:shadow-primary/20 transition-all">
+                    <Button type="submit" disabled={isPending} className="shadow-sm font-medium transition-all duration-300 hover:shadow-md hover:shadow-primary/20 bg-primary/90 hover:bg-primary backdrop-blur-md border border-white/20 text-primary-foreground">
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Save className={cn("mr-2 h-4 w-4", isPending ? "hidden" : "inline")} />
                         {isPending ? 'Saving...' : 'Save Changes'}

@@ -1,26 +1,32 @@
-import { Overview } from "@/components/dashboard/overview";
-import { RecentTransactions } from "@/components/dashboard/recent-transactions";
-import { StatsCards } from "@/components/dashboard/stats-cards";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { verifySession } from '@/lib/session'
+import { prisma } from '@/lib/prisma'
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
+import { UserDashboard } from "@/components/dashboard/user-dashboard";
 
-export default function DashboardPage() {
-    return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-                <div className="flex items-center space-x-2">
-                    <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                    </Button>
-                </div>
-            </div>
-            <StatsCards />
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Overview />
-                <RecentTransactions />
-            </div>
-        </div>
-    );
+export default async function DashboardPage() {
+    const session = await verifySession()
+    
+    let userRole = 'USER';
+    let userId = null;
+
+    if (session?.userId) {
+        userId = parseInt(session.userId as string);
+        const user = await prisma.users.findUnique({
+            where: { UserID: userId },
+            select: { Role: true }
+        });
+        if (user) {
+            userRole = user.Role;
+        }
+    }
+
+    if (userRole === 'ADMIN') {
+        return <AdminDashboard />;
+    }
+
+    if (!userId) {
+        return <div className="p-8">Please log in to view the dashboard.</div>;
+    }
+
+    return <UserDashboard userId={userId} />;
 }

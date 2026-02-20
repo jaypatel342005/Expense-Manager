@@ -1,0 +1,1 @@
+src/lib/dashboard-data.ts(463,13): error TS2353: Object literal may only specify known properties, and 'Budget' does not exist in type 'projectsSelect<DefaultArgs>'.
