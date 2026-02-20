@@ -95,19 +95,19 @@ export function ProfileEditForm({
                 circular={true}
             />
             <form action={action} className="flex flex-col gap-6">
-                <FieldGroup>
+                <FieldGroup className="bg-card rounded-xl border p-6 shadow-sm relative dark:bg-card/50 dark:backdrop-blur-sm dark:border-white/10">
                     {/* Profile Image Upload */}
-                    <div className="flex flex-col items-center gap-4 mb-4">
+                    <div className="flex flex-col items-center gap-4 mb-6">
                         {/* Image Preview Area */}
                         <div className="relative group cursor-pointer">
                             <div className={cn(
-                                "size-24 rounded-full flex items-center justify-center overflow-hidden border-2 transition-colors",
-                                previewUrl ? "border-solid border-primary/20" : "bg-muted border-dashed border-muted-foreground/30 hover:border-primary/50"
+                                "size-28 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all duration-300 relative z-10 shadow-sm dark:shadow-md dark:shadow-black/40",
+                                previewUrl ? "border-primary/20 dark:border-primary/40" : "bg-muted border-dashed border-muted-foreground/30 dark:bg-muted/20 dark:border-white/10"
                             )}>
                                 {previewUrl ? (
                                     <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
                                 ) : (
-                                    <Camera className="h-8 w-8 text-muted-foreground" />
+                                    <Camera className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
                                 )}
                             </div>
                             
@@ -122,7 +122,7 @@ export function ProfileEditForm({
                             />
                             
                             {/* Hover Overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full z-10 pointer-events-none">
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full z-10 pointer-events-none dark:bg-black/60">
                                 <Camera className="h-6 w-6 text-white" />
                             </div>
 
@@ -142,13 +142,13 @@ export function ProfileEditForm({
                                         <Eye className="h-4 w-4" />
                                     </button>
                                     <DialogContent 
-                                        className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col" 
+                                        className="sm:max-w-3xl max-h-[90vh] p-0 overflow-hidden bg-background border shadow-lg flex flex-col dark:border-white/10 dark:bg-card/95 backdrop-blur-xl" 
                                         aria-describedby={undefined}
                                     >
-                                         <div className="p-4 border-b flex items-center justify-between">
+                                         <div className="p-4 border-b flex items-center justify-between dark:border-white/10">
                                             <DialogTitle className="font-semibold">Profile Image</DialogTitle>
                                          </div>
-                                         <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4">
+                                         <div className="relative w-full flex-1 min-h-[50vh] flex items-center justify-center bg-muted/20 p-4 dark:bg-black/40">
                                             <img 
                                                 src={previewUrl} 
                                                 alt="Profile Preview" 
@@ -261,9 +261,13 @@ export function ProfileEditForm({
                     </div>
                 )}
 
-                <div className="flex justify-end gap-3 mt-4">
-                    <Button type="submit" disabled={isPending}>
+                <div className="flex justify-end gap-3 mt-4 border-t pt-5 dark:border-white/10">
+                    <Button type="button" variant="outline" onClick={() => onSuccess?.()} className="dark:border-white/10 dark:bg-transparent dark:hover:bg-white/5">
+                        Cancel
+                    </Button>
+                    <Button type="submit" disabled={isPending} className="dark:shadow-md dark:shadow-primary/20 transition-all">
                         {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Save className={cn("mr-2 h-4 w-4", isPending ? "hidden" : "inline")} />
                         {isPending ? 'Saving...' : 'Save Changes'}
                     </Button>
                 </div>
