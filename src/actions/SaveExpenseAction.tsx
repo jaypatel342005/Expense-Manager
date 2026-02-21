@@ -102,6 +102,7 @@ export async function SaveExpenseAction(formData: FormData) {
         }
 
         revalidatePath("/expenses"); 
+        revalidatePath("/reports"); 
         return { success: true, message: id ? "Expense updated successfully" : "Expense saved successfully" };
 
     } catch (error) {

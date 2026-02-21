@@ -103,6 +103,7 @@ export async function SaveIncomeAction(formData: FormData) {
         }
 
         revalidatePath("/incomes"); 
+        revalidatePath("/reports"); 
         // redirect("/incomes"); // Removed
         return { success: true, message: id ? "Income updated successfully" : "Income saved successfully" };
 

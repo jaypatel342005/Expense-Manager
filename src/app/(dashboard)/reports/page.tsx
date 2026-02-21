@@ -1,44 +1,60 @@
-import { Download, Share } from "lucide-react";
+import { ClientContainer } from "@/components/calendar/components/client-container";
+import { CalendarProvider } from "@/components/calendar/contexts/calendar-context";
+import { getEvents, getUsers } from "@/components/calendar/requests";
+import { Settings } from "lucide-react";
+import { ChangeBadgeVariantInput } from "@/components/calendar/components/change-badge-variant-input";
+import { ChangeVisibleHoursInput } from "@/components/calendar/components/change-visible-hours-input";
+import { ChangeWorkingHoursInput } from "@/components/calendar/components/change-working-hours-input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import type { TCalendarView } from "@/components/calendar/types";
 
-import { Button } from "@/components/ui/button";
-import { CategoryBreakdown } from "@/components/reports/category-breakdown";
-import { MonthlyTrends } from "@/components/reports/monthly-trends";
-import { TransactionsTable } from "@/components/reports/transactions-table";
+export const dynamic = 'force-dynamic';
 
-export default function ReportsPage() {
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+
+export default async function ReportsPage(props: {
+    searchParams: SearchParams
+}) {
+    const searchParams = await props.searchParams;
+    const viewQuery = typeof searchParams.view === 'string' ? searchParams.view : 'month';
+    const validViews: TCalendarView[] = ["day", "week", "month", "year", "agenda"];
+    const view: TCalendarView = validViews.includes(viewQuery as TCalendarView) ? (viewQuery as TCalendarView) : "month";
+
+    const [events, users] = await Promise.all([getEvents(), getUsers()]);
+
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">Reports & Analytics</h2>
-                    <p className="text-muted-foreground">Detailed breakdown of your financial health.</p>
+        <CalendarProvider users={users} events={events}>
+            <div className="flex-1 space-y-4 p-8 pt-6">
+                <div className="flex items-center justify-between space-y-2">
+                    <div>
+                        <h2 className="text-3xl font-bold tracking-tight">Calendar & Schedule</h2>
+                        <p className="text-muted-foreground">Manage your detailed schedule.</p>
+                    </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <Button variant="outline">
-                        <Share className="mr-2 h-4 w-4" />
-                        Share
-                    </Button>
-                    <Button>
-                        <Download className="mr-2 h-4 w-4" />
-                        Export
-                    </Button>
+
+                <div className="mx-auto flex flex-col gap-4">
+                    <ClientContainer view={view} />
+
+                    <Accordion type="single" collapsible>
+                        <AccordionItem value="item-1" className="border-none">
+                            <AccordionTrigger className="flex-none gap-2 py-0 hover:no-underline">
+                                <div className="flex items-center gap-2">
+                                    <Settings className="size-4" />
+                                    <p className="text-base font-semibold">Calendar settings</p>
+                                </div>
+                            </AccordionTrigger>
+
+                            <AccordionContent>
+                                <div className="mt-4 flex flex-col gap-6">
+                                    <ChangeBadgeVariantInput />
+                                    <ChangeVisibleHoursInput />
+                                    <ChangeWorkingHoursInput />
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </div>
             </div>
-            
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <MonthlyTrends />
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <CategoryBreakdown />
-                <div className="col-span-4 md:col-span-4 lg:col-span-3">
-                    {/* Space for another small widget or summaries, for now empty to balance grid */}
-                </div>
-            </div>
-            
-            <div className="space-y-4">
-                <h3 className="text-xl font-semibold tracking-tight">Recent Financial Activity</h3>
-                <TransactionsTable />
-            </div>
-        </div>
+        </CalendarProvider>
     );
 }

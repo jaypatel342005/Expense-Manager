@@ -86,4 +86,7 @@ export async function deleteRow(
     if (path) {
       revalidatePath(path);
     }
+    if (model === 'expenses' || model === 'incomes') {
+      revalidatePath('/reports');
+    }
 }
