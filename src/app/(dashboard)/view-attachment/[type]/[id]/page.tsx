@@ -49,7 +49,7 @@ export default async function Page({
   const badgeClass = isExpense ? "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200/50" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200/50";
 
   return (
-    <div className="container mx-auto p-4 md:p-8 h-full flex flex-col">
+    <div className="container mx-auto p-4 md:px-4 md:py-6 h-full flex flex-col">
        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
               <Button variant="ghost" asChild>

@@ -26,7 +26,7 @@ import {
   isWithinInterval,
 } from "date-fns";
 
-import type { ICalendarCell, IEvent } from "@/components/calendar/interfaces";
+import type { ICalendarCell, ITransaction } from "@/components/calendar/interfaces";
 import type { TCalendarView, TVisibleHours, TWorkingHours } from "@/components/calendar/types";
 
 
@@ -73,7 +73,7 @@ export function navigateDate(date: Date, view: TCalendarView, direction: "previo
   return operations[view](date, 1);
 }
 
-export function getEventsCount(events: IEvent[], date: Date, view: TCalendarView): number {
+export function getTransactionsCount(transactions: ITransaction[], date: Date, view: TCalendarView): number {
   const compareFns = {
     agenda: isSameMonth,
     year: isSameYear,
@@ -82,46 +82,46 @@ export function getEventsCount(events: IEvent[], date: Date, view: TCalendarView
     month: isSameMonth,
   };
 
-  return events.filter(event => compareFns[view](new Date(event.startDate), date)).length;
+  return transactions.filter(t => compareFns[view](new Date(t.startDate), date)).length;
 }
 
 // ================ Week and day view helper functions ================ //
 
-export function getCurrentEvents(events: IEvent[]) {
+export function getCurrentTransactions(transactions: ITransaction[]) {
   const now = new Date();
-  return events.filter(event => isWithinInterval(now, { start: parseISO(event.startDate), end: parseISO(event.endDate) })) || null;
+  return transactions.filter(t => isWithinInterval(now, { start: parseISO(t.startDate), end: parseISO(t.endDate) })) || null;
 }
 
-export function groupEvents(dayEvents: IEvent[]) {
-  const sortedEvents = dayEvents.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
-  const groups: IEvent[][] = [];
+export function groupTransactions(dayTransactions: ITransaction[]) {
+  const sortedTransactions = dayTransactions.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
+  const groups: ITransaction[][] = [];
 
-  for (const event of sortedEvents) {
-    const eventStart = parseISO(event.startDate);
+  for (const transaction of sortedTransactions) {
+    const tStart = parseISO(transaction.startDate);
 
     let placed = false;
     for (const group of groups) {
-      const lastEventInGroup = group[group.length - 1];
-      const lastEventEnd = parseISO(lastEventInGroup.endDate);
+      const lastInGroup = group[group.length - 1];
+      const lastEnd = parseISO(lastInGroup.endDate);
 
-      if (eventStart >= lastEventEnd) {
-        group.push(event);
+      if (tStart >= lastEnd) {
+        group.push(transaction);
         placed = true;
         break;
       }
     }
 
-    if (!placed) groups.push([event]);
+    if (!placed) groups.push([transaction]);
   }
 
   return groups;
 }
 
-export function getEventBlockStyle(event: IEvent, day: Date, groupIndex: number, groupSize: number, visibleHoursRange?: { from: number; to: number }) {
-  const startDate = parseISO(event.startDate);
+export function getTransactionBlockStyle(transaction: ITransaction, day: Date, groupIndex: number, groupSize: number, visibleHoursRange?: { from: number; to: number }) {
+  const startDate = parseISO(transaction.startDate);
   const dayStart = new Date(day.setHours(0, 0, 0, 0));
-  const eventStart = startDate < dayStart ? dayStart : startDate;
-  const startMinutes = differenceInMinutes(eventStart, dayStart);
+  const tStart = startDate < dayStart ? dayStart : startDate;
+  const startMinutes = differenceInMinutes(tStart, dayStart);
 
   let top;
 
@@ -146,23 +146,23 @@ export function isWorkingHour(day: Date, hour: number, workingHours: TWorkingHou
   return hour >= dayHours.from && hour < dayHours.to;
 }
 
-export function getVisibleHours(visibleHours: TVisibleHours, singleDayEvents: IEvent[]) {
-  let earliestEventHour = visibleHours.from;
-  let latestEventHour = visibleHours.to;
+export function getVisibleHours(visibleHours: TVisibleHours, singleDayTransactions: ITransaction[]) {
+  let earliestHour = visibleHours.from;
+  let latestHour = visibleHours.to;
 
-  singleDayEvents.forEach(event => {
-    const startHour = parseISO(event.startDate).getHours();
-    const endTime = parseISO(event.endDate);
+  singleDayTransactions.forEach(t => {
+    const startHour = parseISO(t.startDate).getHours();
+    const endTime = parseISO(t.endDate);
     const endHour = endTime.getHours() + (endTime.getMinutes() > 0 ? 1 : 0);
-    if (startHour < earliestEventHour) earliestEventHour = startHour;
-    if (endHour > latestEventHour) latestEventHour = endHour;
+    if (startHour < earliestHour) earliestHour = startHour;
+    if (endHour > latestHour) latestHour = endHour;
   });
 
-  latestEventHour = Math.min(latestEventHour, 24);
+  latestHour = Math.min(latestHour, 24);
 
-  const hours = Array.from({ length: latestEventHour - earliestEventHour }, (_, i) => i + earliestEventHour);
+  const hours = Array.from({ length: latestHour - earliestHour }, (_, i) => i + earliestHour);
 
-  return { hours, earliestEventHour, latestEventHour };
+  return { hours, earliestEventHour: earliestHour, latestEventHour: latestHour };
 }
 
 // ================ Month view helper functions ================ //
@@ -200,39 +200,39 @@ export function getCalendarCells(selectedDate: Date): ICalendarCell[] {
   return [...prevMonthCells, ...currentMonthCells, ...nextMonthCells];
 }
 
-export function calculateMonthEventPositions(multiDayEvents: IEvent[], singleDayEvents: IEvent[], selectedDate: Date) {
+export function calculateMonthTransactionPositions(multiDayTransactions: ITransaction[], singleDayTransactions: ITransaction[], selectedDate: Date) {
   const monthStart = startOfMonth(selectedDate);
   const monthEnd = endOfMonth(selectedDate);
 
-  const eventPositions: { [key: string]: number } = {};
+  const tPositions: { [key: string]: number } = {};
   const occupiedPositions: { [key: string]: boolean[] } = {};
 
   eachDayOfInterval({ start: monthStart, end: monthEnd }).forEach(day => {
     occupiedPositions[day.toISOString()] = [false, false, false];
   });
 
-  const sortedEvents = [
-    ...multiDayEvents.sort((a, b) => {
+  const sortedTransactions = [
+    ...multiDayTransactions.sort((a, b) => {
       const aDuration = differenceInDays(parseISO(a.endDate), parseISO(a.startDate));
       const bDuration = differenceInDays(parseISO(b.endDate), parseISO(b.startDate));
       return bDuration - aDuration || parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime();
     }),
-    ...singleDayEvents.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()),
+    ...singleDayTransactions.sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime()),
   ];
 
-  sortedEvents.forEach(event => {
-    const eventStart = parseISO(event.startDate);
-    const eventEnd = parseISO(event.endDate);
-    const eventDays = eachDayOfInterval({
-      start: eventStart < monthStart ? monthStart : eventStart,
-      end: eventEnd > monthEnd ? monthEnd : eventEnd,
+  sortedTransactions.forEach(t => {
+    const tStart = parseISO(t.startDate);
+    const tEnd = parseISO(t.endDate);
+    const tDays = eachDayOfInterval({
+      start: tStart < monthStart ? monthStart : tStart,
+      end: tEnd > monthEnd ? monthEnd : tEnd,
     });
 
     let position = -1;
 
     for (let i = 0; i < 3; i++) {
       if (
-        eventDays.every(day => {
+        tDays.every(day => {
           const dayPositions = occupiedPositions[startOfDay(day).toISOString()];
           return dayPositions && !dayPositions[i];
         })
@@ -243,29 +243,29 @@ export function calculateMonthEventPositions(multiDayEvents: IEvent[], singleDay
     }
 
     if (position !== -1) {
-      eventDays.forEach(day => {
+      tDays.forEach(day => {
         const dayKey = startOfDay(day).toISOString();
         occupiedPositions[dayKey][position] = true;
       });
-      eventPositions[event.id] = position;
+      tPositions[t.id] = position;
     }
   });
 
-  return eventPositions;
+  return tPositions;
 }
 
-export function getMonthCellEvents(date: Date, events: IEvent[], eventPositions: Record<string, number>) {
-  const eventsForDate = events.filter(event => {
-    const eventStart = parseISO(event.startDate);
-    const eventEnd = parseISO(event.endDate);
-    return (date >= eventStart && date <= eventEnd) || isSameDay(date, eventStart) || isSameDay(date, eventEnd);
+export function getMonthCellTransactions(date: Date, transactions: ITransaction[], tPositions: Record<string, number>) {
+  const tForDate = transactions.filter(t => {
+    const tStart = parseISO(t.startDate);
+    const tEnd = parseISO(t.endDate);
+    return (date >= tStart && date <= tEnd) || isSameDay(date, tStart) || isSameDay(date, tEnd);
   });
 
-  return eventsForDate
-    .map(event => ({
-      ...event,
-      position: eventPositions[event.id] ?? -1,
-      isMultiDay: event.startDate !== event.endDate,
+  return tForDate
+    .map(t => ({
+      ...t,
+      position: tPositions[t.id] ?? -1,
+      isMultiDay: t.startDate !== t.endDate,
     }))
     .sort((a, b) => {
       if (a.isMultiDay && !b.isMultiDay) return -1;

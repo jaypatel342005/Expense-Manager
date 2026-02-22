@@ -63,7 +63,7 @@ export function CompleteProfileForm({
                 </div>
 
                 <CardContent className="grid p-0 md:grid-cols-2">
-                    <form action={action} className="p-6 md:p-8 flex flex-col justify-between h-full min-h-[500px]">
+                    <form action={action} className="p-6 md:p-6 lg:p-8 flex flex-col justify-between h-full min-h-[500px]">
                         <FieldGroup>
                             <div className="flex flex-col items-center gap-2 text-center mb-6">
                                 <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-white p-1 mb-2 shadow-sm">

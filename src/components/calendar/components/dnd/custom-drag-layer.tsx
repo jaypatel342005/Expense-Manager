@@ -2,10 +2,10 @@
 
 import { useDragLayer } from "react-dnd";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
 interface IDragItem {
-  event: IEvent;
+  transaction: ITransaction;
   children: React.ReactNode;
   width: number;
   height: number;

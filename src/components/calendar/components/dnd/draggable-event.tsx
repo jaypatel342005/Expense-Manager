@@ -6,18 +6,18 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 
 import { cn } from "@/lib/utils";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
 export const ItemTypes = {
-  EVENT: "event",
+  EVENT: "event", // KEEP String internally since it only impacts DnD library identifiers
 };
 
 interface DraggableEventProps {
-  event: IEvent;
+  transaction: ITransaction;
   children: React.ReactNode;
 }
 
-export function DraggableEvent({ event, children }: DraggableEventProps) {
+export function DraggableEvent({ transaction, children }: DraggableEventProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag, preview] = useDrag(() => ({
@@ -25,7 +25,7 @@ export function DraggableEvent({ event, children }: DraggableEventProps) {
     item: () => {
       const width = ref.current?.offsetWidth || 0;
       const height = ref.current?.offsetHeight || 0;
-      return { event, children, width, height };
+      return { transaction, children, width, height };
     },
     collect: monitor => ({ isDragging: monitor.isDragging() }),
   }));

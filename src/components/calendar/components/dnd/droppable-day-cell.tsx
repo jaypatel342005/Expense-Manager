@@ -3,12 +3,12 @@
 import { useDrop } from "react-dnd";
 import { parseISO, differenceInMilliseconds } from "date-fns";
 
-import { useUpdateEvent } from "@/components/calendar/hooks/use-update-event";
+import { useUpdateTransaction } from "@/components/calendar/hooks/use-update-event";
 
 import { cn } from "@/lib/utils";
 import { ItemTypes } from "@/components/calendar/components/dnd/draggable-event";
 
-import type { IEvent, ICalendarCell } from "@/components/calendar/interfaces";
+import type { ITransaction, ICalendarCell } from "@/components/calendar/interfaces";
 
 interface DroppableDayCellProps {
   cell: ICalendarCell;
@@ -16,25 +16,25 @@ interface DroppableDayCellProps {
 }
 
 export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
-  const { updateEvent } = useUpdateEvent();
+  const { updateTransaction } = useUpdateTransaction();
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: ItemTypes.EVENT,
-      drop: (item: { event: IEvent }) => {
-        const droppedEvent = item.event;
+      drop: (item: { transaction: ITransaction }) => {
+        const droppedTransaction = item.transaction;
 
-        const eventStartDate = parseISO(droppedEvent.startDate);
-        const eventEndDate = parseISO(droppedEvent.endDate);
+        const transactionStartDate = parseISO(droppedTransaction.startDate);
+        const transactionEndDate = parseISO(droppedTransaction.endDate);
 
-        const eventDurationMs = differenceInMilliseconds(eventEndDate, eventStartDate);
+        const transactionDurationMs = differenceInMilliseconds(transactionEndDate, transactionStartDate);
 
         const newStartDate = new Date(cell.date);
-        newStartDate.setHours(eventStartDate.getHours(), eventStartDate.getMinutes(), eventStartDate.getSeconds(), eventStartDate.getMilliseconds());
-        const newEndDate = new Date(newStartDate.getTime() + eventDurationMs);
+        newStartDate.setHours(transactionStartDate.getHours(), transactionStartDate.getMinutes(), transactionStartDate.getSeconds(), transactionStartDate.getMilliseconds());
+        const newEndDate = new Date(newStartDate.getTime() + transactionDurationMs);
 
-        updateEvent({
-          ...droppedEvent,
+        updateTransaction({
+          ...droppedTransaction,
           startDate: newStartDate.toISOString(),
           endDate: newEndDate.toISOString(),
         });
@@ -46,7 +46,7 @@ export function DroppableDayCell({ cell, children }: DroppableDayCellProps) {
         canDrop: monitor.canDrop(),
       }),
     }),
-    [cell.date, updateEvent]
+    [cell.date, updateTransaction]
   );
 
   return (

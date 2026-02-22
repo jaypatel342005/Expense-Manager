@@ -3,12 +3,12 @@
 import { useDrop } from "react-dnd";
 import { parseISO, differenceInMilliseconds } from "date-fns";
 
-import { useUpdateEvent } from "@/components/calendar/hooks/use-update-event";
+import { useUpdateTransaction } from "@/components/calendar/hooks/use-update-event";
 
 import { cn } from "@/lib/utils";
 import { ItemTypes } from "@/components/calendar/components/dnd/draggable-event";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
 interface DroppableTimeBlockProps {
   date: Date;
@@ -18,25 +18,25 @@ interface DroppableTimeBlockProps {
 }
 
 export function DroppableTimeBlock({ date, hour, minute, children }: DroppableTimeBlockProps) {
-  const { updateEvent } = useUpdateEvent();
+  const { updateTransaction } = useUpdateTransaction();
 
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: ItemTypes.EVENT,
-      drop: (item: { event: IEvent }) => {
-        const droppedEvent = item.event;
+      drop: (item: { transaction: ITransaction }) => {
+        const droppedTransaction = item.transaction;
 
-        const eventStartDate = parseISO(droppedEvent.startDate);
-        const eventEndDate = parseISO(droppedEvent.endDate);
+        const transactionStartDate = parseISO(droppedTransaction.startDate);
+        const transactionEndDate = parseISO(droppedTransaction.endDate);
 
-        const eventDurationMs = differenceInMilliseconds(eventEndDate, eventStartDate);
+        const transactionDurationMs = differenceInMilliseconds(transactionEndDate, transactionStartDate);
 
         const newStartDate = new Date(date);
         newStartDate.setHours(hour, minute, 0, 0);
-        const newEndDate = new Date(newStartDate.getTime() + eventDurationMs);
+        const newEndDate = new Date(newStartDate.getTime() + transactionDurationMs);
 
-        updateEvent({
-          ...droppedEvent,
+        updateTransaction({
+          ...droppedTransaction,
           startDate: newStartDate.toISOString(),
           endDate: newEndDate.toISOString(),
         });
@@ -48,7 +48,7 @@ export function DroppableTimeBlock({ date, hour, minute, children }: DroppableTi
         canDrop: monitor.canDrop(),
       }),
     }),
-    [date, hour, minute, updateEvent]
+    [date, hour, minute, updateTransaction]
   );
 
   return (

@@ -39,7 +39,7 @@ export async function AdminDashboard() {
     ]);
 
     return (
-        <div className="flex-1 space-y-4 px-3 py-6 md:p-8 md:pt-6 animate-in fade-in duration-500 overflow-x-hidden">
+        <div className="flex-1 space-y-4 px-3 py-6 md:px-4 md:py-6 md:pt-6 animate-in fade-in duration-500 overflow-x-hidden">
             <div className="flex items-center justify-between space-y-2 px-1 md:px-0">
                 <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-emerald-600 to-indigo-600 bg-clip-text text-transparent">
                     Admin Dashboard

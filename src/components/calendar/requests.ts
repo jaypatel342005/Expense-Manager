@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { verifySession } from '@/lib/session'
-import type { IEvent } from '@/components/calendar/interfaces'
+import type { ITransaction } from '@/components/calendar/interfaces'
 
 /** Formats a number as compact Indian Rupee: ₹1.2K, ₹3.5M, ₹2.1Cr */
 function formatAmount(value: number | null | undefined): string {
@@ -11,7 +11,7 @@ function formatAmount(value: number | null | undefined): string {
   return `₹${n}`;
 }
 
-export const getEvents = async (): Promise<IEvent[]> => {
+export const getTransactions = async (): Promise<ITransaction[]> => {
   const session = await verifySession()
   if (!session?.userId) return []
 
@@ -30,15 +30,15 @@ export const getEvents = async (): Promise<IEvent[]> => {
     const [expenses, incomes] = await Promise.all([
       prisma.expenses.findMany({
         where: queryWhere,
-        include: { categories: true, users: true, peoples: true },
+        include: { categories: true, users: true, peoples: true, projects: true },
       }),
       prisma.incomes.findMany({
         where: queryWhere,
-        include: { categories: true, users: true, peoples: true },
+        include: { categories: true, users: true, peoples: true, projects: true },
       }),
     ])
 
-    const expenseEvents: IEvent[] = expenses.map(e => {
+    const expenseTransactions: ITransaction[] = expenses.map(e => {
       const startDate = new Date(e.ExpenseDate);
       startDate.setHours(10, 0, 0, 0); // 10:00 AM local
       const endDate = new Date(startDate);
@@ -46,7 +46,7 @@ export const getEvents = async (): Promise<IEvent[]> => {
 
       return {
         id: `exp-${e.ExpenseID}`,
-        title: `${e.ExpenseDetail || 'Expense'} (${formatAmount(Number(e.Amount))})`,
+        title: `${e.ExpenseDetail || 'Expense'}`,
         description: e.Description || e.categories?.CategoryName || 'Expense',
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
@@ -56,10 +56,14 @@ export const getEvents = async (): Promise<IEvent[]> => {
           name: e.peoples?.PeopleName || e.users?.UserName || 'You',
           picturePath: e.users?.ProfileImage || 'https://i.pravatar.cc/150?u=' + (e.peoples?.PeopleID || e.users?.UserID || userId),
         },
+        amount: Number(e.Amount),
+        type: 'EXPENSE',
+        categoryName: e.categories?.CategoryName,
+        projectName: e.projects?.ProjectName,
       }
     })
 
-    const incomeEvents: IEvent[] = incomes.map(i => {
+    const incomeTransactions: ITransaction[] = incomes.map(i => {
       const startDate = new Date(i.IncomeDate);
       startDate.setHours(10, 0, 0, 0); // 10:00 AM local
       const endDate = new Date(startDate);
@@ -67,7 +71,7 @@ export const getEvents = async (): Promise<IEvent[]> => {
       
       return {
         id: `inc-${i.IncomeID}`,
-        title: `${i.IncomeDetail || 'Income'} (${formatAmount(Number(i.Amount))})`,
+        title: `${i.IncomeDetail || 'Income'}`,
         description: i.Description || i.categories?.CategoryName || 'Income',
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
@@ -77,12 +81,16 @@ export const getEvents = async (): Promise<IEvent[]> => {
           name: i.peoples?.PeopleName || i.users?.UserName || 'You',
           picturePath: i.users?.ProfileImage || 'https://i.pravatar.cc/150?u=' + (i.peoples?.PeopleID || i.users?.UserID || userId),
         },
+        amount: Number(i.Amount),
+        type: 'INCOME',
+        categoryName: i.categories?.CategoryName,
+        projectName: i.projects?.ProjectName,
       }
     })
 
-    return [...expenseEvents, ...incomeEvents]
+    return [...expenseTransactions, ...incomeTransactions]
   } catch (error) {
-    console.error("Failed to fetch events from Prisma:", error)
+    console.error("Failed to fetch transactions from Prisma:", error)
     return []
   }
 }

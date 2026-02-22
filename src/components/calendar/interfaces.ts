@@ -1,4 +1,4 @@
-import type { TEventColor } from "@/components/calendar/types";
+import type { TTransactionColor } from "@/components/calendar/types";
 
 export interface IUser {
   id: string;
@@ -6,14 +6,20 @@ export interface IUser {
   picturePath: string | null;
 }
 
-export interface IEvent {
+export interface ITransaction {
   id: string | number;
   startDate: string;
   endDate: string;
   title: string;
-  color: TEventColor;
+  color: TTransactionColor;
   description: string;
   user: IUser;
+  
+  // Real prisma metadata backing the transaction
+  type: "EXPENSE" | "INCOME";
+  amount: number;
+  categoryName?: string;
+  projectName?: string;
 }
 
 export interface ICalendarCell {

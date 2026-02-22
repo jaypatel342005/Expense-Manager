@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 import type { Dispatch, SetStateAction } from "react";
-import type { IEvent, IUser } from "@/components/calendar/interfaces";
+import type { ITransaction, IUser } from "@/components/calendar/interfaces";
 import type { TBadgeVariant, TVisibleHours, TWorkingHours } from "@/components/calendar/types";
 
 interface ICalendarContext {
@@ -18,8 +18,8 @@ interface ICalendarContext {
   setWorkingHours: Dispatch<SetStateAction<TWorkingHours>>;
   visibleHours: TVisibleHours;
   setVisibleHours: Dispatch<SetStateAction<TVisibleHours>>;
-  events: IEvent[];
-  setLocalEvents: Dispatch<SetStateAction<IEvent[]>>;
+  transactions: ITransaction[];
+  setLocalTransactions: Dispatch<SetStateAction<ITransaction[]>>;
 }
 
 const CalendarContext = createContext({} as ICalendarContext);
@@ -36,13 +36,19 @@ const WORKING_HOURS = {
 
 const VISIBLE_HOURS = { from: 7, to: 18 };
 
-export function CalendarProvider({ children, users, events }: { children: React.ReactNode; users: IUser[]; events: IEvent[] }) {
+export function CalendarProvider({ children, users, transactions }: { children: React.ReactNode; users: IUser[]; transactions: ITransaction[] }) {
   const [badgeVariant, setBadgeVariant] = useState<TBadgeVariant>("colored");
   const [visibleHours, setVisibleHours] = useState<TVisibleHours>(VISIBLE_HOURS);
   const [workingHours, setWorkingHours] = useState<TWorkingHours>(WORKING_HOURS);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedUserId, setSelectedUserId] = useState<IUser["id"] | "all">("all");
+
+  const [localTransactions, setLocalTransactions] = useState<ITransaction[]>(transactions);
+
+  useEffect(() => {
+    setLocalTransactions(transactions);
+  }, [transactions]);
 
   const handleSelectDate = (date: Date | undefined) => {
     if (!date) return;
@@ -63,8 +69,8 @@ export function CalendarProvider({ children, users, events }: { children: React.
         setVisibleHours,
         workingHours,
         setWorkingHours,
-        events,
-        setLocalEvents: () => {}, // No-op to avoid breaking types for now
+        transactions: localTransactions,
+        setLocalTransactions, 
       }}
     >
       {children}

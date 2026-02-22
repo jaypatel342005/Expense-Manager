@@ -1,23 +1,23 @@
 import { useCalendar } from "@/components/calendar/contexts/calendar-context";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
-export function useUpdateEvent() {
-  const { setLocalEvents } = useCalendar();
+export function useUpdateTransaction() {
+  const { setLocalTransactions } = useCalendar();
 
-  
-  const updateEvent = (event: IEvent) => {
-    const newEvent: IEvent = event;
 
-    newEvent.startDate = new Date(event.startDate).toISOString();
-    newEvent.endDate = new Date(event.endDate).toISOString();
+  const updateTransaction = (transaction: ITransaction) => {
+    const newTransaction: ITransaction = transaction;
 
-    setLocalEvents(prev => {
-      const index = prev.findIndex(e => e.id === event.id);
+    newTransaction.startDate = new Date(transaction.startDate).toISOString();
+    newTransaction.endDate = new Date(transaction.endDate).toISOString();
+
+    setLocalTransactions(prev => {
+      const index = prev.findIndex(t => t.id === transaction.id);
       if (index === -1) return prev;
-      return [...prev.slice(0, index), newEvent, ...prev.slice(index + 1)];
+      return [...prev.slice(0, index), newTransaction, ...prev.slice(index + 1)];
     });
   };
 
-  return { updateEvent };
+  return { updateTransaction };
 }

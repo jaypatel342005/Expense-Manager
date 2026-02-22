@@ -7,51 +7,45 @@ import { useCalendar } from "@/components/calendar/contexts/calendar-context";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 
-import { EventBlock } from "@/components/calendar/components/week-and-day-view/event-block";
 import { DroppableTimeBlock } from "@/components/calendar/components/dnd/droppable-time-block";
-import { CalendarTimeline } from "@/components/calendar/components/week-and-day-view/calendar-time-line";
-import { WeekViewMultiDayEventsRow } from "@/components/calendar/components/week-and-day-view/week-view-multi-day-events-row";
+import { 
+  TransactionBlock, 
+  CalendarTimeline, 
+  WeekViewMultiDayTransactionsRow, 
+  TransactionPageControls, 
+  TransactionBlockNav, 
+  useTransactionPage, 
+  getVisibleGroups 
+} from "@/components/calendar/components/week-and-day-view/shared-components";
 
 import { cn } from "@/lib/utils";
-import { groupEvents, getEventBlockStyle, isWorkingHour, getVisibleHours } from "@/components/calendar/helpers";
-import { EventPageControls, EventBlockNav, useEventPage, getVisibleGroups } from "@/components/calendar/components/week-and-day-view/event-scroll-container";
+import { groupTransactions, getTransactionBlockStyle, isWorkingHour, getVisibleHours } from "@/components/calendar/helpers";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
 interface IProps {
-  singleDayEvents: IEvent[];
-  multiDayEvents: IEvent[];
+  singleDayTransactions: ITransaction[];
+  multiDayTransactions: ITransaction[];
 }
 
 // Per-day column component so each day has independent paging state
 interface WeekDayColumnProps {
   day: Date;
-  singleDayEvents: IEvent[];
+  singleDayTransactions: ITransaction[];
   hours: number[];
   workingHours: ReturnType<typeof useCalendar>["workingHours"];
   earliestEventHour: number;
   latestEventHour: number;
 }
 
-function WeekDayColumn({ day, singleDayEvents, hours, workingHours, earliestEventHour, latestEventHour }: WeekDayColumnProps) {
-  const dayEvents = singleDayEvents.filter(event => isSameDay(parseISO(event.startDate), day) || isSameDay(parseISO(event.endDate), day));
-  const groupedEvents = groupEvents(dayEvents);
-  const { page, setPage, totalPages } = useEventPage(groupedEvents.length);
-  const visibleGroups = getVisibleGroups(groupedEvents, page);
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    if (totalPages <= 1) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.deltaY > 0 || e.deltaX > 0) {
-      setPage(page + 1);
-    } else {
-      setPage(page - 1);
-    }
-  }, [totalPages, page, setPage]);
+function WeekDayColumn({ day, singleDayTransactions, hours, workingHours, earliestEventHour, latestEventHour }: WeekDayColumnProps) {
+  const dayTransactions = singleDayTransactions.filter(t => isSameDay(parseISO(t.startDate), day) || isSameDay(parseISO(t.endDate), day));
+  const groupedTransactions = groupTransactions(dayTransactions);
+  const { page, setPage, totalPages } = useTransactionPage(groupedTransactions.length);
+  const visibleGroups = getVisibleGroups(groupedTransactions, page);
 
   return (
-    <div className="relative flex-1 min-w-0" onWheel={handleWheel}>
+    <div className="relative flex-1 min-w-0">
       {hours.map((hour, index) => {
         const isDisabled = !isWorkingHour(day, hour, workingHours);
         return (
@@ -80,15 +74,15 @@ function WeekDayColumn({ day, singleDayEvents, hours, workingHours, earliestEven
       })}
 
       {visibleGroups.map((group, relGroupIndex) =>
-        group.map(event => {
-          let style = getEventBlockStyle(event, day, relGroupIndex, visibleGroups.length, { from: earliestEventHour, to: latestEventHour });
+        group.map(t => {
+          let style = getTransactionBlockStyle(t, day, relGroupIndex, visibleGroups.length, { from: earliestEventHour, to: latestEventHour });
           const hasOverlap = visibleGroups.some(
             (otherGroup, otherIndex) =>
               otherIndex !== relGroupIndex &&
-              otherGroup.some(otherEvent =>
+              otherGroup.some(otherTransaction =>
                 areIntervalsOverlapping(
-                  { start: parseISO(event.startDate), end: parseISO(event.endDate) },
-                  { start: parseISO(otherEvent.startDate), end: parseISO(otherEvent.endDate) }
+                  { start: parseISO(t.startDate), end: parseISO(t.endDate) },
+                  { start: parseISO(otherTransaction.startDate), end: parseISO(otherTransaction.endDate) }
                 )
               )
           );
@@ -96,23 +90,23 @@ function WeekDayColumn({ day, singleDayEvents, hours, workingHours, earliestEven
           if (!hasOverlap) style = { ...style, width: '100%', left: '0%' };
 
           return (
-            <div key={`${page}-${event.id}`} className="absolute p-1 animate-event-slide-in" style={style}>
-              <EventBlockNav totalPages={totalPages} currentPage={page} onPageChange={setPage} totalEvents={groupedEvents.length} />
-              <EventBlock event={event} />
+            <div key={`${page}-${t.id}`} className="absolute p-1 animate-event-slide-in" style={style}>
+              <TransactionBlockNav totalPages={totalPages} currentPage={page} onPageChange={setPage} totalTransactions={groupedTransactions.length} />
+              <TransactionBlock transaction={t} hasNavigation={totalPages > 1} />
             </div>
           );
         })
       )}
 
-      <EventPageControls totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+      <TransactionPageControls totalPages={totalPages} currentPage={page} onPageChange={setPage} />
     </div>
   );
 }
 
-export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
+export function CalendarWeekView({ singleDayTransactions, multiDayTransactions }: IProps) {
   const { selectedDate, workingHours, visibleHours } = useCalendar();
 
-  const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayEvents);
+  const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayTransactions);
 
   const weekStart = startOfWeek(selectedDate);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -126,7 +120,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
 
       <div className="hidden flex-col sm:flex">
         <div>
-          <WeekViewMultiDayEventsRow selectedDate={selectedDate} multiDayEvents={multiDayEvents} />
+          <WeekViewMultiDayTransactionsRow selectedDate={selectedDate} multiDayTransactions={multiDayTransactions} />
 
           {/* Week header */}
           <div className="relative z-20 flex border-b">
@@ -161,7 +155,7 @@ export function CalendarWeekView({ singleDayEvents, multiDayEvents }: IProps) {
                   <WeekDayColumn
                     key={dayIndex}
                     day={day}
-                    singleDayEvents={singleDayEvents}
+                    singleDayTransactions={singleDayTransactions}
                     hours={hours}
                     workingHours={workingHours}
                     earliestEventHour={earliestEventHour}

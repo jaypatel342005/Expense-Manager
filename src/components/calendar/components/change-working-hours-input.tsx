@@ -90,15 +90,15 @@ export function ChangeWorkingHoursInput() {
 
           return (
             <div key={day.index} className="flex items-center gap-4">
-              <div className="flex w-40 items-center gap-2">
+              <div className="flex w-32 shrink-0 items-center gap-2">
                 <Switch checked={isDayActive} onCheckedChange={() => handleToggleDay(day.index)} />
                 <span className="text-sm font-medium">{day.name}</span>
               </div>
 
               {isDayActive ? (
-                <div className="flex items-center gap-4">
+                <div className="flex flex-1 flex-wrap items-center gap-x-2 gap-y-2 sm:gap-x-4">
                   <div className="flex items-center gap-2">
-                    <span>From</span>
+                    <span className="text-xs text-muted-foreground w-8">From</span>
                     <TimeInput
                       id={`${day.name.toLowerCase()}-from`}
                       hourCycle={12}
@@ -109,7 +109,7 @@ export function ChangeWorkingHoursInput() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span>To</span>
+                    <span className="text-xs text-muted-foreground w-4">To</span>
                     <TimeInput
                       id={`${day.name.toLowerCase()}-to`}
                       hourCycle={12}
@@ -120,9 +120,9 @@ export function ChangeWorkingHoursInput() {
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="flex flex-1 items-center gap-2 text-muted-foreground">
                   <Moon className="size-4" />
-                  <span>Closed</span>
+                  <span className="text-sm">Closed</span>
                 </div>
               )}
             </div>

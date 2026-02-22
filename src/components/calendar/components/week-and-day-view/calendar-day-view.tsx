@@ -7,59 +7,52 @@ import { useCalendar } from "@/components/calendar/contexts/calendar-context";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SingleCalendar } from "@/components/ui/single-calendar";
 
-
-import { EventBlock } from "@/components/calendar/components/week-and-day-view/event-block";
 import { DroppableTimeBlock } from "@/components/calendar/components/dnd/droppable-time-block";
-import { CalendarTimeline } from "@/components/calendar/components/week-and-day-view/calendar-time-line";
-import { DayViewMultiDayEventsRow } from "@/components/calendar/components/week-and-day-view/day-view-multi-day-events-row";
-import { EventPageControls, EventBlockNav, useEventPage, getVisibleGroups } from "@/components/calendar/components/week-and-day-view/event-scroll-container";
+import { 
+  TransactionBlock, 
+  CalendarTimeline, 
+  DayViewMultiDayTransactionsRow, 
+  TransactionPageControls, 
+  TransactionBlockNav, 
+  useTransactionPage, 
+  getVisibleGroups 
+} from "@/components/calendar/components/week-and-day-view/shared-components";
 
 import { cn } from "@/lib/utils";
-import { groupEvents, getEventBlockStyle, isWorkingHour, getCurrentEvents, getVisibleHours } from "@/components/calendar/helpers";
+import { groupTransactions, getTransactionBlockStyle, isWorkingHour, getCurrentTransactions, getVisibleHours } from "@/components/calendar/helpers";
 
-import type { IEvent } from "@/components/calendar/interfaces";
+import type { ITransaction } from "@/components/calendar/interfaces";
 
 interface IProps {
-  singleDayEvents: IEvent[];
-  multiDayEvents: IEvent[];
+  singleDayTransactions: ITransaction[];
+  multiDayTransactions: ITransaction[];
 }
 
-export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
+export function CalendarDayView({ singleDayTransactions, multiDayTransactions }: IProps) {
   const { selectedDate, setSelectedDate, users, visibleHours, workingHours } = useCalendar();
 
-  const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayEvents);
+  const { hours, earliestEventHour, latestEventHour } = getVisibleHours(visibleHours, singleDayTransactions);
 
-  const currentEvents = getCurrentEvents(singleDayEvents);
+  const currentTransactions = getCurrentTransactions(singleDayTransactions);
 
-  const dayEvents = singleDayEvents.filter(event => {
-    const eventDate = parseISO(event.startDate);
+  const dayTransactions = singleDayTransactions.filter(t => {
+    const tDate = parseISO(t.startDate);
     return (
-      eventDate.getDate() === selectedDate.getDate() &&
-      eventDate.getMonth() === selectedDate.getMonth() &&
-      eventDate.getFullYear() === selectedDate.getFullYear()
+      tDate.getDate() === selectedDate.getDate() &&
+      tDate.getMonth() === selectedDate.getMonth() &&
+      tDate.getFullYear() === selectedDate.getFullYear()
     );
   });
 
-  const groupedEvents = groupEvents(dayEvents);
-  const { page, setPage, totalPages } = useEventPage(groupedEvents.length, 3);
-  const visibleGroups = getVisibleGroups(groupedEvents, page, 3);
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    if (totalPages <= 1) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.deltaY > 0 || e.deltaX > 0) {
-      setPage(page + 1);
-    } else {
-      setPage(page - 1);
-    }
-  }, [totalPages, page, setPage]);
+  const groupedTransactions = groupTransactions(dayTransactions);
+  const { page, setPage, totalPages } = useTransactionPage(groupedTransactions.length, 3);
+  const visibleGroups = getVisibleGroups(groupedTransactions, page, 3);
 
   return (
     <div className="flex">
       <div className="flex flex-1 flex-col">
         <div>
-          <DayViewMultiDayEventsRow selectedDate={selectedDate} multiDayEvents={multiDayEvents} />
+          <DayViewMultiDayTransactionsRow selectedDate={selectedDate} multiDayTransactions={multiDayTransactions} />
 
           {/* Day header */}
           <div className="relative z-20 flex border-b">
@@ -85,7 +78,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
 
             {/* Day grid - full width, no overflow */}
             <div className="relative flex-1 border-l">
-              <div className="relative" onWheel={handleWheel}>
+              <div className="relative">
                 {hours.map((hour, index) => {
                   const isDisabled = !isWorkingHour(selectedDate, hour, workingHours);
 
@@ -117,15 +110,15 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                 {/* Only render the current page's groups — key={page} remounts to restart animation */}
                 <>
                   {visibleGroups.map((group, relGroupIndex) =>
-                    group.map(event => {
-                      let style = getEventBlockStyle(event, selectedDate, relGroupIndex, visibleGroups.length, { from: earliestEventHour, to: latestEventHour });
+                    group.map(t => {
+                      let style = getTransactionBlockStyle(t, selectedDate, relGroupIndex, visibleGroups.length, { from: earliestEventHour, to: latestEventHour });
                       const hasOverlap = visibleGroups.some(
                         (otherGroup, otherIndex) =>
                           otherIndex !== relGroupIndex &&
-                          otherGroup.some(otherEvent =>
+                          otherGroup.some(otherTransaction =>
                             areIntervalsOverlapping(
-                              { start: parseISO(event.startDate), end: parseISO(event.endDate) },
-                              { start: parseISO(otherEvent.startDate), end: parseISO(otherEvent.endDate) }
+                              { start: parseISO(t.startDate), end: parseISO(t.endDate) },
+                              { start: parseISO(otherTransaction.startDate), end: parseISO(otherTransaction.endDate) }
                             )
                           )
                       );
@@ -133,17 +126,17 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                       if (!hasOverlap) style = { ...style, width: '100%', left: '0%' };
 
                       return (
-                        <div key={`${page}-${event.id}`} className="absolute p-1 animate-event-slide-in" style={style}>
-                          <EventBlockNav
+                        <div key={`${page}-${t.id}`} className="absolute p-1 animate-event-slide-in" style={style}>
+                          <TransactionBlockNav
                             totalPages={totalPages}
                             currentPage={page}
                             onPageChange={setPage}
                             showPrev={relGroupIndex === 0}
                             showNext={relGroupIndex === visibleGroups.length - 1}
-                            totalEvents={groupedEvents.length}
+                            totalTransactions={groupedTransactions.length}
                             perPage={3}
                           />
-                          <EventBlock event={event} />
+                          <TransactionBlock transaction={t} hasNavigation={totalPages > 1} />
                         </div>
                       );
                     })
@@ -151,7 +144,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                 </>
 
                 {/* Carousel nav — only appears when there are multiple pages */}
-                <EventPageControls totalPages={totalPages} currentPage={page} onPageChange={setPage} />
+                <TransactionPageControls totalPages={totalPages} currentPage={page} onPageChange={setPage} />
               </div>
 
               <CalendarTimeline firstVisibleHour={earliestEventHour} lastVisibleHour={latestEventHour} />
@@ -164,7 +157,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
         <SingleCalendar className="mx-auto w-fit" mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
 
         <div className="flex-1 space-y-3">
-          {currentEvents.length > 0 ? (
+          {currentTransactions.length > 0 ? (
             <div className="flex items-start gap-2 px-4 pt-4">
               <span className="relative mt-[5px] flex size-2.5">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75"></span>
@@ -177,15 +170,15 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
             <p className="p-4 text-center text-sm italic text-muted-foreground">No appointments or consultations at the moment</p>
           )}
 
-          {currentEvents.length > 0 && (
+          {currentTransactions.length > 0 && (
             <ScrollArea className="h-[422px] px-4" type="always">
               <div className="space-y-6 pb-4">
-                {currentEvents.map(event => {
-                  const user = users.find(user => user.id === event.user.id);
+                {currentTransactions.map(t => {
+                  const user = users.find(user => user.id === t.user.id);
 
                   return (
-                    <div key={event.id} className="space-y-1.5">
-                      <p className="line-clamp-2 text-sm font-semibold">{event.title}</p>
+                    <div key={t.id} className="space-y-1.5">
+                      <p className="line-clamp-2 text-sm font-semibold">{t.title}</p>
 
                       {user && (
                         <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -202,7 +195,7 @@ export function CalendarDayView({ singleDayEvents, multiDayEvents }: IProps) {
                       <div className="flex items-center gap-1.5 text-muted-foreground">
                         <Clock className="size-3.5" />
                         <span className="text-sm">
-                          {format(parseISO(event.startDate), "h:mm a")} - {format(parseISO(event.endDate), "h:mm a")}
+                          {format(parseISO(t.startDate), "h:mm a")} - {format(parseISO(t.endDate), "h:mm a")}
                         </span>
                       </div>
                     </div>
