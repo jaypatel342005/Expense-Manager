@@ -41,8 +41,6 @@ export async function login(prevState: any, formData: FormData) {
 
   const { email: identifier, password } = result.data
 
-  console.log('Login attempt for:', identifier)
-
   const user = await prisma.users.findFirst({
     where: {
       OR: [
@@ -53,7 +51,6 @@ export async function login(prevState: any, formData: FormData) {
   })
 
   if (!user) {
-    console.log('User not found')
     return {
       errors: {
         email: ['Invalid email/username or password'],
@@ -61,12 +58,9 @@ export async function login(prevState: any, formData: FormData) {
     }
   }
 
-  // Check if password matches (bcrypt or plain text fallback)
   const passwordMatch = await compare(password, user.Password)
-  const plainTextMatch = password === user.Password
 
-  if (!passwordMatch && !plainTextMatch) {
-    console.log('Password mismatch')
+  if (!passwordMatch) {
     return {
       errors: {
         email: ['Invalid email or password'],
@@ -74,8 +68,7 @@ export async function login(prevState: any, formData: FormData) {
     }
   }
 
-  // Cast user to any to access Role if types are not updated
-  const userRole = (user as any).Role || 'USER'
+  const userRole = user.Role || 'USER'
   await createSession(user.UserID.toString(), userRole)
   redirect('/')
 }
@@ -96,14 +89,26 @@ export async function signup(prevState: any, formData: FormData) {
 
   const { name, email, password } = result.data
 
-  const existingUser = await prisma.users.findUnique({
+  const existingEmail = await prisma.users.findUnique({
     where: { EmailAddress: email },
   })
 
-  if (existingUser) {
+  if (existingEmail) {
     return {
       errors: {
         email: ['User with this email already exists'],
+      },
+    }
+  }
+
+  const existingUsername = await prisma.users.findFirst({
+    where: { UserName: name },
+  })
+
+  if (existingUsername) {
+    return {
+      errors: {
+        name: ['Username is already taken. Please choose another.'],
       },
     }
   }
@@ -115,13 +120,12 @@ export async function signup(prevState: any, formData: FormData) {
       UserName: name,
       EmailAddress: email,
       Password: hashedPassword,
-      MobileNo: '', // Optional or add field to form
-      Role: 'USER', // Default
-
-    } as any, 
+      MobileNo: '',
+      Role: 'USER',
+    },
   })
 
-  const userRole = (user as any).Role || 'USER'
+  const userRole = user.Role || 'USER'
   await createSession(user.UserID.toString(), userRole)
   redirect('/complete-profile')
 }

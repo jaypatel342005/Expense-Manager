@@ -5,7 +5,7 @@ import React from 'react';
 
 export default async function AddExpensePage() {
     const categories = await prisma.categories.findMany({
-        where: { IsActive: true } 
+        where: { IsActive: true, IsExpense: true } 
     });
     const subCategories = await prisma.sub_categories.findMany({
         where: { IsActive: true }

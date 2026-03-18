@@ -3,12 +3,17 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { deleteImage } from "@/lib/imagekit";
+import { verifySession } from "@/lib/session";
 
 export async function deleteRow(
   model: string,
   id: string,
   path?: string
 ) {
+    const session = await verifySession();
+    if (!session?.userId) {
+        throw new Error('Unauthorized. Please log in.');
+    }
     const modelKeyMap: Record<string, string> = {
         expenses: "ExpenseID",
         incomes: "IncomeID",

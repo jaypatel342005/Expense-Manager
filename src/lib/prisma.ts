@@ -1,12 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaTiDBCloud } from '@tidbcloud/prisma-adapter';
 
-// 1. Create a secure HTTP connection (Firewall Safe)
 const adapter = new PrismaTiDBCloud({
   url: process.env.DATABASE_URL
 });
 
-// 3. Start Prisma
-const prisma = new PrismaClient({ adapter });
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+}
 
 export { prisma };

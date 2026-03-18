@@ -1,7 +1,6 @@
-// import { auth } from "@/auth";
-import { redirect, notFound } from "next/navigation";
-// import PeopleForm from "@/components/forms/people-form";
 import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import PeopleForm from "@/components/forms/people-form";
 
 // Define PageProps strictly based on Next.js 15+ App Router types
 type PageProps = {
@@ -9,28 +8,26 @@ type PageProps = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default async function EditPeoplePage({ params, searchParams }: PageProps) {
-    // // const session = await auth();
-    // // if (!session?.user) return redirect("/sign-in");
-
-    // // Await params as required in newer Next.js versions
-    // const resolvedParams = await params;
+export default async function EditPeoplePage({ params }: PageProps) {
+    // Await params as required in newer Next.js versions
+    const resolvedParams = await params;
+    const id = Number(resolvedParams.id);
     
-    // if (!resolvedParams.id || isNaN(Number(resolvedParams.id))) {
-    //     return notFound();
-    // }
+    if (isNaN(id)) {
+        return notFound();
+    }
 
-    // const person = await prisma.peoples.findUnique({
-    //     where: {
-    //         PeopleID: Number(resolvedParams.id)
-    //     }
-    // });
+    const person = await prisma.peoples.findUnique({
+        where: {
+            PeopleID: id
+        }
+    });
 
-    // if (!person) return notFound();
+    if (!person) return notFound();
 
     return (
         <div className="container mx-auto py-10">
-            {/* <PeopleForm person={person} /> */}
+            <PeopleForm person={person} />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 
 import { deleteImage, uploadImage } from "@/lib/imagekit";
+import { verifySession } from "@/lib/session";
 
 export async function SaveProjectAction(formData: FormData) {
     const id = formData.get("id");
@@ -15,6 +16,12 @@ export async function SaveProjectAction(formData: FormData) {
     let ProjectLogo = formData.get("ProjectLogo") as string;
     const IsActive = formData.get("IsActive") === "true";
     const UserID = formData.get("UserID");
+
+    const session = await verifySession();
+    if (!session?.userId) {
+        return { success: false, message: "Unauthorized. Please log in." };
+    }
+    const sessionUserId = Number(session.userId);
 
     const file = formData.get("file") as File | null;
     if (file && file.size > 0 && file.name !== 'undefined') {
@@ -39,7 +46,7 @@ export async function SaveProjectAction(formData: FormData) {
         Description: Description || null,
         ProjectLogo: ProjectLogo || null,
         IsActive,
-        UserID: Number(UserID || 1),
+        UserID: UserID ? Number(UserID) : sessionUserId,
         Modified: new Date()
     };
 

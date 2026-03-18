@@ -70,7 +70,7 @@ const navItems: { group: string; items: NavItem[] }[] = [
         group: "Overview",
         items: [
             { title: "Dashboard", url: "/", icon: LayoutDashboard },
-            { title: "Analytics & Reports", url: "/reports", icon: PieChart },
+            { title: "Expense Calendar", url: "/reports", icon: PieChart },
         ],
     },
     {

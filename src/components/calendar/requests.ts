@@ -2,14 +2,6 @@ import { prisma } from '@/lib/prisma'
 import { verifySession } from '@/lib/session'
 import type { ITransaction } from '@/components/calendar/interfaces'
 
-/** Formats a number as compact Indian Rupee: ₹1.2K, ₹3.5M, ₹2.1Cr */
-function formatAmount(value: number | null | undefined): string {
-  const n = Number(value ?? 0);
-  if (n >= 1_00_00_000) return `₹${(n / 1_00_00_000).toFixed(1).replace(/\.0$/, '')}Cr`;
-  if (n >= 1_00_000)    return `₹${(n / 1_00_000).toFixed(1).replace(/\.0$/, '')}L`;
-  if (n >= 1_000)       return `₹${(n / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
-  return `₹${n}`;
-}
 
 export const getTransactions = async (): Promise<ITransaction[]> => {
   const session = await verifySession()

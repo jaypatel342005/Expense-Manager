@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 import { deleteImage, uploadImage } from "@/lib/imagekit";
+import { verifySession } from "@/lib/session";
 
 export async function SaveCategoryAction(formData: FormData) {
     try {
@@ -18,8 +19,11 @@ export async function SaveCategoryAction(formData: FormData) {
         const isIncome = formData.get("IsIncome") === "true";
         const isActive = formData.get("IsActive") !== "false"; // Default true
         
-        // Handle UserID (Mock for now or from hidden input)
-        const userId = parseInt(formData.get("UserID")?.toString() || "1");
+        const session = await verifySession();
+        if (!session?.userId) {
+            return { success: false, message: "Unauthorized. Please log in." };
+        }
+        const userId = Number(session.userId);
 
         // Handle Logo
         let logoPath = formData.get("LogoPath")?.toString();

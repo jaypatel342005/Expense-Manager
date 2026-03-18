@@ -31,7 +31,9 @@ export default function DashboardClientLayout({
     user: any; // Or proper type
 }) {
     const pathname = usePathname();
-    const breadcrumbSegments = pathname === "/" ? [] : pathname.split("/").filter((segment) => segment);
+    const allSegments = pathname === "/" ? [] : pathname.split("/").filter((segment) => segment);
+    // Filter out numeric segments (IDs) from breadcrumb display
+    const breadcrumbSegments = allSegments.filter((segment) => !/^\d+$/.test(segment));
 
     return (
         <SidebarProvider>
@@ -48,12 +50,14 @@ export default function DashboardClientLayout({
                                 </BreadcrumbLink>
                             </BreadcrumbItem>
                             {breadcrumbSegments.map((segment, index) => {
-                                const href = `/${breadcrumbSegments.slice(0, index + 1).join("/")}`;
+                                // Build the actual href by finding this segment's position in the original path
+                                const originalIndex = allSegments.indexOf(segment);
+                                const href = `/${allSegments.slice(0, originalIndex + 1).join("/")}`;
                                 const isLast = index === breadcrumbSegments.length - 1;
-                                const title = segment.charAt(0).toUpperCase() + segment.slice(1);
+                                const title = decodeURIComponent(segment).replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
                                 return (
-                                    <React.Fragment key={segment}>
+                                    <React.Fragment key={`${segment}-${index}`}>
                                         <BreadcrumbSeparator className="hidden md:block" />
                                         <BreadcrumbItem>
                                             {isLast ? (

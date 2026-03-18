@@ -5,7 +5,7 @@ import { serializeData } from '@/lib/serialization';
 import React from 'react';
 
 // Ensure the params are typed correctly as a Promise for Next.js 15+
-export default async function EditIncomePage({ params }: { params: Promise<{ id: number }> }) {
+export default async function EditIncomePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     const session = await verifySession();
@@ -14,7 +14,7 @@ export default async function EditIncomePage({ params }: { params: Promise<{ id:
 
     const [income, categories, subCategories, peoples, projects] = await Promise.all([
         prisma.incomes.findFirst({ where: { IncomeID: Number(id) } }),
-        prisma.categories.findMany({ where: { IsActive: true } }),
+        prisma.categories.findMany({ where: { IsActive: true, IsIncome: true } }),
         prisma.sub_categories.findMany({ where: { IsActive: true } }),
         prisma.peoples.findMany({ 
             where: { 

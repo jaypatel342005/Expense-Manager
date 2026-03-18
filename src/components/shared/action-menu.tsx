@@ -12,8 +12,21 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogClose,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import DeleteButton from "./delete-button";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { deleteRow } from "@/actions/delete-action";
+import { toast } from "sonner";
+import AlertSoftSuccessDemo from "@/components/ui/alert-23";
 
 interface ActionMenuProps {
     editHref?: string;
@@ -41,8 +54,42 @@ export function ActionMenu({
     deletePath,
     redirectTo,
 }: ActionMenuProps) {
+    const router = useRouter();
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        if (!model || !id) return;
+        setIsDeleting(true);
+        try {
+            await deleteRow(model, id, deletePath);
+            setShowDeleteDialog(false);
+            toast.custom(() => (
+                <AlertSoftSuccessDemo 
+                    title={`${model} deleted`}
+                    description={`${model} has been deleted successfully.`}
+                />
+            ));
+            if (redirectTo) {
+                router.push(redirectTo);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.custom(() => (
+                <AlertSoftSuccessDemo 
+                    title="Something went wrong"
+                    description="Failed to delete the item. Please try again."
+                    variant="error"
+                />
+            ));
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
-        <DropdownMenu>
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button 
                     variant="ghost" 
@@ -81,21 +128,36 @@ export function ActionMenu({
                 {(viewHref || editHref) && (model && id) && <DropdownMenuSeparator />}
                 {(model && id) && (
                     <DropdownMenuItem 
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20 p-0"
-                        onSelect={(e) => e.preventDefault()}
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/20 cursor-pointer"
+                        onSelect={() => setShowDeleteDialog(true)}
                     >
-                        <DeleteButton
-                            model={model}
-                            id={id}
-                            path={deletePath}
-                            redirectTo={redirectTo}
-                            deleteLabel={deleteLabel}
-                            className="w-full justify-start h-auto p-2 hover:bg-transparent hover:text-red-600"
-                            variant="ghost"
-                        />
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {deleteLabel}
                     </DropdownMenuItem>
                 )}
             </DropdownMenuContent>
         </DropdownMenu>
+
+        <DialogContent className="data-[state=open]:!zoom-in-0 data-[state=open]:duration-600 sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogDescription>
+                    Are you sure you want to delete this {model}? This action cannot be undone.
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button 
+                    variant="destructive" 
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
     );
 }

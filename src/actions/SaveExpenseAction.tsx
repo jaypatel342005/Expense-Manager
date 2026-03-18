@@ -22,8 +22,11 @@ export async function SaveExpenseAction(formData: FormData) {
 
 
     const session = await verifySession();
+    if (!session?.userId) {
+        return { success: false, message: "Unauthorized. Please log in." };
+    }
     const isUser = session?.role === 'USER';
-    const sessionUserId = session?.userId ? Number(session.userId) : undefined;
+    const sessionUserId = Number(session.userId);
 
     let finalUserId = Number(UserID); // Default from form
     if (isUser && sessionUserId) {
@@ -31,7 +34,9 @@ export async function SaveExpenseAction(formData: FormData) {
     } else if (sessionUserId && !finalUserId) {
         finalUserId = sessionUserId;
     }
-    if (!finalUserId) finalUserId = 1;
+    if (!finalUserId) {
+        return { success: false, message: "Could not determine user. Please try again." };
+    }
 
     
     let finalPeopleId = PeopleID ? Number(PeopleID) : null;

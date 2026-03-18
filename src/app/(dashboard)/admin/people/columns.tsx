@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ArrowUpDown, Copy, Edit, Trash, FileText } from "lucide-react"
+import { ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ActionMenu } from "@/components/shared/action-menu"
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +10,7 @@ import { peoples, users } from "@prisma/client"
 import Link from "next/link"
 import { Logo } from "@/components/shared/logo"
 import { User } from "lucide-react"
+
 
 export type PeopleWithUser = peoples & {
     users: users
@@ -34,11 +35,6 @@ export const columns: ColumnDef<PeopleWithUser>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
-    },
-    {
-        accessorKey: "PeopleID",
-        header: "ID",
-        cell: ({ row }) => <div className="w-[40px]">{row.getValue("PeopleID")}</div>,
     },
     {
         accessorKey: "PeopleName",
@@ -114,7 +110,7 @@ export const columns: ColumnDef<PeopleWithUser>[] = [
             return (
                 <ActionMenu
                     align="end"
-                    viewHref={`/admin/people/edit/${person.PeopleID}`} // Use edit page for view for now as well
+                    viewHref={`/admin/people/${person.PeopleID}`}
                     editHref={`/admin/people/edit/${person.PeopleID}`}
                     editLabel="Edit Person"
                     model="peoples"

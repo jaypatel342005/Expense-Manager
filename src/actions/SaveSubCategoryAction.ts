@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 import { deleteImage } from "@/lib/imagekit";
+import { verifySession } from "@/lib/session";
 
 export async function SaveSubCategoryAction(formData: FormData) {
     try {
@@ -16,7 +17,11 @@ export async function SaveSubCategoryAction(formData: FormData) {
         const logoPath = formData.get("LogoPath")?.toString();
         const isActive = formData.get("IsActive") !== "false"; 
 
-        const userId = parseInt(formData.get("UserID")?.toString() || "1");
+        const session = await verifySession();
+        if (!session?.userId) {
+            return { success: false, message: "Unauthorized. Please log in." };
+        }
+        const userId = Number(session.userId);
 
         if (!subCategoryName) {
             return { success: false, message: "Sub-Category Name is required." };

@@ -44,10 +44,6 @@ export const columns: ColumnDef<Project>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "ProjectID",
-        header: "ID",
-    },
-    {
         id: "ProjectLogo",
         header: "Logo",
         cell: ({ row }) => {

@@ -79,11 +79,11 @@ export async function getDashboardStats(userId?: number) {
 
     const currInc = Number(currentIncomesTotal._sum.Amount || 0);
     const prevInc = Number(prevIncomes._sum.Amount || 0);
-    const incomeChange = prevInc === 0 ? 100 : ((currInc - prevInc) / prevInc) * 100;
+    const incomeChange = prevInc === 0 ? (currInc > 0 ? 100 : 0) : ((currInc - prevInc) / prevInc) * 100;
 
     const currExp = Number(currentExpensesTotal._sum.Amount || 0);
     const prevExp = Number(prevExpenses._sum.Amount || 0);
-    const expenseChange = prevExp === 0 ? 100 : ((currExp - prevExp) / prevExp) * 100;
+    const expenseChange = prevExp === 0 ? (currExp > 0 ? 100 : 0) : ((currExp - prevExp) / prevExp) * 100;
 
     const currBal = currInc - currExp;
     const prevBal = prevInc - prevExp;
@@ -119,8 +119,9 @@ export async function getChartData(userId?: number) {
         select: { Amount: true, ExpenseDate: true }
     });
 
+    const currentYear = new Date().getFullYear();
     const monthlyData = Array.from({ length: 12 }, (_, i) => ({
-        name: format(new Date(2024, i, 1), 'MMM'),
+        name: format(new Date(currentYear, i, 1), 'MMM'),
         income: 0,
         expense: 0,
     }));
@@ -138,7 +139,7 @@ export async function getChartData(userId?: number) {
     return monthlyData.map(d => ({
         name: d.name,
         income: d.income,
-        total: d.expense // total corresponds to expense in the chart
+        expense: d.expense
     }));
 }
 
@@ -290,16 +291,16 @@ export async function getMonthlyTrends(userId?: number) {
     }));
 
     incomes.forEach(inc => {
-        const monthIndex = months.findIndex(m => inc.IncomeDate >= m.start && inc.IncomeDate <= m.end);
-        if (monthIndex !== -1) {
-            trendsData[monthIndex].income += Number(inc.Amount);
+        const monthIdx = inc.IncomeDate.getMonth() - months[0].start.getMonth() + (inc.IncomeDate.getFullYear() - months[0].start.getFullYear()) * 12;
+        if (monthIdx >= 0 && monthIdx < 12) {
+            trendsData[monthIdx].income += Number(inc.Amount);
         }
     });
 
     expenses.forEach(exp => {
-        const monthIndex = months.findIndex(m => exp.ExpenseDate >= m.start && exp.ExpenseDate <= m.end);
-        if (monthIndex !== -1) {
-            trendsData[monthIndex].expense += Number(exp.Amount);
+        const monthIdx = exp.ExpenseDate.getMonth() - months[0].start.getMonth() + (exp.ExpenseDate.getFullYear() - months[0].start.getFullYear()) * 12;
+        if (monthIdx >= 0 && monthIdx < 12) {
+            trendsData[monthIdx].expense += Number(exp.Amount);
         }
     });
 
@@ -523,7 +524,9 @@ export async function getRecentAdditions(userId?: number) {
         }
     });
 
+    const categoryWhereClause = userId ? { UserID: userId } : {};
     const recentCategories = await prisma.categories.findMany({
+        where: categoryWhereClause,
         orderBy: { CategoryID: 'desc' },
         take: 15,
         select: {

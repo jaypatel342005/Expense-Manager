@@ -25,11 +25,11 @@ export default async function ReportsPage(props: {
 
     return (
         <CalendarProvider users={users} transactions={transactions}>
-            <div className="flex-1 space-y-4 px-2 py-4 md:px-4 md:py-6">
+            <div className="flex-1 space-y-4 px-2  md:px-4 md:py-1">
                 <div className="flex items-center justify-between space-y-2">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight">Calendar & Schedule</h2>
-                        <p className="text-muted-foreground">Manage your detailed schedule.</p>
+                        <h2 className="text-2xl font-bold tracking-tight">Expense Calendar</h2>
+                        <p className="text-sm text-muted-foreground">Track and manage your scheduled expenses.</p>
                     </div>
                     
                     <Popover>

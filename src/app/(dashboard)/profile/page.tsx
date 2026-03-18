@@ -29,8 +29,8 @@ export default async function ProfilePage() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
              <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">My Profile</h2>
-                    <p className="text-muted-foreground">
+                    <h2 className="text-2xl font-bold tracking-tight">My Profile</h2>
+                    <p className="text-sm text-muted-foreground">
                         Manage your account settings and preferences.
                     </p>
                 </div>

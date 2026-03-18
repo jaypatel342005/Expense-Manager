@@ -22,8 +22,11 @@ export async function SaveIncomeAction(formData: FormData) {
 
 
     const session = await verifySession();
+    if (!session?.userId) {
+        return { success: false, message: "Unauthorized. Please log in." };
+    }
     const isUser = session?.role === 'USER';
-    const sessionUserId = session?.userId ? Number(session.userId) : undefined;
+    const sessionUserId = Number(session.userId);
 
     // Determine final UserID
     let finalUserId = Number(UserID); // Default from form
@@ -33,8 +36,10 @@ export async function SaveIncomeAction(formData: FormData) {
          // Admin but didn't provide specific ID, or fallback
         finalUserId = sessionUserId;
     }
-    // Fallback to 1 if everything fails (legacy behavior)
-    if (!finalUserId) finalUserId = 1;
+    // Return error if no valid user ID
+    if (!finalUserId) {
+        return { success: false, message: "Could not determine user. Please try again." };
+    }
 
     // Auto-link PeopleID for normal users if not provided
     let finalPeopleId = PeopleID ? Number(PeopleID) : null;

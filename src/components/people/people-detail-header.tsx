@@ -78,9 +78,11 @@ export function PeopleDetailHeader({ person }: PeopleDetailHeaderProps) {
                 </div>
 
                 <div className="flex items-center gap-2 ml-12 md:ml-0">
-                    <Button variant="outline" size="sm" className="h-8 text-xs hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all px-3 hidden sm:flex">
-                        <Edit className="h-3.5 w-3.5 mr-1.5" />
-                        Edit Person
+                    <Button variant="outline" size="sm" className="h-8 text-xs hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all px-3 hidden sm:flex" asChild>
+                        <Link href={`/admin/people/edit/${person.PeopleID}`}>
+                            <Edit className="h-3.5 w-3.5 mr-1.5" />
+                            Edit Person
+                        </Link>
                     </Button>
                     <DropdownMenu>
                          <DropdownMenuTrigger asChild>
@@ -89,8 +91,10 @@ export function PeopleDetailHeader({ person }: PeopleDetailHeaderProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                                <Edit className="mr-2 h-4 w-4" /> Edit Person
+                            <DropdownMenuItem asChild>
+                                <Link href={`/admin/people/edit/${person.PeopleID}`}>
+                                    <Edit className="mr-2 h-4 w-4" /> Edit Person
+                                </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="p-0 text-destructive focus:text-destructive" onSelect={(e) => e.preventDefault()}>

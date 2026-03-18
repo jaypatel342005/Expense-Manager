@@ -3,6 +3,9 @@ import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
 
 const secretKey = process.env.SESSION_SECRET
+if (!secretKey) {
+  throw new Error('SESSION_SECRET environment variable is not set')
+}
 const encodedKey = new TextEncoder().encode(secretKey)
 
 export async function createSession(userId: string, role: string) {
@@ -16,9 +19,10 @@ export async function createSession(userId: string, role: string) {
   const cookieStore = await cookies()
   cookieStore.set('session', session, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
+    maxAge: 7 * 24 * 60 * 60, // 7 days in seconds, matching JWT expiry
   })
 }
 

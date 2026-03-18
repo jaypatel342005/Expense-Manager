@@ -97,7 +97,7 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
             }
         }
 
-        const userUpdateData: any = {
+        const userUpdateData: Record<string, any> = {
             UserName: username,
             MobileNo: mobile,
             Modified: new Date(),
@@ -118,7 +118,7 @@ export async function updateProfile(prevState: UpdateProfileState, formData: For
             where: { UserID: userId } // Assuming UserID is the link, falling back to email if needed
         })
 
-        const personData: any = {
+        const personData: Record<string, any> = {
             PeopleName: name,
             MobileNo: mobile,
             Description: description,

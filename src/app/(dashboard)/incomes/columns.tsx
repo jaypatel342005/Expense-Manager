@@ -48,25 +48,23 @@ export const columns: ColumnDef<Income>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "IncomeID",
-        header: "ID",
-    },
-    {
         accessorKey: "IncomeDate",
         header: ({ column }) => {
             return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Income Date
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
+                <div className="text-center">
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Income Date
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                </div>
             );
         },
         cell: ({ row }) => {
             const date = new Date(row.getValue("IncomeDate"));
-            return <div>{date.toDateString()}</div>;
+            return <div className="text-center">{date.toDateString()}</div>;
         },
     },
 
@@ -74,7 +72,7 @@ export const columns: ColumnDef<Income>[] = [
         accessorKey: "Amount",
         header: ({ column }) => {
             return (
-                <div className="text-right">
+                <div className="text-center">
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
@@ -93,7 +91,7 @@ export const columns: ColumnDef<Income>[] = [
             }).format(amount);
 
             return (
-                <div className="text-right">
+                <div className="text-center">
                     <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800">
                         {formatted}
                     </Badge>
@@ -104,20 +102,20 @@ export const columns: ColumnDef<Income>[] = [
     {
         accessorKey: "categories.CategoryName",
         id: "Category",
-        header: "Category",
+        header: () => <div className="text-center">Category</div>,
         cell: ({ row }) => {
             const category = row.original.categories;
-            return <div className="font-medium">{category?.CategoryName || "-"}</div>;
+            return <div className="text-center font-medium">{category?.CategoryName || "-"}</div>;
         },
     },
     {
         accessorKey: "sub_categories.SubCategoryName",
         id: "SubCategory",
-        header: "Sub Category",
+        header: () => <div className="text-center">Sub Category</div>,
         cell: ({ row }) => {
             const sub = row.original.sub_categories;
             return (
-                <div className="text-muted-foreground">
+                <div className="text-center text-muted-foreground">
                     {sub?.SubCategoryName || "-"}
                 </div>
             );
@@ -126,11 +124,11 @@ export const columns: ColumnDef<Income>[] = [
     {
         accessorKey: "projects.ProjectName",
         id: "Project",
-        header: "Project",
+        header: () => <div className="text-center">Project</div>,
         cell: ({ row }) => {
             const project = row.original.projects;
             return (
-                <div className="text-muted-foreground">
+                <div className="text-center text-muted-foreground">
                     {project?.ProjectName || "-"}
                 </div>
             );
@@ -139,24 +137,25 @@ export const columns: ColumnDef<Income>[] = [
     {
         accessorKey: "peoples.PeopleName",
         id: "People",
-        header: "People",
+        header: () => <div className="text-center">People</div>,
         cell: ({ row }) => {
             const people = row.original.peoples;
             return (
-                <div className="text-muted-foreground">{people?.PeopleName || "-"}</div>
+                <div className="text-center text-muted-foreground">{people?.PeopleName || "-"}</div>
             );
         },
     },
     {
         accessorKey: "IncomeDetail",
-        header: "Details",
+        header: () => <div className="text-center">Details</div>,
+        cell: ({ row }) => <div className="text-center">{row.getValue("IncomeDetail") || "-"}</div>,
     },
     {
         accessorKey: "Description",
-        header: "Description",
+        header: () => <div className="text-center">Description</div>,
         cell: ({ row }) => (
             <div
-                className="max-w-[200px] truncate"
+                className="text-center max-w-[200px] truncate"
                 title={row.getValue("Description")}
             >
                 {row.getValue("Description")}

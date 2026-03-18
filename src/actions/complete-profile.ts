@@ -44,12 +44,9 @@ export async function completeProfile(prevState: CompleteProfileState, formData:
     const description = formData.get('description') as string;
     const userId = parseInt(session.userId as string)
 
-    if (!mobile || mobile.length < 10) {
-        return { errors: { mobile: ['Mobile number must be at least 10 digits'] } }
-    }
-    
-    if (!name) {
-         return { errors: { name: ['Full Name is required'] } }
+    const validatedFields = completeProfileSchema.safeParse({ mobile, name, description });
+    if (!validatedFields.success) {
+        return { errors: validatedFields.error.flatten().fieldErrors };
     }
 
     try {
@@ -76,7 +73,7 @@ export async function completeProfile(prevState: CompleteProfileState, formData:
             }
         }
 
-        const updateData: any = {
+        const updateData: Record<string, any> = {
             MobileNo: mobile,
         };
         if (profileImageUrl) {

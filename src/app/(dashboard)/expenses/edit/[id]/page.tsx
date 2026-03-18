@@ -13,7 +13,7 @@ export default async function EditExpensePage({ params }: { params: Promise<{ id
 
     const [expense, categories, subCategories, peoples, projects] = await Promise.all([
         prisma.expenses.findFirst({ where: { ExpenseID: Number(id) } }),
-        prisma.categories.findMany({ where: { IsActive: true } }),
+        prisma.categories.findMany({ where: { IsActive: true, IsExpense: true } }),
         prisma.sub_categories.findMany({ where: { IsActive: true } }),
         prisma.peoples.findMany({ 
             where: { 

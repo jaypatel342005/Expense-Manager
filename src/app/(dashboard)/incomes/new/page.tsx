@@ -5,7 +5,7 @@ import React from 'react';
 
 export default async function AddIncomePage() {
     const categories = await prisma.categories.findMany({
-        where: { IsActive: true } // Assuming we want active ones. Ideally filtered by IsIncome but schema defaults vary.
+        where: { IsActive: true, IsIncome: true }
     });
     const subCategories = await prisma.sub_categories.findMany({
         where: { IsActive: true }

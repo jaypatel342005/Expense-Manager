@@ -15,7 +15,7 @@ function formatRupee(value: number): string {
 }
 
 interface OverviewProps {
-    data: { name: string; total: number; income: number }[];
+    data: { name: string; expense: number; income: number }[];
 }
 
 export function Overview({ data }: OverviewProps) {
@@ -93,7 +93,7 @@ export function Overview({ data }: OverviewProps) {
                                             }}
                                         />
                                         <Bar
-                                            dataKey="total"
+                                            dataKey="expense"
                                             fill="oklch(0.577 0.245 27.325)"
                                             radius={[4, 4, 0, 0]}
                                             className="fill-rose-500/80"
@@ -135,7 +135,7 @@ export function Overview({ data }: OverviewProps) {
                                         <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                                         <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
                                         <Tooltip cursor={{ fill: 'transparent' }} />
-                                        <Bar dataKey="total" fill="oklch(0.577 0.245 27.325)" radius={[4, 4, 0, 0]} className="fill-rose-500" />
+                                        <Bar dataKey="expense" fill="oklch(0.577 0.245 27.325)" radius={[4, 4, 0, 0]} className="fill-rose-500" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
